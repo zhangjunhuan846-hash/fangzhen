@@ -1,0 +1,94 @@
+{
+  "dataset": {
+    "lab": "SINTEF Battery Lab",
+    "license": "CC-BY-4.0",
+    "newer_record_doi": "10.5281/zenodo.20086298",
+    "record_version_matched": "v1",
+    "short_name": "SINTEF R2032 LFP-NMP-1 p-OCV",
+    "title": "Half-Cell Open-Circuit Voltage of Several Lithium-Ion Battery Active Materials Measured under Various Electrochemical Protocols",
+    "zenodo_doi": "10.5281/zenodo.19107295"
+  },
+  "electrode": {
+    "active_material": "LFP",
+    "cell_configuration": "half_cell",
+    "cell_format": "R2032 coin",
+    "counter_electrode": "Li-metal",
+    "cycling_programme": "p-OCV",
+    "electrode_area_cm2": 1.53938,
+    "electrode_diameter_mm": 14.0,
+    "electrode_thickness_um": 78.0,
+    "metadata_note": "metadata column 'Electrode Diameter / cm' holds value 14 -> consistent with a 14 mm disc; unit header treated as mm (coin-cell geometry). Mass/loading/wt% blank for this commercial electrode (LFP-NMP-1).",
+    "nominal_areal_capacity_mAh_cm2": 2.0,
+    "nominal_capacity_mAh": 3.07876,
+    "public_label": "LFP-NMP-1",
+    "start_date_yyyymmdd": 20250602,
+    "temperature": "RT (record: room temperature; no numeric value reported)",
+    "working_electrode": "LFP"
+  },
+  "metadata_csv": {
+    "column_count": 14,
+    "local_mtime_utc": "2026-09-08T03:04:01+00:00",
+    "local_path_rel": "data/raw/LIB/LFP_LiMetal/SINTEF_R2032/meta/metadata.csv",
+    "md5": "b5aaaed5c7a6f0d523a414e2cb4a3fe3",
+    "row_count": 95,
+    "sha256": "4016e21f880b40b7b55459b0466391fc9a80f24abbd7458c94c206162191af3f",
+    "size_bytes": 19482
+  },
+  "processed_schema": {
+    "capacity_Ah": "cumulative |charge throughput| since the start of the current charge/discharge leg; held constant across the following rest (V relaxation at fixed composition-equivalent throughput). Reset per leg. NOT a global SOC / absolute lithiation coordinate.",
+    "columns": [
+      "time_s",
+      "voltage_V",
+      "current_A",
+      "capacity_Ah",
+      "segment_type",
+      "segment_label",
+      "cycle_index",
+      "raw_cycle_index",
+      "raw_step_index",
+      "cum_capacity_raw_Ah"
+    ]
+  },
+  "runtime": {
+    "no_pybamm_import": true,
+    "numpy": "2.3.5",
+    "pandas": "3.0.5",
+    "python": "3.11.16"
+  },
+  "source_file": {
+    "columns": [
+      "Test Time / s",
+      "Unix Time / s",
+      "Current / A",
+      "Voltage / V",
+      "Cycle Count / 1",
+      "Step Index / 1",
+      "Cumulative Capacity / Ah"
+    ],
+    "download_note": "captured during H1-A screening 2026-09-08; md5 verified == Zenodo v1 official value",
+    "file_name": "sintef__sintef-lfp-R2032-gelon-d07eb6__20250602__p-ocv__RT.bdf.parquet",
+    "local_mtime_utc": "2026-09-08T01:45:45+00:00",
+    "local_path_rel": "data/raw/LIB/LFP_LiMetal/SINTEF_R2032/raw/sintef__sintef-lfp-R2032-gelon-d07eb6__20250602__p-ocv__RT.bdf.parquet",
+    "md5": "3efea83aa4a59c500bde5723a67e3c3c",
+    "md5_matches_official_zenodo_v1": true,
+    "row_count": 221209,
+    "sampling_span_h": 620.197,
+    "sampling_span_s": [
+      0.02,
+      2232710.323
+    ],
+    "sha256": "dcadc26731c2f1e685e3ae73667ff6041e5d7f349e1c31ebfe90363dd21880d5",
+    "size_bytes": 2845751,
+    "time_boundary_duplicate_rows": 0,
+    "time_monotonic_non_decreasing": true,
+    "unit_map": {
+      "cum_capacity_raw_Ah": "Ah (cycler, resets at each segment start)",
+      "current_A": "A",
+      "raw_cycle_index": "1",
+      "raw_step_index": "1",
+      "time_s": "s",
+      "unix_time_s": "s",
+      "voltage_V": "V"
+    }
+  }
+}

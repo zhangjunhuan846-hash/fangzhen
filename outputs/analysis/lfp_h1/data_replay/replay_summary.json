@@ -1,0 +1,230 @@
+{
+  "capacity": {
+    "cycler_cumulative_column_max_dev_uAh": 0.001,
+    "discharge_mean_mAh": 3.2878,
+    "discharge_mean_over_nominal": 1.0679,
+    "note": "current-derived full-window (2.50-3.65 V) capacity ~3.27-3.31 mAh exceeds manufacturer nominal 3.079 mAh by ~6-7%: nominal is a manufacturer label, not the cycler-observed window capacity (same class of finding as Birmingham H0). All 5 discharge legs and charge legs c2-c5 span the full window; the cycle-1 charge leg starts at 3.17 V after the 6 h pre-rest (partial leg) and is excluded from full-window comparisons.",
+    "q_integral_charge_mAh": [
+      3.2783,
+      3.2772,
+      3.3009,
+      3.3055,
+      3.3059
+    ],
+    "q_integral_discharge_mAh": [
+      3.2662,
+      3.2882,
+      3.2935,
+      3.2953,
+      3.2958
+    ],
+    "q_nominal_metadata_mAh": 3.07876,
+    "q_protocol_implied_mAh": 3.07876
+  },
+  "cell_id": "SINTEF-LFP-NMP-1-pocv-d07eb6",
+  "current": {
+    "c50_implied_uA": 61.5752,
+    "driven_leg_absmax_uA": [
+      61.603,
+      61.603,
+      61.603,
+      61.603,
+      61.604,
+      61.603,
+      61.603,
+      61.602,
+      61.602,
+      61.603
+    ],
+    "driven_leg_median_uA": [
+      61.601,
+      61.6,
+      61.599,
+      61.601,
+      61.601,
+      61.601,
+      61.602,
+      61.599,
+      61.601,
+      61.601
+    ]
+  },
+  "gates": {
+    "capacity": true,
+    "current_C50_selfconsistent": true,
+    "file_provenance": true,
+    "fresh_replay": "verified externally by byte-comparing two runs",
+    "geometry_inherited": true,
+    "model_dependency_zero": true,
+    "segmentation": true,
+    "voltage_window": true
+  },
+  "initial_states": [
+    {
+      "current_A_at_first_sample": 6.15773e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 1,
+      "direction": "charge",
+      "initial_voltage_V": 3.1717486382,
+      "preceding_rest_duration_s": 21599.98,
+      "preceding_rest_end_voltage_V": 3.1677107811,
+      "preceding_rest_h": 6.0,
+      "segment": "c1_charge"
+    },
+    {
+      "current_A_at_first_sample": -6.15807e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 1,
+      "direction": "discharge",
+      "initial_voltage_V": 3.4761118889,
+      "preceding_rest_duration_s": 28799.98000000001,
+      "preceding_rest_end_voltage_V": 3.4770736694,
+      "preceding_rest_h": 8.0,
+      "segment": "c1_discharge"
+    },
+    {
+      "current_A_at_first_sample": 6.15792e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 2,
+      "direction": "charge",
+      "initial_voltage_V": 3.2107005119,
+      "preceding_rest_duration_s": 28799.98000000004,
+      "preceding_rest_end_voltage_V": 3.209646225,
+      "preceding_rest_h": 8.0,
+      "segment": "c2_charge"
+    },
+    {
+      "current_A_at_first_sample": -6.15844e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 2,
+      "direction": "discharge",
+      "initial_voltage_V": 3.531465292,
+      "preceding_rest_duration_s": 28799.97999999998,
+      "preceding_rest_end_voltage_V": 3.5322194099,
+      "preceding_rest_h": 8.0,
+      "segment": "c2_discharge"
+    },
+    {
+      "current_A_at_first_sample": 6.15711e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 3,
+      "direction": "charge",
+      "initial_voltage_V": 2.9416286945,
+      "preceding_rest_duration_s": 28799.97999999998,
+      "preceding_rest_end_voltage_V": 2.9408383369,
+      "preceding_rest_h": 8.0,
+      "segment": "c3_charge"
+    },
+    {
+      "current_A_at_first_sample": -6.15827e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 3,
+      "direction": "discharge",
+      "initial_voltage_V": 3.54626894,
+      "preceding_rest_duration_s": 28799.97999999998,
+      "preceding_rest_end_voltage_V": 3.5468790531,
+      "preceding_rest_h": 8.0,
+      "segment": "c3_discharge"
+    },
+    {
+      "current_A_at_first_sample": 6.15809e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 4,
+      "direction": "charge",
+      "initial_voltage_V": 2.8139715195,
+      "preceding_rest_duration_s": 28799.97999999998,
+      "preceding_rest_end_voltage_V": 2.8131945133,
+      "preceding_rest_h": 8.0,
+      "segment": "c4_charge"
+    },
+    {
+      "current_A_at_first_sample": -6.15798e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 4,
+      "direction": "discharge",
+      "initial_voltage_V": 3.5503456593,
+      "preceding_rest_duration_s": 28799.97999999998,
+      "preceding_rest_end_voltage_V": 3.5509932041,
+      "preceding_rest_h": 8.0,
+      "segment": "c4_discharge"
+    },
+    {
+      "current_A_at_first_sample": 6.15675e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 5,
+      "direction": "charge",
+      "initial_voltage_V": 2.8094763756,
+      "preceding_rest_duration_s": 28799.97999999998,
+      "preceding_rest_end_voltage_V": 2.8087351322,
+      "preceding_rest_h": 8.0,
+      "segment": "c5_charge"
+    },
+    {
+      "current_A_at_first_sample": -6.15799e-05,
+      "current_before_segment_A": 0.0,
+      "cycle_index": 5,
+      "direction": "discharge",
+      "initial_voltage_V": 3.5568220615,
+      "preceding_rest_duration_s": 28799.97999999998,
+      "preceding_rest_end_voltage_V": 3.5574374199,
+      "preceding_rest_h": 8.0,
+      "segment": "c5_discharge"
+    }
+  ],
+  "outputs": {
+    "cycle_manifest.csv": "036986425aa59dd2a6de05146175cd22c5012407e1cec93e284e0603431b2647",
+    "processed_pocv.parquet": "c082c7f312d97294f420f0be8e36f142da04ab90a6f7dd9d177abbcbe45ed0f6",
+    "source_manifest.json": "5abe997788e573d2f4da574408bde52bd4f4c165c29bc310cc5879f6b6237a1d"
+  },
+  "protocol_summary": {
+    "block_sequence": [
+      "rest(c1)",
+      "charge(c1)",
+      "rest(c1)",
+      "discharge(c1)",
+      "rest(c1)",
+      "charge(c2)",
+      "rest(c2)",
+      "discharge(c2)",
+      "rest(c2)",
+      "charge(c3)",
+      "rest(c3)",
+      "discharge(c3)",
+      "rest(c3)",
+      "charge(c4)",
+      "rest(c4)",
+      "discharge(c4)",
+      "rest(c4)",
+      "charge(c5)",
+      "rest(c5)",
+      "discharge(c5)",
+      "rest(c5)"
+    ],
+    "charge_legs": 5,
+    "discharge_legs": 5,
+    "full_cycles": 5,
+    "initial_block": "6 h rest at ~3.15 V (relaxing 3.1498->3.1677 V); file begins mid-relaxation, no defined SOC claim",
+    "rest_blocks": 11
+  },
+  "rest_durations_h": [
+    6.0,
+    8.0,
+    8.0,
+    8.0,
+    8.0,
+    8.0,
+    8.0,
+    8.0,
+    8.0,
+    8.0,
+    8.0
+  ],
+  "voltage_window_V": {
+    "expected": [
+      2.5,
+      3.65
+    ],
+    "max": 3.65,
+    "min": 2.49999
+  }
+}
