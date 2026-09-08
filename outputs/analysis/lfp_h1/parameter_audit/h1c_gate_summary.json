@@ -1,0 +1,42 @@
+{
+  "h1c_date": "2026-09-08",
+  "scope": "SINTEF R2032 LFP-NMP-1 p-OCV parameter-source audit. NO pybamm run / NO fit / NO GITT download / H0+H1-B untouched.",
+  "gates": {
+    "G1_model_requirement_coverage": {
+      "pass": true,
+      "detail": "all 51 half-cell reference keys enumerated; 55 rows incl. 4 conceptual inputs (x0, dx, mass loading, hysteresis definition)."
+    },
+    "G2_provenance": {
+      "pass": true,
+      "detail": "every row carries role + source_class + match_grade; U rows carry no fabricated value (value_or_range starts with 'UNKNOWN')."
+    },
+    "G3_experimental_separation": {
+      "pass": true,
+      "detail": "experimental_facts.json contains only SINTEF A0/A1 facts; all external priors live in literature_prior_bank.csv and the source matrix."
+    },
+    "G4_capacity_closure_quantified": {
+      "pass": true,
+      "detail": "84 grid rows (2 c_smax x 7 eps_s x 6 dx) written with geom_vs_nominal_pct / geom_vs_experimental_pct; diagnostic: Q_geom = F*A*L*eps_s*c_smax*dx with theoretical c_smax=22820 and eps_s*dx ~0.42-0.45 closes the measured window capacity. eps_s ~0.5 with dx ~0.85-0.9 or eps_s ~0.55 with dx ~0.8 are all physically plausible commercial-LFP values -> capacity closure is CONSISTENT but DEGENERATE: eps_s and dx cannot be separated without an independent x0/x-endpoint or volume-fraction measurement. The +6.8% over nominal label is explained by geometry + theoretical density; the manufacturer nominal is a conservative label, not a discrepancy in the cell. NO parameter was tuned: all rows are prior/grid values.",
+      "note": "No active fraction / c_smax / stoichiometric window was selected to force Q_geom == 3.2878 mAh. If a future composite gives only ~2.8 mAh under priors, the honest output is 'capacity closure failed -> composite not eligible for H1-D', not a retune."
+    },
+    "G5_ocp_traceability": {
+      "pass": true,
+      "detail": "5 OCP candidates fully annotated; SINTEF provides both branches (A1) - single-branch equilibrium limitation flagged as model structure."
+    },
+    "G6_unknown_preservation": {
+      "pass": true,
+      "detail": "14 parameters kept UNKNOWN (see unresolved_parameters.csv); none force-filled."
+    },
+    "G7_model_declaration": {
+      "pass": true,
+      "detail": "model_ready_composite_draft.json declares composite_unmatched / no reproduction claim / no fit."
+    }
+  },
+  "all_gates_pass": true,
+  "n_unresolved": 14,
+  "gitt_download_decision": {
+    "rule": "Download SINTEF GITT (b89ab5 / b26620) ONLY if the audit proves D_s is the dominant evidence gap for the approved next experiment.",
+    "verdict": "DEFER. D_s is UNRESOLVED (U, external spread covers orders of magnitude), but for the approved H1-D0 target (zero-fit reproduction of the C/50 p-OCV) the near-equilibrium scan has LOW sensitivity to D_s; capacity closure and OCP/hysteresis dominate instead. A GITT download becomes justified only when a D_s-attribution or multi-rate experiment is approved."
+  },
+  "next_stage": "H1-D0 zero-fit forward baseline with audited composite pristine-LFP params; decompose residual into capacity / OCP / kinetics / transport layers. No parameterisation before H1-D0 decomposition and (V2) identifiability study."
+}

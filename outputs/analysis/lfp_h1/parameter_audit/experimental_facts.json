@@ -1,0 +1,215 @@
+{
+  "record": {
+    "short_name": "SINTEF R2032 LFP-NMP-1 p-OCV",
+    "zenodo_doi": "10.5281/zenodo.19107295",
+    "record_version_matched": "v1",
+    "newer_record_doi": "10.5281/zenodo.20086298",
+    "license": "CC-BY-4.0",
+    "lab": "SINTEF Battery Lab"
+  },
+  "cell": {
+    "cell_configuration": "half_cell LFP||Li R2032 (coin)",
+    "working_electrode": "LFP (commercial LFP-NMP-1)",
+    "counter_electrode": "Li-metal",
+    "public_label": "LFP-NMP-1",
+    "start_date_yyyymmdd": 20250602,
+    "cycling_programme": "p-OCV"
+  },
+  "geometry_A0": {
+    "electrode_diameter_mm": 14.0,
+    "electrode_thickness_um": 78.0,
+    "nominal_areal_capacity_mAh_cm2": 2.0,
+    "nominal_capacity_mAh": 3.07876
+  },
+  "geometry_A1_derived": {
+    "electrode_area_cm2": 1.53938,
+    "electrode_area_m2": 0.000153938,
+    "note": "disc area from diameter (A0); pybamm footprint uses sqrt(A) square equivalent"
+  },
+  "protocol_A0": {
+    "sequence": "6 h pre-rest + [charge C/50 -> 8 h rest -> discharge C/50 -> 8 h rest] x5",
+    "full_cycles": 5,
+    "charge_legs": 5,
+    "discharge_legs": 5,
+    "rest_blocks": 11,
+    "rest_durations_h": [
+      6.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    "voltage_window_V": {
+      "expected": [
+        2.5,
+        3.65
+      ],
+      "max": 3.65,
+      "min": 2.49999
+    },
+    "cutoffs_reached": {
+      "charge_V": 3.65,
+      "discharge_V": 2.49999
+    }
+  },
+  "current_A0": {
+    "driven_leg_median_uA": [
+      61.601,
+      61.6,
+      61.599,
+      61.601,
+      61.601,
+      61.601,
+      61.602,
+      61.599,
+      61.601,
+      61.601
+    ],
+    "c50_implied_uA": 61.5752,
+    "note": "measured |I| = 61.60 uA vs C/50 on nominal 3.0788 mAh = 61.575 uA (ratio 1.0004)"
+  },
+  "capacity_A1": {
+    "q_integral_charge_mAh": [
+      3.2783,
+      3.2772,
+      3.3009,
+      3.3055,
+      3.3059
+    ],
+    "q_integral_discharge_mAh": [
+      3.2662,
+      3.2882,
+      3.2935,
+      3.2953,
+      3.2958
+    ],
+    "discharge_mean_mAh": 3.2878,
+    "discharge_mean_over_nominal": 1.0679,
+    "cycler_cumulative_max_dev_uAh": 0.001,
+    "note": "current-derived full-window (2.50-3.65 V) capacity ~3.27-3.31 mAh exceeds manufacturer nominal 3.079 mAh by ~6-7%: nominal is a manufacturer label, not the cycler-observed window capacity (same class of finding as Birmingham H0). All 5 discharge legs and charge legs c2-c5 span the full window; the cycle-1 charge leg starts at 3.17 V after the 6 h pre-rest (partial leg) and is excluded from full-window comparisons."
+  },
+  "initial_state_facts_A0": [
+    {
+      "segment": "c1_charge",
+      "cycle_index": 1,
+      "direction": "charge",
+      "initial_voltage_V": 3.1717486382,
+      "preceding_rest_end_voltage_V": 3.1677107811,
+      "preceding_rest_h": 6.0,
+      "current_A_at_first_sample": 6.15773e-05
+    },
+    {
+      "segment": "c1_discharge",
+      "cycle_index": 1,
+      "direction": "discharge",
+      "initial_voltage_V": 3.4761118889,
+      "preceding_rest_end_voltage_V": 3.4770736694,
+      "preceding_rest_h": 8.0,
+      "current_A_at_first_sample": -6.15807e-05
+    },
+    {
+      "segment": "c2_charge",
+      "cycle_index": 2,
+      "direction": "charge",
+      "initial_voltage_V": 3.2107005119,
+      "preceding_rest_end_voltage_V": 3.209646225,
+      "preceding_rest_h": 8.0,
+      "current_A_at_first_sample": 6.15792e-05
+    },
+    {
+      "segment": "c2_discharge",
+      "cycle_index": 2,
+      "direction": "discharge",
+      "initial_voltage_V": 3.531465292,
+      "preceding_rest_end_voltage_V": 3.5322194099,
+      "preceding_rest_h": 8.0,
+      "current_A_at_first_sample": -6.15844e-05
+    },
+    {
+      "segment": "c3_charge",
+      "cycle_index": 3,
+      "direction": "charge",
+      "initial_voltage_V": 2.9416286945,
+      "preceding_rest_end_voltage_V": 2.9408383369,
+      "preceding_rest_h": 8.0,
+      "current_A_at_first_sample": 6.15711e-05
+    },
+    {
+      "segment": "c3_discharge",
+      "cycle_index": 3,
+      "direction": "discharge",
+      "initial_voltage_V": 3.54626894,
+      "preceding_rest_end_voltage_V": 3.5468790531,
+      "preceding_rest_h": 8.0,
+      "current_A_at_first_sample": -6.15827e-05
+    },
+    {
+      "segment": "c4_charge",
+      "cycle_index": 4,
+      "direction": "charge",
+      "initial_voltage_V": 2.8139715195,
+      "preceding_rest_end_voltage_V": 2.8131945133,
+      "preceding_rest_h": 8.0,
+      "current_A_at_first_sample": 6.15809e-05
+    },
+    {
+      "segment": "c4_discharge",
+      "cycle_index": 4,
+      "direction": "discharge",
+      "initial_voltage_V": 3.5503456593,
+      "preceding_rest_end_voltage_V": 3.5509932041,
+      "preceding_rest_h": 8.0,
+      "current_A_at_first_sample": -6.15798e-05
+    },
+    {
+      "segment": "c5_charge",
+      "cycle_index": 5,
+      "direction": "charge",
+      "initial_voltage_V": 2.8094763756,
+      "preceding_rest_end_voltage_V": 2.8087351322,
+      "preceding_rest_h": 8.0,
+      "current_A_at_first_sample": 6.15675e-05
+    },
+    {
+      "segment": "c5_discharge",
+      "cycle_index": 5,
+      "direction": "discharge",
+      "initial_voltage_V": 3.5568220615,
+      "preceding_rest_end_voltage_V": 3.5574374199,
+      "preceding_rest_h": 8.0,
+      "current_A_at_first_sample": -6.15799e-05
+    }
+  ],
+  "ocp_hysteresis_A1": {
+    "median_voltage_per_cycle_charge_V": [
+      3.4449,
+      3.4439,
+      3.4439,
+      3.4437
+    ],
+    "median_voltage_per_cycle_discharge_V": [
+      3.406,
+      3.4066,
+      3.4068,
+      3.4071
+    ],
+    "hysteresis_proxy_median_ch_minus_dc_mV": 37.5,
+    "method": "median terminal voltage during driven legs c2-c5 (proxy; NOT throughput-aligned hysteresis, which would require x-aligned comparison in H1-D)"
+  },
+  "temperature": {
+    "description": "RT (record: room temperature; no numeric value reported)",
+    "assumed_K_for_model": 298.15,
+    "assumption_note": "298.15 K is a model default; the record does not report a numeric chamber temperature"
+  },
+  "mass_loading": {
+    "value": null,
+    "source_class": "U",
+    "note": "metadata columns Mass/Electrode Coating Mass/wt%/Theoretical Capacity/Loading are BLANK for all LFP rows"
+  }
+}

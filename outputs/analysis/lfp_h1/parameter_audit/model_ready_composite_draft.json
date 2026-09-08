@@ -1,0 +1,55 @@
+{
+  "parameter_set_type": "composite_unmatched",
+  "publication_reproduction": false,
+  "fit_performed": false,
+  "declaration": "DRAFT ONLY. This is NOT a matched publication parameter set and NOT a validated SINTEF parameter set. It exists to declare the assembly status; it MUST NOT be run before H1-D0 defines the zero-fit semantics. No value was tuned to close capacity.",
+  "experimental_anchor": "SINTEF R2032 LFP-NMP-1 p-OCV (H1-B frozen)",
+  "assembly_anchors": [
+    {
+      "role": "geometry (A0/A1)",
+      "status": "resolved",
+      "source": "SINTEF metadata + H1-B"
+    },
+    {
+      "role": "OCP (A1)",
+      "status": "resolved (two measured branches)",
+      "source": "own p-OCV"
+    },
+    {
+      "role": "cutoffs / current / protocol (A0)",
+      "status": "resolved",
+      "source": "H1-B"
+    },
+    {
+      "role": "c_smax",
+      "status": "prior (B2/theoretical, ~22820)",
+      "source": "ae94f3 / derivation"
+    },
+    {
+      "role": "porosity / active fraction",
+      "status": "UNRESOLVED (U)",
+      "source": "priors acfc66/ae94f3/generic"
+    },
+    {
+      "role": "particle radius",
+      "status": "UNRESOLVED (U)",
+      "source": "priors acfc66/ae94f3"
+    },
+    {
+      "role": "D_s",
+      "status": "UNRESOLVED (U)",
+      "source": "priors acfc66/ae94f3; SINTEF GITT deferred"
+    },
+    {
+      "role": "k0 / j0",
+      "status": "UNRESOLVED (U)",
+      "source": "priors acfc66/ae94f3"
+    },
+    {
+      "role": "electrolyte + separator",
+      "status": "UNRESOLVED (U/C)",
+      "source": "composition anchors only"
+    }
+  ],
+  "n_unresolved": 14
+}

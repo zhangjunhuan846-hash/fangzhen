@@ -1,0 +1,50 @@
+{
+  "task": "H1-C parameter-source audit",
+  "experimental_facts_source": "H1-B frozen replay (outputs/analysis/lfp_h1/data_replay)",
+  "inputs": {
+    "processed_pocv.parquet": {
+      "path": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/outputs/analysis/lfp_h1/data_replay/processed_pocv.parquet",
+      "sha256": "c082c7f312d97294f420f0be8e36f142da04ab90a6f7dd9d177abbcbe45ed0f6"
+    },
+    "replay_summary.json": {
+      "path": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/outputs/analysis/lfp_h1/data_replay/replay_summary.json",
+      "sha256": "3e483e5fa26dca675ff107bba96c1d24d98f86666ac0d6d467dab6f0978dc526"
+    },
+    "source_manifest.json": {
+      "path": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/outputs/analysis/lfp_h1/data_replay/source_manifest.json",
+      "sha256": "5abe997788e573d2f4da574408bde52bd4f4c165c29bc310cc5879f6b6237a1d"
+    },
+    "metadata.csv": {
+      "path": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/data/raw/LIB/LFP_LiMetal/SINTEF_R2032/meta/metadata.csv",
+      "sha256": "4016e21f880b40b7b55459b0466391fc9a80f24abbd7458c94c206162191af3f"
+    },
+    "raw_pocv.parquet": {
+      "path": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/data/raw/LIB/LFP_LiMetal/SINTEF_R2032/raw/sintef__sintef-lfp-R2032-gelon-d07eb6__20250602__p-ocv__RT.bdf.parquet",
+      "sha256": "dcadc26731c2f1e685e3ae73667ff6041e5d7f349e1c31ebfe90363dd21880d5",
+      "md5": "3efea83aa4a59c500bde5723a67e3c3c"
+    },
+    "halfcell_required_keys.json": {
+      "path": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/scripts/lfp_h1c/halfcell_required_keys.json",
+      "sha256": "da3caa9a61476d5e1b080873c7d6e8a3b7e721570d21f151870cfb2f2fca0c66"
+    }
+  },
+  "build_script": {
+    "path": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/scripts/lfp_h1c/build_parameter_audit.py",
+    "sha256": "11518438eee9fc671eb30b0741c2ea8298f9ce0354acc4e5a6b7c6c29f7efd8b",
+    "pybamm_import": false,
+    "python": "3.11.16",
+    "pandas": "3.0.5"
+  },
+  "outputs": {
+    "capacity_closure.csv": "be50adcdb15cced3a0d328106b304372d7198aebdb448a9b5dd4d001b84c0a1d",
+    "experimental_facts.json": "c3b7349dac3a5c8e0d8a0550789a10b5dcd2246f87a5743de41d73681e845d5b",
+    "h1c_gate_summary.json": "d800f590d0f1f365a7a726b4d66d5bfece326532cae63755018e526956dd9a2e",
+    "literature_prior_bank.csv": "8a0456811b9783e80d505bde5d7cd0334ef3edec29d08cb5e728f945cc541cb5",
+    "model_ready_composite_draft.json": "9642ec96a5e7597ccd8a315bf63f2b1594dbc0c25b83d6dcaeed600afc5fb9c3",
+    "ocp_source_audit.json": "00dd5b87cd6025446fb8ff8ba6d58f0de45c7745c2d9766803d465bddc11e156",
+    "parameter_requirements.csv": "f07d34c5041d58e44d3f1b486d39fef3b2b5e33738a68972393b95f4153bb7a2",
+    "parameter_source_matrix.csv": "b335decd523041197af3f56ae33588dc79e5d0ca40785234c7a6cb191079d8fe",
+    "unresolved_parameters.csv": "583032280bf487235dd45f4fd1f253da8665035d3eaba6e0ff5f52c125515e7c"
+  },
+  "determinism": "no wall-clock timestamps; sorted rows; deterministic JSON/CSV serialisation."
+}

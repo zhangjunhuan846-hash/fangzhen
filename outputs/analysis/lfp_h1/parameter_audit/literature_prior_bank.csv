@@ -1,0 +1,23 @@
+parameter,value/range,unit,temperature,electrolyte,electrode_details,measurement_or_model_method,doi_or_source,source_class,match_grade,uncertainty_status,note
+positive_electrode_porosity,0.254,1 (vol frac),298 K,1 M LiPF6 EC:DEC 1:1 (Sec.2),"in-house LFP 26.5 um, 4.749 mg/cm2, 16 mm disc",computed (Table 1),10.1088/2515-7655/acfc66 (acfc66),B2,C (parameters-matched publication),medium,"electrode eps_e, base case"
+separator_porosity,0.37,1,298 K,same,separator 20 um,Table 1,10.1088/2515-7655/acfc66,B2,C,medium,
+positive_particle_radius,1e-6,m,298 K,same,FESEM-verified mean,Table 1 / Sec.2,10.1088/2515-7655/acfc66,B2,C,low-medium,1 um primary particles
+positive_particle_diffusivity,3.7e-16,m2.s-1,298 K,same,same electrode,EIS (Table 1),10.1088/2515-7655/acfc66,B2,C,medium,constant Ds base case
+positive_reaction_rate,0.12e-11,m^2.5 mol^-0.5 s^-1,298 K,same,same electrode,calibrated/fitted (Table 1),10.1088/2515-7655/acfc66,B2,C,high,k0 form; requires unit conversion to pybamm i0 form
+positive_c_smax,21852,mol.m-3,298 K,same,same electrode,Table 1,10.1088/2515-7655/acfc66,B2,C,low,slightly below theoretical
+electrode_thickness,26.5e-6,m,298 K,same,"in-house LFP (THIN, areal ~0.66 mAh/cm2)",Table 1,10.1088/2515-7655/acfc66,B2,C,n/a,geometry anchor only - NOT the SINTEF 78 um electrode
+active_mass_loading,4.749,mg.cm-2,298 K,same,in-house LFP,Sec.2,10.1088/2515-7655/acfc66,B2,C,n/a,anchor cell geometry differs from SINTEF
+positive_c_smax,22820,mol.m-3,298.15 K,1 M LiPF6 EC:DEC 1:1 (50:50 vol%),"in-house LFP 11.0+-0.8 mg/cm2, Celgard 2325",estimated (Table I; ~theoretical),10.1149/1945-7111/ae94f3 (ae94f3),B2,C,low,equals theoretical c_smax (3.60 g/cc / 157.76 g/mol)
+positive_electrode_porosity,0.45,1 (vol frac),298.15 K,1 M LiPF6 EC:DEC 1:1,"in-house LFP 80:10:10, 11.0 mg/cm2",measured / calc. Eq.12 (Table I),10.1149/1945-7111/ae94f3,B2,C,medium,electrode eps_e
+separator_porosity,0.39,1,298.15 K,same,Celgard 2325,manufacturer spec (Table I),10.1149/1945-7111/ae94f3,B2,C,low,separator = Celgard 2325
+separator_thickness,25e-6,m,298.15 K,same,Celgard 2325,spec,10.1149/1945-7111/ae94f3,B2,C,low,anchor only
+positive_exchange_current,50 (assumed),A.m-2,298.15 K,same,same electrode,assumed in Table I (NOT measured),10.1149/1945-7111/ae94f3,B2,C,high,j0 reference 0.363 from lit.[12] also reported; 50 A/m2 is the P2D table value
+positive_particle_diffusivity,SOC-dependent (GITT),m2.s-1,298.15 K,same,same electrode,own GITT (Fig.4); constant-Ds test consistent w/ GITT at SOC~0.34,10.1149/1945-7111/ae94f3,B2,C,high,table extraction of numeric ranges unreliable in H1-C; treat as qualitative SOC-dependence evidence
+positive_particle_radius,PSD (surface-area-weighted),m,298.15 K,same,same electrode,SEM + laser PSD (Eq.5),10.1149/1945-7111/ae94f3,B2,C,high,no single mean radius number found in H1-C fetch
+voltage_window,2.8-3.8,V,298.15 K,same,same electrode,Table II,10.1149/1945-7111/ae94f3,B2,C,n/a,ae94f3 window DIFFERS from SINTEF 2.50-3.65
+electrolyte_composition,1 M LiPF6 EC:DEC 1:1 vol,-,298.15 K,-,-,Sec.2 exp.,10.1149/1945-7111/ae94f3,B2,C,n/a,composition anchor for SINTEF-style LFP half cells
+positive_c_smax,~22820 (theoretical),mol.m-3,RT,-,-,"rho=3.60 g/cc, M=157.76 g/mol -> F*c_smax*M=rho (x=1)",derivation,C,C,low,generic theoretical ceiling; ae94f3 estimate coincides
+positive_alpha,0.5,1,RT,-,-,symmetric Butler-Volmer default,generic,C,C,low,
+positive_brug_ele,1.5,1,RT,-,-,Bruggeman default,generic,C,C,medium,classic exponent
+electrolyte_transport,generic 1 M LiPF6 carbonate model,-,RT,1 M LiPF6,-,PyBaMM default electrolyte parameterisation (or any published 1 M LiPF6),generic/pybamm,C,C,medium,SINTEF electrolyte not disclosed; property values are generic unless a specific recipe is later matched
+positive_ocp,"LFP OCP (Prada2013 set, pybamm)",-,RT,-,LFP/graphite full-cell context,registered pybamm parameter set (full-cell surrogate for CALCE A123 in v0.4),pybamm 'Prada2013',C,C,medium,chemistry prior only; full-cell origin -> not a half-cell reference

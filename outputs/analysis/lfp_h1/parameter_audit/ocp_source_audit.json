@@ -1,0 +1,101 @@
+{
+  "method_note": "Each candidate OCP is audited for source, direction, stoichiometry range, temperature, hysteresis handling, interpolation and extrapolation semantics.",
+  "measured_hysteresis_proxy": {
+    "median_voltage_per_cycle_charge_V": [
+      3.4449,
+      3.4439,
+      3.4439,
+      3.4437
+    ],
+    "median_voltage_per_cycle_discharge_V": [
+      3.406,
+      3.4066,
+      3.4068,
+      3.4071
+    ],
+    "hysteresis_proxy_median_ch_minus_dc_mV": 37.5,
+    "method": "median terminal voltage during driven legs c2-c5 (proxy; NOT throughput-aligned hysteresis, which would require x-aligned comparison in H1-D)"
+  },
+  "candidates": [
+    {
+      "id": "sintef_pocv_discharge",
+      "source": "SINTEF p-OCV d07eb6, discharge legs c2-c5 (full window)",
+      "source_class": "A0/A1",
+      "branch": "discharge",
+      "voltage_range_V": [
+        2.49999,
+        3.65
+      ],
+      "stoichiometry_range": "UNKNOWN (x-axis not yet assigned; H1-D layer)",
+      "temperature": "RT (no numeric)",
+      "hysteresis_handling": "lower branch; hysteresis vs charge branch observed",
+      "interpolation": "piecewise linear on cycler samples (dense C/50 sampling)",
+      "extrapolation": "none required inside [2.5, 3.65] full window",
+      "match_grade": "A1 (same cell, derived from own raw)",
+      "note": "Primary OCP candidate for discharge-direction replay."
+    },
+    {
+      "id": "sintef_pocv_charge",
+      "source": "SINTEF p-OCV d07eb6, charge legs c2-c5 (full window)",
+      "source_class": "A0/A1",
+      "branch": "charge",
+      "voltage_range_V": [
+        3.65,
+        2.5
+      ],
+      "stoichiometry_range": "UNKNOWN",
+      "temperature": "RT (no numeric)",
+      "hysteresis_handling": "upper branch",
+      "interpolation": "piecewise linear on cycler samples",
+      "extrapolation": "none required",
+      "match_grade": "A1",
+      "note": "Charge branch; visible offset from discharge branch."
+    },
+    {
+      "id": "acfc66_c50_ocp",
+      "source": "acfc66 (10.1088/2515-7655/acfc66), own C/50 half-cell OCP",
+      "source_class": "B2",
+      "branch": "galvanostatic C/50 (quasi-OCP)",
+      "voltage_range_V": "not stated numerically in fetched text (2.5-3.65 class)",
+      "stoichiometry_range": "not stated",
+      "temperature": "298 K",
+      "hysteresis_handling": "as recorded (figure only; raw unavailable)",
+      "interpolation": "unknown (paper figure)",
+      "extrapolation": "unknown",
+      "match_grade": "C (parameters-matched publication, raw not public)",
+      "note": "Different in-house electrode (26.5 um, 4.749 mg/cm2). Chemistry prior only."
+    },
+    {
+      "id": "ae94f3_c25_ocp",
+      "source": "ae94f3 (10.1149/1945-7111/ae94f3), own C/25 half-cell equilibrium",
+      "source_class": "B2",
+      "branch": "galvanostatic C/25 (equilibrium; 2x C/25 formation)",
+      "voltage_range_V": [
+        2.8,
+        3.8
+      ],
+      "stoichiometry_range": "not stated",
+      "temperature": "298.15 K",
+      "hysteresis_handling": "single recorded equilibrium curve",
+      "interpolation": "unknown (paper figure)",
+      "extrapolation": "unknown",
+      "match_grade": "C",
+      "note": "Different electrode (11.0 mg/cm2) AND different voltage window (2.8-3.8 V). Prior only."
+    },
+    {
+      "id": "generic_single_branch",
+      "source": "any single-branch equilibrium LFP OCP (e.g. pybamm 'Prada2013' LFP positive)",
+      "source_class": "C",
+      "branch": "equilibrium (single)",
+      "voltage_range_V": "as-registered",
+      "stoichiometry_range": "as-registered",
+      "temperature": "as-registered",
+      "hysteresis_handling": "NONE - single curve cannot represent both measured branches",
+      "interpolation": "as-registered",
+      "extrapolation": "as-registered",
+      "match_grade": "C",
+      "note": "If H1-D uses one equilibrium OCP against the hysteretic SINTEF p-OCV, residual is expected to be structurally dominated by the single-branch assumption (a model-structure issue, not a Ds/k0 error). SINTEF itself provides both branches so a branch-resolved or hysteretic OCP is available without external priors."
+    }
+  ],
+  "hysteresis_warning": "LFP charge/discharge hysteresis is evident in H1-B V-Q figure. Residual attribution in H1-D must separate hysteresis-model structure from parameter error."
+}

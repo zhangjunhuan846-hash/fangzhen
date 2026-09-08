@@ -1,0 +1,56 @@
+canonical_name,pybamm_key,unit,required_for_spm,required_for_spme,required_for_dfn,physical_group
+cation_transference,Cation transference number,1,N,Y,Y,electrolyte transport
+electrolyte_conductivity,Electrolyte conductivity [S.m-1],S.m-1,N,Y,Y,electrolyte transport
+electrolyte_diffusivity,Electrolyte diffusivity [m2.s-1],m2.s-1,N,Y,Y,electrolyte transport
+electrolyte_thermodynamic_factor,Thermodynamic factor,1,N,Y,Y,electrolyte transport
+initial_electrolyte_concentration,Initial concentration in electrolyte [mol.m-3],mol.m-3,Y,Y,Y,electrolyte transport
+positive_brug_ele,Positive electrode Bruggeman coefficient (electrolyte),1,N,Y,Y,electrolyte transport
+separator_brug_ele,Separator Bruggeman coefficient (electrolyte),1,N,Y,Y,electrolyte transport
+separator_porosity,Separator porosity,1,N,Y,Y,electrolyte transport
+contact_resistance,Contact resistance [Ohm],Ohm,Y,Y,Y,electronic transport
+lithium_counter_conductivity,Negative electrode conductivity [S.m-1],S.m-1,N,N,Y,electronic transport
+positive_brug_elec,Positive electrode Bruggeman coefficient (electrode),1,N,N,Y,electronic transport
+positive_electrode_conductivity,Positive electrode conductivity [S.m-1],S.m-1,N,N,Y,electronic transport
+separator_brug_elec,Separator Bruggeman coefficient (electrode),1,N,N,N,electronic transport
+active_mass_loading,(conceptual) active material mass loading,1,Y,Y,Y,geometry/loading
+applied_current,Current function [A],A,Y,Y,Y,geometry/loading
+cell_footprint_size,Electrode height [m],m,Y,Y,Y,geometry/loading
+cell_footprint_size,Electrode width [m],m,Y,Y,Y,geometry/loading
+lithium_counter_thickness,Negative electrode thickness [m],m,Y,Y,Y,geometry/loading
+lower_cutoff,Lower voltage cut-off [V],V,Y,Y,Y,geometry/loading
+nominal_capacity,Nominal cell capacity [A.h],A.h,Y,Y,Y,geometry/loading
+parallel_electrodes,Number of electrodes connected in parallel to make a cell,1,Y,Y,Y,geometry/loading
+positive_active_volume_fraction,Positive electrode active material volume fraction,1,Y,Y,Y,geometry/loading
+positive_electrode_porosity,Positive electrode porosity,1,N,Y,Y,geometry/loading
+positive_electrode_thickness,Positive electrode thickness [m],m,Y,Y,Y,geometry/loading
+separator_thickness,Separator thickness [m],m,N,Y,Y,geometry/loading
+series_cells,Number of cells connected in series to make a battery,1,Y,Y,Y,geometry/loading
+upper_cutoff,Upper voltage cut-off [V],V,Y,Y,Y,geometry/loading
+initial_positive_concentration,Initial concentration in positive electrode [mol.m-3],mol.m-3,Y,Y,Y,initialization
+initial_stoichiometry_x0,(conceptual) initial stoichiometry x0,1,Y,Y,Y,initialization
+stoichiometry_window_dx,(conceptual) stoichiometry window dx,1,Y,Y,Y,initialization
+li_counter_double_layer_capacity,Negative electrode double-layer capacity [F.m-2],F.m-2,Y,Y,Y,kinetics
+li_counter_exchange_current,Exchange-current density for lithium metal electrode [A.m-2],A.m-2,Y,Y,Y,kinetics
+positive_activation_energy,Positive electrode reaction activation energy [J.mol-1],J.mol-1,Y,Y,Y,kinetics
+positive_alpha,Positive electrode charge transfer coefficient,1,Y,Y,Y,kinetics
+positive_double_layer_capacity,Positive electrode double-layer capacity [F.m-2],F.m-2,Y,Y,Y,kinetics
+positive_exchange_current,Positive electrode exchange-current density [A.m-2],A.m-2,Y,Y,Y,kinetics
+positive_reaction_rate,Positive electrode reaction rate [A.m-2.(m3.mol-1)^1.5],A.m-2.(m3.mol-1)^1.5,Y,Y,Y,kinetics
+lithium_counter_ocp,Negative electrode OCP [V],V,Y,Y,Y,solid thermo/OCP
+lithium_counter_ocp_entropic,Negative electrode OCP entropic change [V.K-1],V.K-1,T,T,T,solid thermo/OCP
+ocp_hysteresis_definition,(conceptual) OCP hysteresis / equilibrium definition,1,Y,Y,Y,solid thermo/OCP
+ocv_at_0pct_soc,Open-circuit voltage at 0% SOC [V],V,N,N,N,solid thermo/OCP
+ocv_at_100pct_soc,Open-circuit voltage at 100% SOC [V],V,N,N,N,solid thermo/OCP
+positive_ocp,Positive electrode OCP [V],V,Y,Y,Y,solid thermo/OCP
+positive_ocp_entropic,Positive electrode OCP entropic change [V.K-1],V.K-1,T,T,T,solid thermo/OCP
+positive_c_smax,Maximum concentration in positive electrode [mol.m-3],mol.m-3,Y,Y,Y,solid transport
+positive_ds_scaling,Positive electrode diffusivity scaling factor,1,Y,Y,Y,solid transport
+positive_particle_diffusivity,Positive particle diffusivity [m2.s-1],m2.s-1,Y,Y,Y,solid transport
+positive_particle_radius,Positive particle radius [m],m,Y,Y,Y,solid transport
+ambient_temperature,Ambient temperature [K],K,T,T,T,thermal/constants
+electrolyte_density,Electrolyte density [kg.m-3],kg.m-3,N,N,N,thermal/constants
+initial_temperature,Initial temperature [K],K,T,T,T,thermal/constants
+li_partial_molar_volume,Lithium metal partial molar volume [m3.mol-1],m3.mol-1,Y,Y,Y,thermal/constants
+positive_active_density,Positive electrode active material density [kg.m-3],kg.m-3,N,N,N,thermal/constants
+positive_carbon_binder_density,Positive electrode carbon-binder density [kg.m-3],kg.m-3,N,N,N,thermal/constants
+reference_temperature,Reference temperature [K],K,Y,Y,Y,thermal/constants
