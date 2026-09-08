@@ -1,0 +1,39 @@
+{
+  "dataset": "birmingham_ncm920305",
+  "cell": "2mAhcm2",
+  "model": "DFN",
+  "rate_slug": "C0p1",
+  "rate_label": "C/10",
+  "c_rate": 0.1,
+  "source_rate": "Cover10",
+  "parameter_set": "Jackowska2025_2mAh_cm2",
+  "external_repo_commit": "9f3b526",
+  "pybamm_version": "26.8.0.0",
+  "solver": {
+    "class": "IDAKLUSolver",
+    "rtol": 1e-06,
+    "atol": 1e-06
+  },
+  "source_file": "RateCapability_Cover10_2mAhcm_2_NCM920305.csv",
+  "dataset_file_sha256": "581c8d0b7a8e54f7cc209a2b29e41726a85dc7bcae0b2bdfcaa9af35d0af1b3a",
+  "ocp_file": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/external/Jackowska-2025-JPS/2mAh_cm2/results/ocp_discharge.csv",
+  "ocp_file_sha256": "8d1700296398fc47f3e8a6ba289a147535c08ec604600b78bc2e1b448eb00ef7",
+  "mapping": [
+    {
+      "parameter_set": "Jackowska2025_2mAh_cm2",
+      "source_key": "Initial concentration in positive electrode [mol.m-3]",
+      "mapped_key": "Initial concentration in positive electrode [mol.m-3]",
+      "source_value": 5000.0,
+      "mapped_value": 14905.665580250377,
+      "mapping_reason": "inverse-OCP(rest OCV 4.1935 V) -> x0 = 0.3028 -> x0*c_max = 14905.7 mol/m3; published default starts at Li fraction ~0.10 which contradicts the measured ~4.19-4.20 V rest OCV; the author pipeline (figure_5.py) initialises from inverse-OCP(rest V0).  The OCP inversion extends linearly ABOVE the ocp_discharge.csv top (4.186 V), matching PyBaMM's linear Interpolant: the authors' saved simulation opens at the measured 4.1935 V (H7 probe, docs/halfcell_birmingham_params_audit.md)"
+    },
+    {
+      "parameter_set": "Jackowska2025_2mAh_cm2",
+      "source_key": "(absent from author dict)",
+      "mapped_key": "Positive particle diffusivity scaling factor",
+      "source_value": null,
+      "mapped_value": 1.0,
+      "mapping_reason": "auto-materialised by PyBaMM 26.8 (deprecated-key alias); value copied from the author's legacy key, model inputs unchanged"
+    }
+  ]
+}

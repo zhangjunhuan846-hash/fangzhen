@@ -1,0 +1,18 @@
+{
+  "pybop": "26.3",
+  "pybamm": "26.8.0.0",
+  "true": [
+    0.75,
+    0.665
+  ],
+  "identified": [
+    0.74897,
+    0.66481
+  ],
+  "rel_error_pct": [
+    0.137,
+    0.028
+  ],
+  "noise_sigma": 0.002,
+  "n_iterations": 25
+}

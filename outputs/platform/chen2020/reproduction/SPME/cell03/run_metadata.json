@@ -1,0 +1,12 @@
+{
+  "dataset": "chen2020",
+  "model": "SPME",
+  "cell": "03",
+  "mode": "reproduction",
+  "parameter_set": "Chen2020",
+  "initial_voltage_V": 3.1279,
+  "ambient_temperature_C": 26.7131,
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-07T09:04:56+00:00",
+  "runtime_s": 1.3767423879762646
+}

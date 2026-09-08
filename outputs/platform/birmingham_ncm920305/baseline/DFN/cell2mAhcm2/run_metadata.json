@@ -1,0 +1,49 @@
+{
+  "dataset": "birmingham_ncm920305",
+  "model": "DFN",
+  "cell": "2mAhcm2",
+  "mode": "baseline",
+  "rates": [
+    "C0p5"
+  ],
+  "rate_labels": [
+    "C/2"
+  ],
+  "c_rates": [
+    0.5
+  ],
+  "source_rates": [
+    "Cover2"
+  ],
+  "parameter_set": "Jackowska2025_2mAh_cm2",
+  "capacity_metric_type": "forced_current_window",
+  "capacity_is_predictive": false,
+  "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
+  "parameter_match": {
+    "level": "exact",
+    "grade": "A",
+    "parameter_set": "Jackowska2025_2mAh_cm2",
+    "experimental_cell": "NCM920305 || Li metal half cell, 2 mAh/cm2 (14.8 mm disc, 1.72 cm2)",
+    "fitted_to_dataset_family": true,
+    "notes": "Matched half-cell pilot: the authors used the same electrode loading to parameterise this PyBaMM set and published both the experimental CSVs and the model outputs.  H2 identity check shows our 5 rate files are row-identical to the files the authors' saved model outputs were computed from (|V_ours - V_sim| deviates from their logged absolute error by ~25 uV median).  Wording: numerically matched to the dataset used in the authors' simulations -- NOT cryptographically identical.  First replay is as-published (D scaling = 1.0), ZERO fitting.\n"
+  },
+  "cell_configuration": "half_cell",
+  "working_electrode": "positive",
+  "model_options": {
+    "working electrode": "positive",
+    "surface form": "differential",
+    "contact resistance": "true"
+  },
+  "parameter_source": {
+    "repo_rel": "external/Jackowska-2025-JPS",
+    "module": "Jackowska2025",
+    "function": "get_parameter_values_2mAh_cm2",
+    "electrode_subdir": "2mAh_cm2"
+  },
+  "parameter_repo_commit": "9f3b526",
+  "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
+  "reused_reference": "scripts/run_baseline.py",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-08T02:39:52+00:00",
+  "runtime_s": 0.6927545139988069
+}

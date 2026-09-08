@@ -1,0 +1,429 @@
+# ============================================================
+# Battery Dataset Simulation Platform v0.1
+# Dataset registry configuration
+#
+# Adding a new dataset = new adapter in platform/datasets/ +
+# one entry here. No changes to the core runners required.
+# ============================================================
+
+chen2020:
+  name: "Chen2020 LG M50"
+  ion: "Li"
+  chemistry: "NMC_Graphite"
+
+  raw_dir: "data/raw/LIB/NMC_Graphite/Chen2020_LGM50/raw"
+  processed_dir: "data/processed/LIB/NMC_Graphite/Chen2020_LGM50"
+
+  adapter: "chen2020"
+  protocol: "chen2020"
+
+  parameter_set: "Chen2020"
+
+  cells:
+    - "02"
+    - "03"
+    - "04"
+
+  rates:
+    - "C10"
+    - "C2"
+    - "1C"
+    - "1p5C"
+
+  supported_models:
+    - "SPM"
+    - "SPMe"
+    - "DFN"
+
+  nominal_capacity_Ah: 5.0
+
+  lower_voltage_cutoff_V: 2.5
+  upper_voltage_cutoff_V: 4.2
+
+  # Raw Maccor file template used by the adapter:
+  #   raw_dir / f"LGM50_cell{cell}.csv"
+  raw_file_template: "LGM50_cell{cell}.csv"
+
+# ------------------------------------------------------------
+# v0.2: CALCE CS2 (first generalization dataset)
+#
+# Chemistry audit (Step 16):
+#   CS2 cathode = LiCoO2 (CALCE official).  No exact PyBaMM
+#   parameter set exists for this cell.
+#     Ramadass2004  -> graphite / LiCoO2 / LiPF6
+#                      (PyBaMM docs warn: mixed "Frankenstein"
+#                      parameter set)  -> B: compatible_surrogate
+#     Ecker2015     -> graphite / Li(Ni0.4Co0.6)O2 (Kokam SLPB)
+#                      -> C: mismatched (chemistry mismatch)
+# All CALCE runs are unfitted surrogate baselines, NOT
+# physics-model validation.
+# ------------------------------------------------------------
+calce_cs2:
+  name: "CALCE CS2 (LCO/Graphite)"
+  ion: "Li"
+  chemistry: "LCO_Graphite"
+
+  raw_dir: "data/raw/LIB/LCO_Graphite/CALCE_CS2/raw"
+
+  adapter: "calce_cs2"
+  protocol: "calce_cs2"
+
+  parameter_set: "Ramadass2004"
+
+  cells:
+    - "33"    # 0.5C CC discharge (0.55 A), Type 1
+    - "35"    # 1C   CC discharge (1.10 A), Type 2
+
+  rates:
+    - "0p5C"
+    - "1C"
+
+  supported_models:
+    - "SPM"
+    - "SPMe"
+    - "DFN"
+
+  nominal_capacity_Ah: 1.1
+
+  lower_voltage_cutoff_V: 2.7
+  upper_voltage_cutoff_V: 4.2
+
+  # T7: CALCE official metadata does NOT report test temperature.
+  # The assumption below is OWNED BY THIS CONFIG (never hard-coded
+  # in the adapter): a 23 C robustness run only needs a change
+  # here, not a Python edit.
+  ambient_temperature:
+    value_C: 25.0
+    source: assumed
+    confidence: low
+    note: >
+      CALCE official metadata does not report test temperature.
+      25 C is used as the platform default modeling assumption.
+      A secondary dataset review describes CS2 testing as room
+      temperature (~23 C).  A 23-vs-25 C robustness check is
+      planned but does not block v0.2.
+
+  # Chemistry-parameter compatibility metadata (Step 16 schema)
+  parameter_match:
+    level: compatible_surrogate
+    grade: B
+    parameter_set: Ramadass2004
+    experimental_cell: "CALCE CS2 (LiCoO2/graphite, 1.1 Ah prismatic, 5.4x33.6x50.6 mm)"
+    fitted_to_dataset: false
+    notes: >
+      Unfitted surrogate baseline - NOT physics-model validation.
+      PyBaMM describes Ramadass2004 as a mixed ("Frankenstein")
+      parameter set; it is chemistry-compatible (graphite/LiCoO2)
+      but was fitted to a different cell.  Ecker2015 is a C-grade
+      (mismatched) comparator: its Kokam SLPB75106100 cathode is
+      Li(Ni0.4Co0.6)O2, not LiCoO2.
+
+# ------------------------------------------------------------
+# v0.3: CALCE INR18650-20R (dynamic-protocol generalization)
+#
+# Step 21 chemistry audit (docs/v03_calce20r_parameter_audit.md):
+#   20R = Samsung SDI 2.0 Ah, NMC cathode / graphite anode,
+#   cylindrical 18650, 2.5-4.2 V (window verified in the data).
+#     Chen2020    -> NMC811/graphite, 5.0 Ah, 2.5-4.2 V
+#                    -> B: compatible_surrogate (best available;
+#                       capacity 5.0 vs 2.0 Ah is a documented
+#                       structural surrogate bias, NOT an error)
+#     Mohtat2020 / ORegan2022 -> graphite-SiOx anode / 4.4 V window
+#     Ecker2015   -> Li(Ni0.4Co0.6)O2 (v0.2 verdict: C for CALCE)
+# All CALCE 20R runs are unfitted surrogate baselines, NOT
+# physics-model validation.
+#
+# Dynamic windows: DST/FUDS/US06 x {50,80}% starting SOC, one
+# continuous file per window (Step 18 audit).  The replay runner
+# stays protocol-agnostic: it only sees t, I(t), Vexp(t).
+# ------------------------------------------------------------
+calce_20r:
+  name: "CALCE INR18650-20R (NMC/Graphite, dynamic)"
+  ion: "Li"
+  chemistry: "NMC_Graphite"
+
+  raw_dir: "data/raw/LIB/NMC_Graphite/CALCE_INR18650_20R/raw"
+
+  adapter: "calce_20r"
+  protocol: "calce_20r"
+
+  parameter_set: "Chen2020"
+
+  cells:
+    - "2"     # SP20-2: the dynamic-test cell (SP20-1 is OCV only)
+
+  # canonical window ids (protocol + starting SOC)
+  rates:
+    - "DST50"
+    - "DST80"
+    - "FUDS50"
+    - "FUDS80"
+    - "US0650"
+    - "US0680"
+
+  supported_models:
+    - "SPM"
+    - "SPMe"
+    - "DFN"
+
+  nominal_capacity_Ah: 2.0
+
+  lower_voltage_cutoff_V: 2.5
+  upper_voltage_cutoff_V: 4.2
+
+  # The Arbin files contain NO temperature column (Step 18 audit).
+  # The 25 C assumption is owned by this config (source: CALCE
+  # archive naming "SP2_25C_*"); change it here, never in Python.
+  ambient_temperature:
+    value_C: 25.0
+    source: calce_archive_naming_25C
+    confidence: medium
+    note: >
+      CALCE INR18650-20R dynamic tests were logged without a
+      temperature column.  25 C is taken from the dataset archive
+      naming (SP2_25C_DST / SP2_25C_FUDS / SP2_25C_US06).
+
+  # Step 19: dynamic protocol metadata (schema-level, no
+  # DST/US06-specific fields anywhere)
+  dynamic_protocol:
+    profile_kind: dynamic
+    initial_soc_source: calce_filename_SOC_label
+    initial_soc_confidence: low
+
+  # Chemistry-parameter compatibility metadata (Step 16 schema)
+  parameter_match:
+    level: compatible_surrogate
+    grade: B
+    parameter_set: Chen2020
+    experimental_cell: "Samsung SDI INR 18650-20R (NMC/graphite, 2.0 Ah, cylindrical 18650)"
+    fitted_to_dataset: false
+    notes: >
+      Unfitted surrogate baseline - NOT physics-model validation.
+      Chen2020 matches the 20R chemistry family (NMC/graphite) and
+      its exact voltage window (2.5-4.2 V), but was fitted to the
+      LG M50 5.0 Ah pouch cell, so the 2.0 Ah 20R cell sees
+      structurally lower model C-rates.  Initial SOC per window
+      comes from the CALCE filename SOC label (low confidence).
+
+# ============================================================
+# v0.5 pilot: Birmingham NCM920305 || Li half-cell (H0)
+#
+# NOT a v0.4 core rewrite: half-cell pilot, single dataset,
+# zero fitting.  This is a REAL-DATA reproduction benchmark:
+#   NCM920305 electrode (2 mAh/cm2) || Li metal
+#       x
+#   author-matched Jackowska2025_2mAh_cm2 parameter set
+#       x
+#   positive-working-electrode DFN / SPMe (PyBaMM half-cell)
+#
+# Chemistry/geometry audit (docs/halfcell_birmingham_params_audit.md):
+#   * electrode disc d = 14.8 mm -> width=height=sqrt(pi)*0.0148/2
+#     (1.72 cm2); consistent with experimental 1C = 3.44 mA
+#   * NCM920305 half cell, separator Celgard 2325, LiPF6
+#   * cutoff 4.2 / 2.5 V, chamber 298.15 K (constant in-file)
+#   * experimental current sign: discharge = NEGATIVE [mA] in the
+#     raw files -> adapter flips to platform canonical
+#     (discharge = +)
+#   * pOCV/GITT/EIS files exist but are NOT replayed in H0.
+#
+# parameter_match grade A (matched half-cell pilot):
+#   the experimental electrode / data used by the authors for the
+#   same simulations is row-identical to ours (H2 identity check);
+#   see docs/halfcell_birmingham_params_audit.md.  Precision of
+#   wording: "numerically matched", NOT "exact file identity".
+# ------------------------------------------------------------
+birmingham_ncm920305:
+  name: "Birmingham NCM920305 (NCM||Li half cell, 2 mAh/cm2)"
+  ion: "Li"
+  chemistry: "NCM_LiMetal"
+
+  raw_dir: "data/raw/LIB/NMC_LiMetal/Birmingham_NCM920305/raw"
+
+  adapter: "birmingham_ncm920305"
+  protocol: "birmingham_ncm920305"
+
+  # ---- half-cell first-class configuration (H4) -------------
+  cell_configuration: "half_cell"
+  working_electrode: "positive"
+  counter_electrode: "lithium_metal"
+  electrode_areal_capacity_mAh_cm2: 2.0
+  # PyBaMM model options that reproduce the author half-cell model
+  # (author options audited in H3/H5):
+  model_options:
+    surface form: "differential"
+    contact resistance: "true"
+  # initialisation: measured pre-discharge rest OCV is inverted on
+  # the author positive-OCP curve -> initial Li fraction x0 in the
+  # working electrode (NOT a battery SOC, NOT a fitted parameter).
+  initialisation_method: "inverse_ocp"
+  initialisation_ocp_file_rel: "external/Jackowska-2025-JPS/2mAh_cm2/results/ocp_discharge.csv"
+
+  # ---- author parameter set source (H5) ---------------------
+  parameter_set: "Jackowska2025_2mAh_cm2"
+  parameter_source:
+    repo_rel: "external/Jackowska-2025-JPS"
+    module: "Jackowska2025"
+    function: "get_parameter_values_2mAh_cm2"
+    electrode_subdir: "2mAh_cm2"
+
+  # source rate tokens = file stem tokens of the RateCapability
+  # CSVs (Cover10=C/10 ... 2C); resolved to canonical c_rate
+  # 0.1/0.2/0.5/1.0/2.0 by the adapter SOURCE_TO_CANONICAL map.
+  cells:
+    - "2mAhcm2"
+
+  rates:
+    - "Cover10"
+    - "Cover5"
+    - "Cover2"
+    - "1C"
+    - "2C"
+
+  supported_models:
+    - "SPMe"
+    - "DFN"
+
+  # nominal capacity in the author set is 3.112 mAh, but the
+  # experimental 1C is 3.44 mA (H6): baseline replay ALWAYS uses
+  # the measured current trace, never a C-rate string back-derived
+  # from nominal capacity.
+  nominal_capacity_Ah: 0.003112
+
+  lower_voltage_cutoff_V: 2.5
+  upper_voltage_cutoff_V: 4.2
+
+  raw_file_template: "RateCapability_{token}_2mAhcm_2_NCM920305.csv"
+
+  ambient_temperature:
+    value_C: 25.0
+    source: measured_chamber_temperature_298.15K_in_file
+    confidence: high
+    note: >
+      Every rate file logs a constant 298.15 K temperature column.
+      Replay is isothermal at 25 C (initial = ambient).
+
+  parameter_match:
+    level: exact
+    grade: A
+    parameter_set: Jackowska2025_2mAh_cm2
+    experimental_cell: "NCM920305 || Li metal half cell, 2 mAh/cm2 (14.8 mm disc, 1.72 cm2)"
+    fitted_to_dataset_family: true
+    notes: >
+      Matched half-cell pilot: the authors used the same electrode
+      loading to parameterise this PyBaMM set and published both the
+      experimental CSVs and the model outputs.  H2 identity check
+      shows our 5 rate files are row-identical to the files the
+      authors' saved model outputs were computed from
+      (|V_ours - V_sim| deviates from their logged absolute error by
+      ~25 uV median).  Wording: numerically matched to the dataset
+      used in the authors' simulations -- NOT cryptographically
+      identical.  First replay is as-published (D scaling = 1.0),
+      ZERO fitting.
+
+# ------------------------------------------------------------
+# v0.4: CALCE A123 (chemistry generalization LFP/Graphite)
+#
+# Step 30 chemistry audit (docs/v04_a123_parameter_audit.md):
+#   A123 = A123 Systems APR18650M1A, 1.1 Ah, LFP cathode /
+#   graphite anode, 18650, 2.0-3.6 V (all verified in-data).
+#     Prada2013      -> LFP/graphite (LFP_ocp_Afshar2017),
+#                       2.3 Ah, 2.0-3.6 V
+#                       -> B: compatible_surrogate (the ONLY
+#                       Li-ion LFP/graphite set in PyBaMM 26.8;
+#                       capacity 2.3 vs 1.1 Ah is a documented
+#                       structural surrogate bias)
+#     Chayambuka2022 -> sodium-ion (NVPF/hard carbon) - excluded
+#     Ai2020         -> LiCoO2 - excluded
+# All A123 runs are unfitted surrogate baselines, NOT
+# physics-model validation.
+#
+# One xlsx per cell (A1-007 / A1-008) containing DST + US06 +
+# FUDS dynamic segments, each preceded by a full CC-CV charge.
+# Protocol identity is assigned by the measured charge-peak
+# signature (rule-based, cross-checked against the archive
+# order) -- see adapter docstring.
+# ------------------------------------------------------------
+calce_a123:
+  name: "CALCE A123 (LFP/Graphite, dynamic)"
+  ion: "Li"
+  chemistry: "LFP_Graphite"
+
+  raw_dir: "data/raw/LIB/LFP_Graphite/CALCE_A123/raw/DST-US06-FUDS-25"
+
+  adapter: "calce_a123"
+  protocol: "calce_a123"
+
+  parameter_set: "Prada2013"
+
+  cells:
+    - "007"   # A1-007
+    - "008"   # A1-008
+
+  # window ids (one file per cell holds all three protocols)
+  rates:
+    - "DST"
+    - "FUDS"
+    - "US06"
+
+  supported_models:
+    - "SPM"
+    - "SPMe"
+    - "DFN"
+
+  nominal_capacity_Ah: 1.1
+
+  lower_voltage_cutoff_V: 2.0
+  upper_voltage_cutoff_V: 3.6
+
+  # A123 files HAVE a measured temperature column
+  # ("Temperature (C)_1", 26.5-28.4 C).  v0.4 FINAL temperature
+  # semantics: T_cell,exp(t) is a cell RESPONSE, so it is kept in
+  # the canonical column temperature_cell_C as a VALIDATION
+  # TARGET ONLY and never drives the model.  The isothermal
+  # replay uses the pre-profile rest-end measured cell
+  # temperature for BOTH initial_temperature_C and
+  # ambient_temperature_C (no chamber sensor in this archive;
+  # nominal 25 C per the archive naming "-25").
+  ambient_temperature:
+    source: assumed_from_preprofile_rest_cell_temperature
+    confidence: medium
+    note: >
+      Measured cell temperature at the end of the rest immediately
+      preceding each dynamic profile, held FIXED for the whole
+      replay (initial = ambient).  The in-profile measured cell
+      temperature trace is retained as a validation target for a
+      future thermal model, never as a model input.  No Python-side
+      assumed default exists; the adapter computes it from data.
+
+  # Step 34 + v0.4 wording freeze: dynamic protocol metadata.
+  # initial_soc_value is OWNED BY THIS CONFIG and is a STABLE
+  # SURROGATE INITIALIZATION (purpose), NOT a measured cell SOC
+  # and NOT fitted to the measured voltage -- under Prada2013
+  # the model OCV at nominal SOC 1.0 sits AT the surrogate's own
+  # upper-cutoff (3.6 V) event boundary, so the highest audited
+  # clean-start value is pinned here; replay RMSE is insensitive
+  # over 0.98-0.995 (LFP plateau diagnostic, Step 33).
+  dynamic_protocol:
+    profile_kind: dynamic
+    initial_soc_value: 0.995
+    initial_soc_purpose: "stable surrogate initialization"
+    initial_soc_fitted_to_voltage: false
+    initial_soc_source: "protocol full charge (CC-CV to 3.6 V); SOC mapped through Prada2013 OCV, see docs/v04_a123_parameter_audit.md"
+    initial_soc_confidence: medium
+
+  # Chemistry-parameter compatibility metadata (Step 16 schema)
+  parameter_match:
+    level: compatible_surrogate
+    grade: B
+    parameter_set: Prada2013
+    experimental_cell: "A123 Systems APR18650M1A (LFP/graphite, 1.1 Ah, cylindrical 18650)"
+    fitted_to_dataset: false
+    notes: >
+      Unfitted surrogate baseline - NOT physics-model validation.
+      Prada2013 is the only Li-ion LFP/graphite parameter set in
+      PyBaMM 26.8 and its voltage window (2.0-3.6 V) matches the
+      A123 exactly; it was fitted to a different 2.3 Ah LFP cell
+      (pouch geometry), so capacity and electrode dimensions are
+      structurally different.  Each dynamic window starts from
+      the protocol's own full charge (nominal SOC 1.0) with the
+      preceding history NOT replayed.

@@ -1,0 +1,33 @@
+{
+  "dataset": "chen2020",
+  "model": "SPME",
+  "cell": "02",
+  "mode": "sensitivity",
+  "parameter_set": "Chen2020",
+  "parameters": [
+    "Dsn",
+    "Dsp",
+    "j0n",
+    "j0p",
+    "De",
+    "kappa_e",
+    "Rn",
+    "Rp",
+    "brug_e"
+  ],
+  "factors": {
+    "low": 0.8,
+    "high": 1.2
+  },
+  "rates": [
+    "C10",
+    "C2",
+    "1C",
+    "1p5C"
+  ],
+  "initial_voltage_V": 3.1315,
+  "ambient_temperature_C": 26.7131,
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-07T09:17:46+00:00",
+  "note": "Local OAT wrapper of scripts/sensitivity/sensitivity_screen.py; metrics voltage_rms_shift_mV / cutoff_capacity_shift_pct / rmse_mV"
+}

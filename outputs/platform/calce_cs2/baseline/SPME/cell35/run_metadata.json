@@ -1,0 +1,35 @@
+{
+  "dataset": "calce_cs2",
+  "model": "SPME",
+  "cell": "35",
+  "mode": "baseline",
+  "rates": [
+    "C1"
+  ],
+  "rate_labels": [
+    "1C"
+  ],
+  "c_rates": [
+    1.0
+  ],
+  "source_rates": [
+    "1C"
+  ],
+  "parameter_set": "Ramadass2004",
+  "capacity_metric_type": "forced_current_window",
+  "capacity_is_predictive": false,
+  "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
+  "parameter_match": {
+    "level": "compatible_surrogate",
+    "grade": "B",
+    "parameter_set": "Ramadass2004",
+    "experimental_cell": "CALCE CS2 (LiCoO2/graphite, 1.1 Ah prismatic, 5.4x33.6x50.6 mm)",
+    "fitted_to_dataset": false,
+    "notes": "Unfitted surrogate baseline - NOT physics-model validation. PyBaMM describes Ramadass2004 as a mixed (\"Frankenstein\") parameter set; it is chemistry-compatible (graphite/LiCoO2) but was fitted to a different cell.  Ecker2015 is a C-grade (mismatched) comparator: its Kokam SLPB75106100 cathode is Li(Ni0.4Co0.6)O2, not LiCoO2.\n"
+  },
+  "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
+  "reused_reference": "scripts/run_baseline.py",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-08T02:39:55+00:00",
+  "runtime_s": 0.5121746160002658
+}

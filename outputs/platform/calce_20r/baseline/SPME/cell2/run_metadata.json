@@ -1,0 +1,39 @@
+{
+  "dataset": "calce_20r",
+  "model": "SPME",
+  "cell": "2",
+  "mode": "baseline",
+  "rates": [
+    "DST_50SOC",
+    "DST_80SOC"
+  ],
+  "rate_labels": [
+    "DST @ 50% SOC",
+    "DST @ 80% SOC"
+  ],
+  "c_rates": [
+    NaN,
+    NaN
+  ],
+  "source_rates": [
+    "50SOC",
+    "80SOC"
+  ],
+  "parameter_set": "Chen2020",
+  "capacity_metric_type": "forced_current_window",
+  "capacity_is_predictive": false,
+  "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
+  "parameter_match": {
+    "level": "compatible_surrogate",
+    "grade": "B",
+    "parameter_set": "Chen2020",
+    "experimental_cell": "Samsung SDI INR 18650-20R (NMC/graphite, 2.0 Ah, cylindrical 18650)",
+    "fitted_to_dataset": false,
+    "notes": "Unfitted surrogate baseline - NOT physics-model validation. Chen2020 matches the 20R chemistry family (NMC/graphite) and its exact voltage window (2.5-4.2 V), but was fitted to the LG M50 5.0 Ah pouch cell, so the 2.0 Ah 20R cell sees structurally lower model C-rates.  Initial SOC per window comes from the CALCE filename SOC label (low confidence).\n"
+  },
+  "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
+  "reused_reference": "scripts/run_baseline.py",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-08T02:40:14+00:00",
+  "runtime_s": 3.4532000370018068
+}

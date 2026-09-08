@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "steps": [
+    "[1/5] pybamm version = 26.8.0.0",
+    "[2/5] deps = {'numpy': '2.4.6', 'scipy': '1.17.1', 'casadi': '3.7.2', 'matplotlib': '3.11.1', 'pandas': '3.0.5', 'autograd': 'MISSING (ModuleNotFoundError)'}",
+    "[3/5] DFN + Chen2020 model built",
+    "[4/5] solved in 0.2s",
+    "[5/5] done: 170 points, V 4.038 -> 2.500, Q=4.9381 Ah"
+  ],
+  "deps": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "casadi": "3.7.2",
+    "matplotlib": "3.11.1",
+    "pandas": "3.0.5",
+    "autograd": "MISSING (ModuleNotFoundError)"
+  },
+  "solve_seconds": 0.17,
+  "n_points": 170,
+  "v_start": 4.037713830274228,
+  "v_end": 2.4999999999998903,
+  "capacity_Ah": 4.938124945542328
+}

@@ -1,0 +1,31 @@
+{
+  "dataset": "chen2020",
+  "mode": "benchmark",
+  "models": [
+    "SPME",
+    "DFN"
+  ],
+  "cells": [
+    "02",
+    "03",
+    "04"
+  ],
+  "rates": [
+    "C10",
+    "C2",
+    "1C",
+    "1p5C"
+  ],
+  "n_cells": 3,
+  "n_models": 2,
+  "parameter_set": "Chen2020",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-07T09:16:19+00:00",
+  "runtime_s": 10.248349618000006,
+  "aggregation": {
+    "note": "Per-cell metrics come from run_reproduction_cell(); summary columns match scripts/aggregate_protocol_results.py",
+    "rmse_source_column": "rmse_Qaligned_mV"
+  },
+  "initial_voltage_V": 3.1348,
+  "ambient_temperature_C": 26.7131
+}

@@ -1,0 +1,79 @@
+# ============================================================
+# Battery Dataset Simulation Platform v0.1
+# Sensitivity screening configuration
+#
+# v0.1 wraps the already-validated OAT screen:
+#   scripts/sensitivity/sensitivity_screen.py
+# First-stage screening parameters, factors and rates.
+# ============================================================
+
+# Local one-at-a-time perturbation factors
+factors:
+  low: 0.8
+  high: 1.2
+
+rates:
+  - "C10"
+  - "C2"
+  - "1C"
+  - "1p5C"
+
+# Screening parameters: platform id -> PyBaMM parameter keys.
+# The full key lists replicate scripts/sensitivity/sensitivity_screen.py
+# and must be kept in sync with it (single scientific definition).
+parameters:
+  Dsn:
+    label: "Negative particle diffusivity"
+    group: "solid_transport"
+    keys:
+      - "Negative particle diffusivity [m2.s-1]"
+
+  Dsp:
+    label: "Positive particle diffusivity"
+    group: "solid_transport"
+    keys:
+      - "Positive particle diffusivity [m2.s-1]"
+
+  j0n:
+    label: "Negative exchange-current density"
+    group: "kinetics"
+    keys:
+      - "Negative electrode exchange-current density [A.m-2]"
+
+  j0p:
+    label: "Positive exchange-current density"
+    group: "kinetics"
+    keys:
+      - "Positive electrode exchange-current density [A.m-2]"
+
+  De:
+    label: "Electrolyte diffusivity"
+    group: "electrolyte_transport"
+    keys:
+      - "Electrolyte diffusivity [m2.s-1]"
+
+  kappa_e:
+    label: "Electrolyte conductivity"
+    group: "electrolyte_transport"
+    keys:
+      - "Electrolyte conductivity [S.m-1]"
+
+  Rn:
+    label: "Negative particle radius"
+    group: "microstructure"
+    keys:
+      - "Negative particle radius [m]"
+
+  Rp:
+    label: "Positive particle radius"
+    group: "microstructure"
+    keys:
+      - "Positive particle radius [m]"
+
+  brug_e:
+    label: "Electrolyte Bruggeman coefficients"
+    group: "electrolyte_transport"
+    keys:
+      - "Negative electrode Bruggeman coefficient (electrolyte)"
+      - "Separator Bruggeman coefficient (electrolyte)"
+      - "Positive electrode Bruggeman coefficient (electrolyte)"

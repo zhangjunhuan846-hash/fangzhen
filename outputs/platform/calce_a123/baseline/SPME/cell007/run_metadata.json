@@ -1,0 +1,35 @@
+{
+  "dataset": "calce_a123",
+  "model": "SPME",
+  "cell": "007",
+  "mode": "baseline",
+  "rates": [
+    "DST"
+  ],
+  "rate_labels": [
+    "DST"
+  ],
+  "c_rates": [
+    NaN
+  ],
+  "source_rates": [
+    "DST"
+  ],
+  "parameter_set": "Prada2013",
+  "capacity_metric_type": "forced_current_window",
+  "capacity_is_predictive": false,
+  "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
+  "parameter_match": {
+    "level": "compatible_surrogate",
+    "grade": "B",
+    "parameter_set": "Prada2013",
+    "experimental_cell": "A123 Systems APR18650M1A (LFP/graphite, 1.1 Ah, cylindrical 18650)",
+    "fitted_to_dataset": false,
+    "notes": "Unfitted surrogate baseline - NOT physics-model validation. Prada2013 is the only Li-ion LFP/graphite parameter set in PyBaMM 26.8 and its voltage window (2.0-3.6 V) matches the A123 exactly; it was fitted to a different 2.3 Ah LFP cell (pouch geometry), so capacity and electrode dimensions are structurally different.  Each dynamic window starts from the protocol's own full charge (nominal SOC 1.0) with the preceding history NOT replayed.\n"
+  },
+  "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
+  "reused_reference": "scripts/run_baseline.py",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-08T02:39:52+00:00",
+  "runtime_s": 3.1277886949974345
+}

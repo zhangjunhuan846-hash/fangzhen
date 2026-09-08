@@ -1,0 +1,27 @@
+# ============================================================
+# Battery Dataset Simulation Platform v0.1
+# Model factory configuration
+#
+# build_model(name) maps a model id to a pybamm lithium-ion
+# model class. load_parameter_values(parameter_set) loads the
+# pybamm parameter set by name (no dataset hardcoding here).
+# ============================================================
+
+# ---- Solver defaults for command-level protocol simulation ----
+solver:
+  class: "IDAKLUSolver"
+  rtol: 1.0e-6
+  atol: 1.0e-6
+
+# ---- Experiment sampling period ----
+experiment:
+  period: "10 seconds"
+  calc_esoh: false
+
+# ---- Model id -> pybamm builder ----
+# Each entry must be a callable import path: "module:attr"
+# where attr(name) -> pybamm.lithium_ion model.
+builders:
+  SPM: "battery_sim.models.pybamm_factory:_spm"
+  SPMe: "battery_sim.models.pybamm_factory:_spme"
+  DFN: "battery_sim.models.pybamm_factory:_dfn"

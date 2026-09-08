@@ -1,0 +1,47 @@
+{
+  "dataset": "chen2020",
+  "model": "SPME",
+  "cell": "02",
+  "mode": "baseline",
+  "rates": [
+    "C0p1",
+    "C0p5",
+    "C1",
+    "C1p5"
+  ],
+  "rate_labels": [
+    "C/10",
+    "C/2",
+    "1C",
+    "1.5C"
+  ],
+  "c_rates": [
+    0.1,
+    0.5,
+    1.0,
+    1.5
+  ],
+  "source_rates": [
+    "C10",
+    "C2",
+    "1C",
+    "1p5C"
+  ],
+  "parameter_set": "Chen2020",
+  "capacity_metric_type": "forced_current_window",
+  "capacity_is_predictive": false,
+  "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
+  "parameter_match": {
+    "level": "exact",
+    "grade": "A",
+    "parameter_set": "Chen2020",
+    "experimental_cell": "LG M50 (NMC532/graphite-SiOx, 5 Ah, 21700)",
+    "fitted_to_dataset": true,
+    "notes": "Chen2020 parameter set was fitted to this exact cell geometry and chemistry."
+  },
+  "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
+  "reused_reference": "scripts/run_baseline.py",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-08T02:40:28+00:00",
+  "runtime_s": 2.2046729389985558
+}

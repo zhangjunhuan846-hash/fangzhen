@@ -1,0 +1,32 @@
+# ---- heavy raw data (13 GB) - never commit ----
+data/
+
+# ---- external cloned repos (provenance tracked by commit hash in docs) ----
+external/
+
+# ---- local workspace state ----
+.workbuddy/
+
+# ---- python ----
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# ---- generated outputs: keep only frozen small numeric tables ----
+outputs/_golden_backup_protocol_reproduction/
+outputs/_legacy_v02_step14/
+outputs/baseline/
+outputs/reproduction/
+outputs/protocol_reproduction/
+outputs/_legacy_*
+outputs/fitting/
+outputs/validation/
+outputs/audit/
+outputs/sensitivity/
+outputs/platform/**/*.png
+outputs/platform/**/*_Vt.png
+outputs/analysis/**/cache/
+outputs/analysis/targeted_sensitivity/*.npz
+outputs/analysis/targeted_sensitivity/*.png
+outputs/analysis/residual_atlas/*.png
