@@ -1,36 +1,3 @@
-问题不是内容，而是**Markdown渲染效果和排版设计**。
-
-你现在这个 README 主要有几个问题：
-
-1. **架构图用纯 ASCII 画，在 GitHub 宽度下会错位**
-
-   * GitHub README 不适合复杂框图。
-   * 横线、箭头会因为字体比例导致乱。
-
-2. **中文+英文+代码块混排太多**
-
-   * 看起来像技术笔记，不像项目主页。
-
-3. **标题层级太密**
-
-   * “主要功能 → 小标题 → 解释”太长。
-   * GitHub 首屏应该突出：
-
-     * 项目定位
-     * 架构图
-     * 核心功能
-     * 快速开始
-     * Roadmap
-
-4. **缺少徽章和视觉元素**
-
-   * 开源项目 README 一般顶部会有 badge。
-
-建议改成更像 GitHub 项目的形式。
-
-直接替换成下面这个版本：
-
-```markdown
 # 🔋 Battery Data–Model Integration Framework
 
 <p align="center">
