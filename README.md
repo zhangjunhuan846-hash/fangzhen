@@ -1,388 +1,330 @@
+问题不是内容，而是**Markdown渲染效果和排版设计**。
+
+你现在这个 README 主要有几个问题：
+
+1. **架构图用纯 ASCII 画，在 GitHub 宽度下会错位**
+
+   * GitHub README 不适合复杂框图。
+   * 横线、箭头会因为字体比例导致乱。
+
+2. **中文+英文+代码块混排太多**
+
+   * 看起来像技术笔记，不像项目主页。
+
+3. **标题层级太密**
+
+   * “主要功能 → 小标题 → 解释”太长。
+   * GitHub 首屏应该突出：
+
+     * 项目定位
+     * 架构图
+     * 核心功能
+     * 快速开始
+     * Roadmap
+
+4. **缺少徽章和视觉元素**
+
+   * 开源项目 README 一般顶部会有 badge。
+
+建议改成更像 GitHub 项目的形式。
+
+直接替换成下面这个版本：
+
 ```markdown
 # 🔋 Battery Data–Model Integration Framework
 
-> 面向电池研究的数据—模型串联仿真平台  
-> A reproducible framework for integrating battery experimental data, electrochemical models and analysis workflows.
+<p align="center">
 
----
+<strong>面向电池研究的数据—模型串联仿真平台</strong>
 
-## 📌 项目简介
+<br>
 
-电池研究过程中，实验数据、物理模型和数据分析流程通常相互独立，导致：
+A reproducible framework connecting battery experimental data, electrochemical models and simulation analysis.
 
-- 不同来源实验数据格式不统一；
-- 实验数据难以直接进入电化学模型；
-- 模型调用和参数管理流程复杂；
-- 仿真结果缺少统一评价和追踪机制。
-
-本项目基于 **PyBaMM 电化学建模框架**，构建一个面向电池研究的数据—模型串联仿真平台，实现：
-
-**实验数据 → 数据标准化 → 电化学模型 → 自动仿真 → 结果评价 → 参数分析**
-
-的完整流程。
-
-该平台旨在为电池数字化研究、模型验证、参数分析以及后续智能化设计提供基础框架。
+</p>
 
 
 ---
 
-# 🏗️ 平台架构
+## 📌 Overview
+
+电池研究中，实验数据、物理模型和分析流程通常相互独立，导致：
+
+- 实验数据格式不统一；
+- 数据难以直接进入电化学模型；
+- 模型比较和参数分析流程复杂；
+- 模拟结果缺少统一追踪机制。
+
+本项目基于 **PyBaMM** 构建数据—模型串联框架，实现：
 
 ```
 
-┌──────────────────────┐
-│   Experimental Data  │
-│     实验测试数据      │
-└──────────┬───────────┘
+Experimental Data
 ↓
-┌──────────────────────┐
-│  Dataset Adapter     │
-│    数据标准化接口     │
-└──────────┬───────────┘
+Data Standardization
 ↓
-┌──────────────────────┐
-│ PyBaMM Model Layer   │
-│  SPM / SPMe / DFN    │
-└──────────┬───────────┘
+Electrochemical Models
 ↓
-┌──────────────────────┐
-│ Simulation Engine    │
-│    自动化仿真流程     │
-└──────────┬───────────┘
+Automated Simulation
 ↓
-┌──────────────────────┐
-│ Evaluation & Analysis│
-│ 误差评价/敏感性分析   │
-└──────────┬───────────┘
+Evaluation & Analysis
 ↓
-┌──────────────────────┐
-│ Design Feedback      │
-│ 实验优化与模型改进    │
-└──────────────────────┘
+Sensitivity Exploration
+
+```
+
+用于支持电池模型验证、参数分析以及后续智能化设计。
+
+
+---
+
+# 🏗️ Architecture
+
+```
+
+```
+             Battery Data
+
+                  │
+
+                  ▼
+
+      ┌───────────────────┐
+      │ Dataset Adapter   │
+      │ 数据标准化接口     │
+      └───────────────────┘
+
+                  │
+
+                  ▼
+
+      ┌───────────────────┐
+      │  PyBaMM Models    │
+      │ SPM/SPMe/DFN      │
+      └───────────────────┘
+
+                  │
+
+                  ▼
+
+      ┌───────────────────┐
+      │ Simulation Engine │
+      │ 自动化仿真流程     │
+      └───────────────────┘
+
+                  │
+
+                  ▼
+
+      ┌───────────────────┐
+      │ Evaluation        │
+      │ Error Analysis    │
+      └───────────────────┘
+
+                  │
+
+                  ▼
+
+      ┌───────────────────┐
+      │ Sensitivity       │
+      │ Parameter Analysis│
+      └───────────────────┘
+```
 
 ````
 
+
 ---
 
-# ✨ 主要功能
+# ✨ Features
 
-## 1. 多来源电池数据接入
+## 1. Multi-source Battery Data
 
-支持不同来源电池实验数据统一处理：
+支持：
 
 - 恒流充放电数据；
-- 电压–时间曲线；
-- 电流–容量数据；
-- 不同采样频率测试数据。
+- 电压-时间曲线；
+- 电流-容量数据；
+- 不同采样频率实验数据。
 
-通过数据适配模块，将实验数据转换为统一格式，实现自动进入模型计算流程。
-
-
----
-
-## 2. 多尺度电化学模型支持
-
-基于 PyBaMM，实现多种电化学模型调用。
-
-
-### ⚡ SPM
-Single Particle Model
-
-特点：
-
-- 计算速度快；
-- 适合快速模拟；
-- 支持大规模参数扫描。
-
-
-### ⚡ SPMe
-Single Particle Model with Electrolyte
-
-进一步考虑：
-
-- 电解液浓度变化；
-- 浓差极化影响。
-
-
-### ⚡ DFN
-Doyle–Fuller–Newman Model
-
-考虑：
-
-- 固相扩散；
-- 电解液传输；
-- 电极动力学；
-- 电化学反应过程。
-
-
-支持不同模型在相同条件下自动比较。
+通过数据适配模块，实现不同实验数据统一进入模型。
 
 
 ---
 
-# 🚀 自动化仿真流程
+## 2. Electrochemical Model Support
+
+基于 PyBaMM：
+
+| Model | Description |
+|---|---|
+| SPM | 快速单粒子模型 |
+| SPMe | 考虑电解液影响 |
+| DFN | 完整电化学模型 |
+
+
+支持：
+
+- 模型自动调用；
+- 参数统一管理；
+- 不同模型性能比较。
+
+
+---
+
+## 3. Automated Simulation Pipeline
 
 统一入口：
 
 ```bash
-run_pipeline.py
+python run_pipeline.py
 ````
 
-支持四类任务：
+支持：
 
-| 模式           | 功能        |
+| Mode         | Function  |
 | ------------ | --------- |
 | reproduction | 实验/文献结果复现 |
-| benchmark    | 不同模型性能比较  |
-| baseline     | 标准条件仿真    |
+| benchmark    | 模型性能比较    |
+| baseline     | 标准仿真      |
 | sensitivity  | 参数敏感性分析   |
 
-示例：
-
-```bash
-python run_pipeline.py --mode baseline
-```
-
 ---
 
-# 📊 仿真结果评价
+## 4. Simulation Evaluation
 
-平台不仅生成模拟曲线，同时自动进行性能评价。
+自动计算：
 
-## 电压误差
-
-计算：
-
-* RMSE；
+* Voltage RMSE；
 * MAE；
-* 电压曲线偏差。
+* Capacity error；
+* Time alignment。
 
-## 容量分析
+输出：
 
-比较：
-
-* 实验容量；
-* 模拟容量；
-* 容量误差。
-
-## 时间同步
-
-解决实验数据与模型输出：
-
-* 时间步长不同；
-* 采样频率不同；
-
-的问题，实现自动时间对齐。
+* 模拟曲线；
+* 评价指标；
+* 运行记录。
 
 ---
 
-# 🔍 参数敏感性分析
+## 5. Sensitivity Analysis
 
-支持分析模型参数变化对电池性能的影响。
-
-可分析：
+分析：
 
 * 固相扩散系数；
-* 反应速率常数；
-* 孔隙率；
-* 电极相关参数。
-
-分析流程：
-
-```
-参数变化
-
-      ↓
-
-电化学模型响应
-
-      ↓
-
-性能指标变化
-
-      ↓
-
-关键参数识别
-```
+* 反应速率；
+* 电极参数；
+* 结构参数。
 
 用于：
 
-* 识别主要影响因素；
-* 指导实验设计；
-* 支撑模型优化。
+* 关键参数识别；
+* 模型优化；
+* 实验设计。
 
 ---
 
-# 🧾 可追溯运行记录
+# 📂 Project Structure
 
-每次仿真自动保存：
+```
+.
+├── run_pipeline.py        # Main entry
+├── battery_sim/           # Core simulation modules
+├── configs/               # Model configurations
+├── datasets/              # Battery datasets
+├── outputs/               # Simulation results
+├── tests/                 # Regression tests
+└── README.md
+```
 
-* 数据来源；
-* 模型类型；
-* 参数配置；
-* 软件环境；
-* 输出结果。
+---
 
-生成：
+# 🔬 Reproducibility
+
+每次运行自动保存：
 
 ```
 run_metadata.json
 ```
 
-保证每一次模拟均具有完整 provenance（来源追踪）。
+记录：
+
+* Dataset
+* Model
+* Parameters
+* Runtime environment
+* Results
+
+保证模拟过程可追溯。
 
 ---
 
-# 🧩 平台特点
+# ✅ Current Status
 
-## 1. 数据与模型解耦
-
-通过标准接口连接：
-
-```
-实验数据
-
-↓
-
-数据适配
-
-↓
-
-电化学模型
-```
-
-降低不同数据源和模型之间的数据转换成本。
+* [x] Dataset standardization
+* [x] PyBaMM integration
+* [x] SPM/SPMe/DFN support
+* [x] Automated simulation pipeline
+* [x] Benchmark workflow
+* [x] Baseline simulation
+* [x] Sensitivity analysis
+* [x] Result tracking
+* [x] Regression testing
 
 ---
 
-## 2. 可复现计算流程
-
-所有模拟过程：
-
-✅ 参数明确
-✅ 配置保存
-✅ 自动记录
-✅ 结果可重复
-
----
-
-## 3. 可扩展科研框架
-
-未来可进一步连接：
-
-* 文献数据自动抽取系统；
-* 电池数据库；
-* 机器学习模型；
-* AI Agent 科研自动化流程。
-
----
-
-# ✅ 当前完成内容
-
-* [x] 电池实验数据标准化接口
-* [x] PyBaMM 模型自动调用
-* [x] SPM / SPMe / DFN 支持
-* [x] reproduction 模式
-* [x] benchmark 模式
-* [x] baseline 模式
-* [x] sensitivity 模式
-* [x] 自动误差评价
-* [x] 参数敏感性分析
-* [x] 运行结果追踪
-* [x] 自动化测试验证
-
----
-
-# 🔮 后续发展方向
+# 🚀 Future Development
 
 ## Phase I
 
-### 实验数据 → 电化学模型
-
-```
-实验曲线
+Experimental data
 
 ↓
 
-自动输入模型
-
-↓
-
-仿真结果
-
-↓
-
-误差分析
-```
-
----
+Battery simulation
 
 ## Phase II
 
-### 文献数据 → 模型参数
-
-```
-论文数据
+Literature data extraction
 
 ↓
 
-材料/电池参数
-
-↓
-
-自动仿真
-
-↓
-
-模型评价
-```
-
----
+Model parameter generation
 
 ## Phase III
 
-### AI辅助科研闭环
+AI-assisted battery research workflow
 
 ```
-数据
-
-↓
-
+Literature
+     ↓
 AI Agent
-
-↓
-
-模型选择
-
-↓
-
-自动仿真
-
-↓
-
-参数优化
-
-↓
-
-实验设计
+     ↓
+Simulation
+     ↓
+Optimization
+     ↓
+Experiment
 ```
 
 ---
 
-# 🎯 项目定位
+# 🎯 Project Goal
 
-**Battery Data–Model Integration Framework**
+构建一个面向电池数字化研究的数据—模型集成基础设施：
 
-面向电池研究的数据—模型串联仿真基础平台。
+**Battery Data → Physics Model → Simulation → Analysis → Design**
 
-用于连接：
-
-* 实验数据；
-* 电化学模型；
-* 数据分析方法；
-* 智能化科研流程。
-
-为下一代电池数字化研究和智能设计提供基础工具。
+为电池模型验证、材料研究和智能化实验设计提供基础平台。
 
 ```
+
+这个版本会比你截图里的更像 GitHub 项目主页：
+
+- 第一屏能看懂；
+- 没有大段文字；
+- 架构图不会乱；
+- 导师打开也能快速理解；
+- 后续接 Mobius / Agent 也自然。
 ```
