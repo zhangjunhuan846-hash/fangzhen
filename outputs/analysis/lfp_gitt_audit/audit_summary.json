@@ -1,0 +1,27 @@
+{
+  "dataset": "LFP4graphite_CC_GITT_EV (Pozzato 2022, Zenodo)",
+  "readme_facts": {
+    "creator": "Gabriele Pozzato (README last modified 2022-08-16)",
+    "sign_convention": "discharge = +current, charge = -current (native, matches platform)",
+    "units": "current [A], voltage [V], soc [-], time [s]",
+    "cc_rates": {
+      "C/12": null,
+      "C/6": null
+    },
+    "gitt_rates": [
+      "C/6",
+      "C/3",
+      "C/2",
+      "1C",
+      " @ 25C"
+    ],
+    "real_world": "7 EV profiles, soc_start scalar"
+  },
+  "n_mat_files": 13,
+  "n_legs": 19,
+  "n_canonical_previews": 19,
+  "time_monotonic_all": false,
+  "V_window_all": "[2.400, 3.600] V",
+  "Q_nom_implied_spread_Ah": "[48.996, 49.228]",
+  "audit_csv": "audit_per_leg.csv"
+}

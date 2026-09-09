@@ -1,0 +1,20 @@
+{
+  "lfp_hysteresis": {
+    "note": "Single-curve external OCP (Afshar2017) has no two-branch structure. SINTEF charge/discharge branches are separated by a median-terminal-voltage proxy of 37.5 mV (H1-B); D0-A does not represent it, D0-B substitutes measured branch OCP as a diagnostic only.",
+    "represented": false
+  },
+  "other_simplifications": [
+    "constant D_s (3.7e-16 m2/s) - SOC dependence reported by ae94f3 GITT not used",
+    "constant j0 (50 A/m2, assumed in ae94f3) - no exchange-current concentration/SOC dependence beyond Butler-Volmer",
+    "isothermal 298.15 K (assumed; SINTEF reports RT only)",
+    "contact resistance feature on with value 0.0"
+  ],
+  "particle_size_distribution": {
+    "note": "Single representative particle radius R_p = 1 um (acfc66 FESEM mean). No PSD broadening.",
+    "represented": false
+  },
+  "two_phase_dynamics": {
+    "note": "Mean-field single-particle (per-electrode) DFN/SPMe/SPM with smooth Afshar OCP; no moving-boundary two-phase (shrinking-core) LFP phase-transformation model and no interfacial phase nucleation kinetics. LFP two-phase plateaus are approximated by the analytic OCP slope.",
+    "represented": "simplified"
+  }
+}

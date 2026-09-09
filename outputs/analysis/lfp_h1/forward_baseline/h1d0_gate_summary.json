@@ -1,0 +1,35 @@
+{
+  "failures": [],
+  "gate_1_parameter_lock": {
+    "detail": "lock_sha256=1c0a52639a4a7d5e9eac141165f1170aae4aefd9a87e0f63d7223fd30b10ad33; 49 parameters frozen selected_before_forward_run=true; lock file read-only in runner",
+    "pass": true
+  },
+  "gate_2_provenance": {
+    "detail": "source_manifest.json written (inputs + git head + env versions)",
+    "pass": true
+  },
+  "gate_3_capacity_accounting": {
+    "detail": "Qper_dx=3.6718 mAh/dsto from frozen eps_s*c_smax; neither eps_s nor dx tuned to 3.2878 mAh (H1-C Tightening 1/2)",
+    "pass": true
+  },
+  "gate_4_initialisation": {
+    "detail": "initialisation_audit.json: per-leg x0 from rest-end V0 via locked external OCP with dU/dx conditioning + weakly-determined flag",
+    "pass": true
+  },
+  "gate_5_model_comparison": {
+    "detail": "D0-A SPM/SPMe/DFN x 10 legs; D0-B DFN branch-aware (8 independent legs); same locked physics across models",
+    "pass": true
+  },
+  "gate_6_residual_decomposition": {
+    "detail": "metrics_by_model.csv + residual_by_capacity_bin.csv + capacity_diagnostics.csv + ocp_diagnostics.csv written (no RMSE threshold used)",
+    "pass": true
+  },
+  "gate_7_reproducibility": {
+    "detail": "fresh replay byte-compare pending",
+    "pass": null
+  },
+  "gate_8_h0_regression": {
+    "detail": "88 platform tests pending",
+    "pass": null
+  }
+}

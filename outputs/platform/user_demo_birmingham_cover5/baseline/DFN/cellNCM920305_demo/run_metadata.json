@@ -1,0 +1,49 @@
+{
+  "dataset": "user_demo_birmingham_cover5",
+  "model": "DFN",
+  "cell": "NCM920305_demo",
+  "mode": "baseline",
+  "rates": [
+    "as_provided"
+  ],
+  "rate_labels": [
+    "~0.22 C (from max|I| / declared nominal capacity)"
+  ],
+  "c_rates": [
+    0.22107910734530845
+  ],
+  "source_rates": [
+    "user_provided"
+  ],
+  "parameter_set": "Jackowska2025_2mAh_cm2",
+  "capacity_metric_type": "forced_current_window",
+  "capacity_is_predictive": false,
+  "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
+  "parameter_match": {
+    "available": true,
+    "parameter_set": "Jackowska2025_2mAh_cm2",
+    "level": "design_matched_surrogate",
+    "grade": "B",
+    "provenance": {
+      "provenance": "matched_study",
+      "electrode_design": "matched_2mAh_cm2",
+      "fitted_to_user_dataset": false,
+      "executable_reproduction": "partial"
+    },
+    "fitted_to_dataset": false,
+    "reason": "电极设计尺度匹配（面容量 2 mAh/cm2，参数集标定值 2 +/-0.2）。此数据源即参数集作者研究的同一电极体系（matched_study），但仍不是用你的材料/批次标定的，结果只能作为 zero-fit baseline，不能作为模型验证。",
+    "blockers": []
+  },
+  "cell_configuration": "half_cell",
+  "working_electrode": "positive",
+  "model_options": {
+    "working electrode": "positive"
+  },
+  "parameter_source": {},
+  "parameter_repo_commit": "9f3b526",
+  "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
+  "reused_reference": "scripts/run_baseline.py",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-08T11:57:41+00:00",
+  "runtime_s": 1.2583452190010576
+}

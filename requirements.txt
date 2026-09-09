@@ -1,0 +1,35 @@
+# Battery Simulation Platform v0.4 — runtime requirements
+#
+# Install INSIDE the WSL Ubuntu conda env "pybamm" (Python 3.11):
+#   source ~/miniforge3/etc/profile.d/conda.sh && conda activate pybamm
+#   pip install -r requirements.txt
+#
+# Do NOT install into the Windows Python (it has no PyBaMM) and do NOT
+# pip-install the pinned research repo under external/ (PyBaMM==25.8 lock).
+
+# --- core simulation -------------------------------------------------
+pybamm==26.8.0.0
+pybammsolvers==0.9.1
+casadi==3.7.2
+# numpy MUST stay <2.4: PyBOP 26.3 depends on it. Do not upgrade blindly.
+numpy==2.3.5
+
+# --- data / IO -------------------------------------------------------
+pandas==3.0.5
+pyyaml
+# .xls (CALCE) and .xlsx (A123, user uploads)
+xlrd
+openpyxl
+# parquet support for H1-B replay (installed with --no-deps to avoid
+# pulling a numpy upgrade)
+pyarrow==25.0.1
+
+# --- plotting / numeric ----------------------------------------------
+matplotlib
+scipy
+
+# --- optional research extras ----------------------------------------
+# parameter estimation / experiment design (not required by the platform)
+pybop==26.3
+# BPX parameter-file interchange
+bpx>=1.1

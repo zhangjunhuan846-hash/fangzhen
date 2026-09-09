@@ -1,0 +1,13 @@
+﻿code,severity,message,evidence
+NAN_IN_REQUIRED,PASS,time 列没有空值,679/679
+NAN_IN_REQUIRED,PASS,current 列没有空值,679/679
+NAN_IN_REQUIRED,PASS,voltage 列没有空值,679/679
+DUPLICATE_TIMESTAMP,PASS,没有重复时间戳,0
+NON_MONOTONIC_TIME,PASS,时间单调递增,0 back steps
+CURRENT_SIGN_CONFLICT,PASS,电流符号与声明自洽（discharge_negative），转换后放电为正，符合平台约定,median I during V-decline = 0.000687969 A
+VOLTAGE_RANGE,WARN,有 2 个点（0.3%）在声明窗口之外,"measured V range [2.5, 4.193] V"
+CURRENT_RANGE,PASS,电流幅值在合理范围,max|I| = 0.000687998 A（约 0.22 C，按标称容量 0.003112 Ah）
+CAPACITY_CONSISTENCY,PASS,容量列与电流积分一致,"dQ_col=0.00298761 Ah, integral=0.00298761 Ah, rel diff 0.0%"
+SAMPLING_INTERVAL,PASS,采样间隔统计已记录,"median dt=3.544 s, max dt=120 s, duration=1.75e+04 s"
+SAMPLING_INTERVAL_GAP,WARN,存在明显采样间断（最大间隔是中位数间隔的 34 倍）,median 3.544 s vs max 120 s
+AMBIENT_TEMPERATURE,PASS,使用你填写的环境温度 25 C,user declared

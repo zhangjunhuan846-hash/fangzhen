@@ -6,7 +6,8 @@
 # modifies battery_sim/ scientific logic (read-only imports).
 # No fitting anywhere in A2.
 #
-# Representative runs (rationale in docs/targeted_sensitivity_A2.md):
+# Representative runs (6, per the Phase A2 brief; rationale in
+# docs/targeted_sensitivity_A2.md).  NOT expanded to all 18 runs.
 #   chen2020/02/C0p5   exact (A); CC;  bias + late-discharge error
 #                       (legacy rate label "C2" == C/2)
 #   chen2020/02/C1p5   exact (A); CC;  counter-example: low late error
@@ -14,10 +15,17 @@
 #   calce_20r/2/DST_50SOC  surrogate (B); dynamic; 50% SOC
 #   calce_20r/2/DST_80SOC  surrogate (B); dynamic; 80% SOC
 #                          (initial-state / domain contrast)
-#   calce_a123/007/DST surrogate (B); dynamic; LFP
-#   calce_a123/008/DST added ONLY because the 007 vs 008 residual
-#                          shapes differ clearly (|r| < 0.5 on an
-#                          elapsed-fraction grid for DST/FUDS/US06)
+#   calce_a123/008/FUDS  ONE A123 dynamic representative, chosen
+#                          from the frozen A1 atlas as the A123
+#                          window with the MOST PRONOUNCED dynamic
+#                          residual (see A123_SELECTION below).
+#
+# Revision note (2026-09-08): the first A2 round covered 7 runs
+# (it also carried calce_a123/007/DST and 008/DST and was archived
+# to _archive_7run/).  The Phase A2 brief fixes the panel at 6 runs
+# and asks for ONE A123 representative -> 008/FUDS replaces the two
+# A123 DST runs.  Perturbation machinery, delta and metrics are
+# unchanged.
 #
 # First round parameter block (already-validated perturbation
 # machinery, keys from configs/sensitivity.yaml):
@@ -52,8 +60,36 @@ SELECTED = {
     ("calce_cs2", "33", "C0p5"): "CS2_33 0.5C",
     ("calce_20r", "2", "DST_50SOC"): "20R DST 50SOC",
     ("calce_20r", "2", "DST_80SOC"): "20R DST 80SOC",
-    ("calce_a123", "007", "DST"): "A123 007 DST",
-    ("calce_a123", "008", "DST"): "A123 008 DST",
+    ("calce_a123", "008", "FUDS"): "A123 008 FUDS",
+}
+
+# Evidence for the A123 representative choice, read DIRECTLY from the
+# frozen A1 atlas (outputs/analysis/residual_atlas/decomposition.csv).
+# "dynamic residual" = the non-bias part of the residual; ranked by
+# (a) dynamic_residual_component = share of RMSE^2 that is NOT bias
+# and (b) residual_std_mV = absolute size of that non-bias part.
+# Both criteria pick the same window -> choice is not threshold-tuned.
+A123_SELECTION = {
+    "chosen": "calce_a123/008/FUDS",
+    "criterion": (
+        "largest dynamic (non-bias) residual among the six A123 "
+        "dynamic windows, on BOTH the relative share and the "
+        "absolute magnitude"
+    ),
+    "candidates": {
+        # window: (dynamic_residual_component, residual_std_mV, RMSE_mV)
+        "calce_a123/007/DST": (0.6725, 163.756, 199.686),
+        "calce_a123/007/FUDS": (0.6924, 164.860, 198.120),
+        "calce_a123/007/US06": (0.5888, 135.485, 176.559),
+        "calce_a123/008/DST": (0.6802, 174.498, 211.576),
+        "calce_a123/008/FUDS": (0.6960, 189.132, 226.699),
+        "calce_a123/008/US06": (0.5986, 161.719, 209.031),
+    },
+    "source": "outputs/analysis/residual_atlas/decomposition.csv (A1)",
+    "note": (
+        "surrogate (B) parameter match (Prada2013 <-> LFP): the A123 "
+        "block is a model-structure probe, NOT a validation"
+    ),
 }
 
 SELECTION_RATIONALE = {
@@ -75,14 +111,13 @@ SELECTION_RATIONALE = {
         "surrogate (B) dynamic; 80% SOC window (Bias 263 mV, ~2x "
         "50SOC) -> initial-state/domain contrast"
     ),
-    "calce_a123/007/DST": (
-        "surrogate (B) dynamic LFP; dynamic-residual-component "
-        "regime (0.67)"
-    ),
-    "calce_a123/008/DST": (
-        "second A123 cell added: 007 vs 008 residual shapes differ "
-        "clearly (fraction-grid corr DST 0.44 < 0.5); "
-        "largest DST dynamic component (0.68)"
+    "calce_a123/008/FUDS": (
+        "surrogate (B) dynamic LFP; chosen from the A1 atlas as the "
+        "A123 window with the most pronounced DYNAMIC residual: "
+        "dynamic component 0.696 (max of the six A123 dynamic "
+        "windows) and residual_std 189.13 mV (also max); "
+        "bias_fraction only 0.304 -> the error is dominated by the "
+        "dynamic, not the offset, part"
     ),
 }
 

@@ -1,0 +1,36 @@
+{
+  "baseline_mirror_max_abs_diff_mV": {
+    "calce_20r/2/DST_50SOC": {
+      "max_abs_diff_mV": 1.6431300764452317e-11,
+      "n_ok": 2000
+    },
+    "calce_20r/2/DST_80SOC": {
+      "max_abs_diff_mV": 3.108624468950438e-11,
+      "n_ok": 2000
+    },
+    "calce_a123/007/DST": {
+      "max_abs_diff_mV": 2.4424906541753444e-11,
+      "n_ok": 2000
+    },
+    "calce_a123/008/DST": {
+      "max_abs_diff_mV": 1.9984014443252818e-11,
+      "n_ok": 2000
+    },
+    "calce_cs2/33/C0p5": {
+      "max_abs_diff_mV": 8.881784197001252e-13,
+      "n_ok": 760
+    },
+    "chen2020/02/C0p5": {
+      "max_abs_diff_mV": 8.881784197001252e-13,
+      "n_ok": 284
+    },
+    "chen2020/02/C1p5": {
+      "max_abs_diff_mV": 1.7763568394002505e-12,
+      "n_ok": 143
+    }
+  },
+  "delta": 0.2,
+  "n_solved_cases": 126,
+  "wall_time_s": 189.43583959699754,
+  "note": "baseline mirror diff ~0 proves the perturbed replay shares the exact solver/parameter pipeline of the frozen baseline outputs"
+}

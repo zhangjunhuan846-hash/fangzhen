@@ -1,11 +1,18 @@
 # ---- heavy raw data (13 GB) - never commit ----
 data/
 
-# ---- external cloned repos (provenance tracked by commit hash in docs) ----
-external/
+# ---- external repos: vendored (Jackowska BSD 3-Clause, pinned commit 9f3b526, see README §11) ----
+# tracked except the nested .git of the upstream clone
+external/**/.git/
 
 # ---- local workspace state ----
 .workbuddy/
+.mobius/
+.venv/
+结果/
+
+# ---- handoff transfer artifact (rebuilt from repo at any time) ----
+battery_platform_code_*.zip
 
 # ---- python ----
 __pycache__/
@@ -30,3 +37,6 @@ outputs/analysis/**/cache/
 outputs/analysis/targeted_sensitivity/*.npz
 outputs/analysis/targeted_sensitivity/*.png
 outputs/analysis/residual_atlas/*.png
+# lfp_gitt_audit: keep small audit tables only; canonical previews + figs are regenerable by scripts/lfp_gitt_audit.py
+outputs/analysis/lfp_gitt_audit/canonical_preview/
+outputs/analysis/lfp_gitt_audit/*.png

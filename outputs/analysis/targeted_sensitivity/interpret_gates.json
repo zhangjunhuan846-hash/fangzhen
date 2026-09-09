@@ -1,0 +1,52 @@
+{
+  "pre_registered": {
+    "align_gate_abs_cos": 0.7,
+    "projection_gate": 0.49,
+    "magnitude_gate_coverage_20pct": 0.1,
+    "weak_below_abs_cos": 0.3
+  },
+  "added_after_first_pass_disclosed": {
+    "shape_gate_centred_r2": 0.5,
+    "amplitude_sufficient_gate_coverage_20pct": 1.0,
+    "reason": "projection_fraction = cos^2 on uncentred vectors is inflated by the shared DC component for bias-dominated runs; a centred shape gate was therefore required before any direction may be called a candidate."
+  },
+  "coverage_definition": "0.20 * response_rms_mV / residual_RMSE_mV",
+  "metric_families": {
+    "raw_cosine_and_projection": {
+      "vectors": "uncentred e(t), S_p(t)",
+      "includes_dc_component": true,
+      "purpose": "total co-directionality (offset + shape)",
+      "caveat": "inflated when both vectors are dominated by a constant offset"
+    },
+    "centred_shape_metric": {
+      "definition": "affine_r2 = R^2 of e ~ a + b*S_p with free intercept = squared Pearson correlation of (e, S_p) = centred cosine^2",
+      "includes_dc_component": false,
+      "purpose": "shape-only agreement",
+      "caveat": "no information about amplitude adequacy"
+    }
+  },
+  "confounders_not_tested": [
+    "OCP",
+    "stoichiometry window",
+    "active-material inventory",
+    "initial-state mapping",
+    "multi-parameter interaction",
+    "nonlinear large perturbations",
+    "other resistance terms"
+  ],
+  "null_statement_wording": "Within the local +/-20% single-parameter perturbation range, the tested kinetic/transport parameter block is insufficient to explain the observed residual magnitude.",
+  "fits_performed": 0,
+  "simulations_run": 0,
+  "vocabulary_allowed": [
+    "candidate model direction",
+    "strongly shape-aligned, amplitude-insufficient candidate model direction",
+    "magnitude-viable, shape-unconfirmed"
+  ],
+  "vocabulary_forbidden": [
+    "residual is not determined by these parameter values",
+    "therefore the error is model-structure error",
+    "identified parameter",
+    "root cause",
+    "fitted variance explained"
+  ]
+}

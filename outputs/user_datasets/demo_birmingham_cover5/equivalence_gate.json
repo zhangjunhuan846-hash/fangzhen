@@ -1,0 +1,17 @@
+{
+  "gate": "importer_equivalence",
+  "source_file": "demo_birmingham_cover5.csv",
+  "reference": "birmingham_ncm920305._load_raw_file",
+  "n_rows_reference": 679,
+  "n_rows_importer": 679,
+  "method": "elementwise",
+  "max_abs_dt_s": 0.0,
+  "max_abs_dI_A": 9.985502008591496e-17,
+  "max_abs_dV_V": 0.0,
+  "tolerances": {
+    "t_s": 1e-06,
+    "I_A": 1e-12,
+    "V_V": 1e-09
+  },
+  "equivalent": true
+}

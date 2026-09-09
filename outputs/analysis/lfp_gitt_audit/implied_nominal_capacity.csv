@@ -1,0 +1,13 @@
+file,rate,leg,side,Q_nom_implied_Ah
+gitt_0_17C.mat,C/6,charge,charge,49.01399996529892
+gitt_0_17C.mat,C/6,discharge,discharge,49.013999973960225
+gitt_0_33C.mat,C/3,charge,charge,48.998999999999995
+gitt_0_33C.mat,C/3,discharge,discharge,48.998999999999995
+gitt_0_5C.mat,C/2,charge,charge,49.228
+gitt_0_5C.mat,C/2,discharge,discharge,49.002
+gitt_1C.mat,1C,charge,charge,49.0
+gitt_1C.mat,1C,discharge,discharge,49.001
+cc_0_08.mat,C/12,charge,charge,49.007999999999996
+cc_0_08.mat,C/12,discharge,discharge,49.007999999999996
+cc_0_17.mat,C/6,charge,charge,48.996
+cc_0_17.mat,C/6,discharge,discharge,49.002

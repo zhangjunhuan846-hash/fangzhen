@@ -1,0 +1,29 @@
+{
+  "environment": {
+    "numpy": "2.3.5",
+    "pybamm": "26.8.0.0"
+  },
+  "inputs": {
+    "experimental_facts.json": "/mnt/c/Users/24330/WorkBuddy/\u4eff\u771f\u6a21\u62df/outputs/analysis/lfp_h1/parameter_audit/experimental_facts.json",
+    "git_head": "8adf857bd585a34f9fae85b286100625f99d8711",
+    "processed_pocv.parquet": "/mnt/c/Users/24330/WorkBuddy/\u4eff\u771f\u6a21\u62df/outputs/analysis/lfp_h1/data_replay/processed_pocv.parquet",
+    "template_parameter_set": "Jackowska2025_2mAh_cm2"
+  },
+  "models": {
+    "D0A": [
+      "DFN",
+      "SPMe",
+      "SPM"
+    ],
+    "D0B": [
+      "DFN(branch-aware)"
+    ]
+  },
+  "parameter_lock": "/mnt/c/Users/24330/WorkBuddy/\u4eff\u771f\u6a21\u62df/outputs/analysis/lfp_h1/forward_baseline/parameter_lock.json",
+  "parameter_lock_sha256": "1c0a52639a4a7d5e9eac141165f1170aae4aefd9a87e0f63d7223fd30b10ad33",
+  "solver": {
+    "atol": 1e-06,
+    "rtol": 1e-06
+  },
+  "stage": "H1-D0"
+}

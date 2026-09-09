@@ -1,0 +1,223 @@
+==========================================================================
+Phase A2 - Residual-guided Targeted Sensitivity (6 runs x 9 params)
+delta = 0.20 central difference | local linear diagnostic only
+NO fitting, NO optimisation, NO new simulation in this step
+==========================================================================
+[0] completion: 6 runs x 9 parameters = 54 cells, valid = 45/54
+    A123 representative: calce_a123/008/FUDS (largest dynamic (non-bias) residual among the six A123 dynamic windows, on BOTH the relative share and the absolute magnitude)
+    audit: max|affine_r2 - centred_cos^2| = 2.40e-15 (the two are the same quantity)
+
+METRIC FAMILIES (different questions, both reported):
+  RAW      cosine_alignment / projection_fraction = cos^2 on
+           UNCENTRED vectors -> includes the shared DC
+           component; inflated for bias-dominated runs.
+           Purpose: total co-directionality (offset + shape).
+  CENTERED affine_r2 = centred cosine^2 (R^2 of e ~ a + b*S),
+           DC component projected out.
+           Purpose: SHAPE-ONLY agreement.
+
+--------------------------------------------------------------------------
+calce_20r/2/DST_50SOC   [20R DST50 | grade B | DST]
+  residual: RMSE 152.8 mV | Bias 134.1 mV | std 73.2 mV | bias^2/RMSE^2 = 0.77
+  rationale: surrogate (B) dynamic; 50% SOC window (Bias 134 mV)
+  top-3 response magnitude [mV per unit frac. change]:
+      Rn       rms=   17.84  cover20= 0.02  cos=-0.791  centredR2=+0.500
+      Rp       rms=   17.66  cover20= 0.02  cos=-0.884  centredR2=+0.098
+      j0n      rms=   17.63  cover20= 0.02  cos=+0.767  centredR2=+0.450
+  top-3 RAW |alignment| (sign preserved; DC-inflated):
+      brug_e   cos=-0.892  proj=0.796  | centredR2=0.418  rms=   12.51  cover20= 0.02
+      Rp       cos=-0.884  proj=0.781  | centredR2=0.098  rms=   17.66  cover20= 0.02
+      Dsp      cos=+0.842  proj=0.708  | centredR2=0.003  rms=    8.31  cover20= 0.01
+  top-3 RAW projection fraction (= cos^2, uncentred):
+      brug_e   proj=0.796  cos=-0.892  | centredR2=0.418
+      Rp       proj=0.781  cos=-0.884  | centredR2=0.098
+      Dsp      proj=0.708  cos=+0.842  | centredR2=0.003
+  top-3 CENTERED shape metric (affine_r2 = centred cos^2):
+      Dsn      centredR2=0.546  | raw cos=+0.818  proj=0.669  rms=    0.60  cover20= 0.00
+      j0p      centredR2=0.512  | raw cos=+0.735  proj=0.541  rms=    3.04  cover20= 0.00
+      Rn       centredR2=0.500  | raw cos=-0.791  proj=0.626  rms=   17.84  cover20= 0.02
+  classification:
+      candidate model direction : NONE
+      shape-aligned, magnitude short      : ['Rn', 'j0p', 'Dsn']
+      magnitude-viable, shape-unconfirmed : NONE
+      weak / inconsistent with e(t)       : NONE
+  >> Within the local +/-20% single-parameter perturbation range, the tested kinetic/transport parameter block is insufficient to explain the observed residual magnitude.
+     (best raw |cos|=0.89, best centredR2=0.55, best cover20=0.02)
+  >> untested confounders for this B-grade (surrogate) run:
+       - OCP
+       - stoichiometry window
+       - active-material inventory
+       - initial-state mapping
+       - multi-parameter interaction
+       - nonlinear large perturbations
+       - other resistance terms
+
+--------------------------------------------------------------------------
+calce_20r/2/DST_80SOC   [20R DST80 | grade B | DST]
+  residual: RMSE 275.6 mV | Bias 263.4 mV | std 81.0 mV | bias^2/RMSE^2 = 0.91
+  rationale: surrogate (B) dynamic; 80% SOC window (Bias 263 mV, ~2x 50SOC) -> initial-state/domain contrast
+  top-3 response magnitude [mV per unit frac. change]:
+      Rp       rms=   23.14  cover20= 0.02  cos=-0.966  centredR2=+0.324
+      j0n      rms=   17.77  cover20= 0.01  cos=+0.680  centredR2=+0.329
+      Rn       rms=   17.72  cover20= 0.01  cos=-0.693  centredR2=+0.338
+  top-3 RAW |alignment| (sign preserved; DC-inflated):
+      Rp       cos=-0.966  proj=0.933  | centredR2=0.324  rms=   23.14  cover20= 0.02
+      Dsp      cos=+0.954  proj=0.910  | centredR2=0.139  rms=   11.20  cover20= 0.01
+      brug_e   cos=-0.865  proj=0.748  | centredR2=0.325  rms=   12.47  cover20= 0.01
+  top-3 RAW projection fraction (= cos^2, uncentred):
+      Rp       proj=0.933  cos=-0.966  | centredR2=0.324
+      Dsp      proj=0.910  cos=+0.954  | centredR2=0.139
+      brug_e   proj=0.748  cos=-0.865  | centredR2=0.325
+  top-3 CENTERED shape metric (affine_r2 = centred cos^2):
+      j0p      centredR2=0.387  | raw cos=+0.630  proj=0.397  rms=    3.00  cover20= 0.00
+      kappa_e  centredR2=0.387  | raw cos=+0.632  proj=0.399  rms=    4.61  cover20= 0.00
+      Rn       centredR2=0.338  | raw cos=-0.693  proj=0.480  rms=   17.72  cover20= 0.01
+  classification:
+      candidate model direction : NONE
+      shape-aligned, magnitude short      : NONE
+      magnitude-viable, shape-unconfirmed : NONE
+      weak / inconsistent with e(t)       : NONE
+  >> Within the local +/-20% single-parameter perturbation range, the tested kinetic/transport parameter block is insufficient to explain the observed residual magnitude.
+     (best raw |cos|=0.97, best centredR2=0.39, best cover20=0.02)
+  >> untested confounders for this B-grade (surrogate) run:
+       - OCP
+       - stoichiometry window
+       - active-material inventory
+       - initial-state mapping
+       - multi-parameter interaction
+       - nonlinear large perturbations
+       - other resistance terms
+
+--------------------------------------------------------------------------
+calce_a123/008/FUDS   [A123 008 FUDS | grade B | FUDS]
+  residual: RMSE 226.7 mV | Bias 125.0 mV | std 189.1 mV | bias^2/RMSE^2 = 0.30
+  rationale: surrogate (B) dynamic LFP; chosen from the A1 atlas as the A123 window with the most pronounced DYNAMIC residual: dynamic component 0.696 (max of the six A123 dynamic windows) and residual_std 189.13 mV (also max); bias_fraction only 0.304 -> the error is dominated by the dynamic, not the offset, part
+  top-3 response magnitude [mV per unit frac. change]:
+      Rn       rms=   28.64  cover20= 0.03  cos=-0.798  centredR2=+0.488
+      j0n      rms=   23.86  cover20= 0.02  cos=+0.860  centredR2=+0.663
+      Dsn      rms=    6.55  cover20= 0.01  cos=+0.216  centredR2=+0.006
+  top-3 RAW |alignment| (sign preserved; DC-inflated):
+      kappa_e  cos=+0.894  proj=0.799  | centredR2=0.748  rms=    0.78  cover20= 0.00
+      j0n      cos=+0.860  proj=0.739  | centredR2=0.663  rms=   23.86  cover20= 0.02
+      brug_e   cos=-0.834  proj=0.696  | centredR2=0.582  rms=    1.46  cover20= 0.00
+  top-3 RAW projection fraction (= cos^2, uncentred):
+      kappa_e  proj=0.799  cos=+0.894  | centredR2=0.748
+      j0n      proj=0.739  cos=+0.860  | centredR2=0.663
+      brug_e   proj=0.696  cos=-0.834  | centredR2=0.582
+  top-3 CENTERED shape metric (affine_r2 = centred cos^2):
+      kappa_e  centredR2=0.748  | raw cos=+0.894  proj=0.799  rms=    0.78  cover20= 0.00
+      j0n      centredR2=0.663  | raw cos=+0.860  proj=0.739  rms=   23.86  cover20= 0.02
+      brug_e   centredR2=0.582  | raw cos=-0.834  proj=0.696  rms=    1.46  cover20= 0.00
+  classification:
+      candidate model direction : NONE
+      shape-aligned, magnitude short      : ['j0n', 'brug_e', 'kappa_e', 'j0p']
+      magnitude-viable, shape-unconfirmed : NONE
+      weak / inconsistent with e(t)       : ['Dsn', 'Rp', 'Dsp']
+  >> Within the local +/-20% single-parameter perturbation range, the tested kinetic/transport parameter block is insufficient to explain the observed residual magnitude.
+     (best raw |cos|=0.89, best centredR2=0.75, best cover20=0.03)
+  >> untested confounders for this B-grade (surrogate) run:
+       - OCP
+       - stoichiometry window
+       - active-material inventory
+       - initial-state mapping
+       - multi-parameter interaction
+       - nonlinear large perturbations
+       - other resistance terms
+
+--------------------------------------------------------------------------
+calce_cs2/33/C0p5   [CS2 33 0p5C | grade B | CC]
+  residual: RMSE 200.4 mV | Bias 176.6 mV | std 94.6 mV | bias^2/RMSE^2 = 0.78
+  rationale: surrogate (B) CC; bias dominated (bias_fraction 0.78)
+  top-3 response magnitude [mV per unit frac. change]:
+      brug_e   rms=   49.82  cover20= 0.05  cos=-0.884  centredR2=+0.033
+      kappa_e  rms=    8.55  cover20= 0.01  cos=+0.882  centredR2=+0.004
+      De       rms=    5.29  cover20= 0.01  cos=+0.885  centredR2=+0.026
+  top-3 RAW |alignment| (sign preserved; DC-inflated):
+      j0p      cos=+0.892  proj=0.795  | centredR2=0.439  rms=    2.02  cover20= 0.00
+      De       cos=+0.885  proj=0.783  | centredR2=0.026  rms=    5.29  cover20= 0.01
+      brug_e   cos=-0.884  proj=0.782  | centredR2=0.033  rms=   49.82  cover20= 0.05
+  top-3 RAW projection fraction (= cos^2, uncentred):
+      j0p      proj=0.795  cos=+0.892  | centredR2=0.439
+      De       proj=0.783  cos=+0.885  | centredR2=0.026
+      brug_e   proj=0.782  cos=-0.884  | centredR2=0.033
+  top-3 CENTERED shape metric (affine_r2 = centred cos^2):
+      j0p      centredR2=0.439  | raw cos=+0.892  proj=0.795  rms=    2.02  cover20= 0.00
+      Dsn      centredR2=0.239  | raw cos=+0.778  proj=0.605  rms=    0.06  cover20= 0.00
+      Dsp      centredR2=0.235  | raw cos=+0.716  proj=0.512  rms=    1.45  cover20= 0.00
+  classification:
+      candidate model direction : NONE
+      shape-aligned, magnitude short      : NONE
+      magnitude-viable, shape-unconfirmed : NONE
+      weak / inconsistent with e(t)       : NONE
+  >> Within the local +/-20% single-parameter perturbation range, the tested kinetic/transport parameter block is insufficient to explain the observed residual magnitude.
+     (best raw |cos|=0.89, best centredR2=0.44, best cover20=0.05)
+  >> untested confounders for this B-grade (surrogate) run:
+       - OCP
+       - stoichiometry window
+       - active-material inventory
+       - initial-state mapping
+       - multi-parameter interaction
+       - nonlinear large perturbations
+       - other resistance terms
+
+--------------------------------------------------------------------------
+chen2020/02/C0p5   [Chen2020 C2 | grade A | CC]
+  residual: RMSE 123.9 mV | Bias 93.5 mV | std 81.3 mV | bias^2/RMSE^2 = 0.57
+  rationale: exact (A) CC; strongest bias + late-discharge rise in the exact block (RMSE 123.88, Bias 93.49 mV)
+  top-3 response magnitude [mV per unit frac. change]:
+      Rp       rms=   82.66  cover20= 0.13  cos=-0.698  centredR2=+0.018
+      Rn       rms=   73.99  cover20= 0.12  cos=-0.976  centredR2=+0.916
+      brug_e   rms=   46.40  cover20= 0.07  cos=-0.758  centredR2=+0.011
+  top-3 RAW |alignment| (sign preserved; DC-inflated):
+      Rn       cos=-0.976  proj=0.953  | centredR2=0.916  rms=   73.99  cover20= 0.12
+      Dsn      cos=+0.934  proj=0.872  | centredR2=0.937  rms=   23.01  cover20= 0.04
+      j0p      cos=+0.822  proj=0.676  | centredR2=0.755  rms=    8.00  cover20= 0.01
+  top-3 RAW projection fraction (= cos^2, uncentred):
+      Rn       proj=0.953  cos=-0.976  | centredR2=0.916
+      Dsn      proj=0.872  cos=+0.934  | centredR2=0.937
+      j0p      proj=0.676  cos=+0.822  | centredR2=0.755
+  top-3 CENTERED shape metric (affine_r2 = centred cos^2):
+      Dsn      centredR2=0.937  | raw cos=+0.934  proj=0.872  rms=   23.01  cover20= 0.04
+      Rn       centredR2=0.916  | raw cos=-0.976  proj=0.953  rms=   73.99  cover20= 0.12
+      j0p      centredR2=0.755  | raw cos=+0.822  proj=0.676  rms=    8.00  cover20= 0.01
+  classification:
+      Rn       -> strongly shape-aligned, amplitude-insufficient candidate model direction (raw cos -0.976, raw proj 0.953, centredR2 0.916, cover20 0.119)
+      shape-aligned, magnitude short      : ['Dsn', 'j0p']
+      magnitude-viable, shape-unconfirmed : NONE
+      weak / inconsistent with e(t)       : NONE
+
+--------------------------------------------------------------------------
+chen2020/02/C1p5   [Chen2020 1p5C | grade A | CC]
+  residual: RMSE 48.0 mV | Bias 36.0 mV | std 31.8 mV | bias^2/RMSE^2 = 0.56
+  rationale: exact (A) CC; internal counter-example with LOW late-error (RMSE 48.04 mV) -> different residual structure
+  top-3 response magnitude [mV per unit frac. change]:
+      brug_e   rms=  245.53  cover20= 1.02  cos=-0.714  centredR2=+0.263
+      Rp       rms=  226.28  cover20= 0.94  cos=-0.643  centredR2=+0.467
+      Rn       rms=  179.52  cover20= 0.75  cos=-0.359  centredR2=+0.477
+  top-3 RAW |alignment| (sign preserved; DC-inflated):
+      j0n      cos=+0.757  proj=0.574  | centredR2=0.192  rms=   49.66  cover20= 0.21
+      kappa_e  cos=+0.757  proj=0.573  | centredR2=0.000  rms=   31.71  cover20= 0.13
+      brug_e   cos=-0.714  proj=0.510  | centredR2=0.263  rms=  245.53  cover20= 1.02
+  top-3 RAW projection fraction (= cos^2, uncentred):
+      j0n      proj=0.574  cos=+0.757  | centredR2=0.192
+      kappa_e  proj=0.573  cos=+0.757  | centredR2=0.000
+      brug_e   proj=0.510  cos=-0.714  | centredR2=0.263
+  top-3 CENTERED shape metric (affine_r2 = centred cos^2):
+      Dsn      centredR2=0.568  | raw cos=+0.075  proj=0.006  rms=   93.54  cover20= 0.39
+      j0p      centredR2=0.532  | raw cos=+0.660  proj=0.435  rms=   30.94  cover20= 0.13
+      Rn       centredR2=0.477  | raw cos=-0.359  proj=0.129  rms=  179.52  cover20= 0.75
+  classification:
+      candidate model direction : NONE
+      shape-aligned, magnitude short      : NONE
+      magnitude-viable, shape-unconfirmed : ['brug_e', 'j0n', 'kappa_e']
+      weak / inconsistent with e(t)       : ['Dsn']
+  >> Within the local +/-20% single-parameter perturbation range, the tested kinetic/transport parameter block is insufficient to explain the observed residual magnitude.
+     (best raw |cos|=0.76, best centredR2=0.57, best cover20=1.02)
+
+==========================================================================
+GATES  pre-registered: |cos| >= 0.70, proj >= 0.49, cover20 >= 0.10
+       added after first pass (disclosed): centredR2 >= 0.50, amplitude-sufficient cover20 >= 1.00
+       projection_fraction = cos^2 on UNCENTRED vectors ->
+       inflated by the shared DC component for bias-dominated runs;
+       the centred metric is reported alongside for that reason.
+==========================================================================

@@ -1,0 +1,520 @@
+{
+  "a0_a1_facts": {
+    "c50_driven_median_uA": 61.6,
+    "c50_implied_uA": 61.5752,
+    "electrode_area_m2": 0.000153938,
+    "electrode_diameter_mm": 14.0,
+    "electrode_thickness_um": 78.0,
+    "nominal_capacity_mAh": 3.07876,
+    "ocp_hysteresis_proxy_mV": 37.5,
+    "temperature_assumed_K": 298.15,
+    "voltage_window_V": [
+      2.5,
+      3.65
+    ]
+  },
+  "capacity_axis_declaration": "eps_s * dx capacity closure is DEGENERATE (H1-C): observed 3.2878 mAh discharge does not determine eps_s or dx separately. eps_s=0.50 is a central prior; neither eps_s nor dx was selected to match 3.2878 mAh. This lock therefore predicts a model full-window capacity of ~3.67 mAh on the Afshar window, i.e. an anticipated capacity-axis residual.",
+  "composite_declaration": "unmatched composite, NOT a publication reproduction, NOT a validated SINTEF parameter set. Values were locked BEFORE any forward run and were never chosen to improve agreement with any SINTEF voltage curve.",
+  "d0b": {
+    "note": "branch-aware diagnostic uses measured branch OCP on the frozen model capacity axis; NOT an independent prediction",
+    "reference_legs": {
+      "charge": "c2_charge",
+      "discharge": "c1_discharge"
+    }
+  },
+  "fit_performed": false,
+  "lock_sha256": "1c0a52639a4a7d5e9eac141165f1170aae4aefd9a87e0f63d7223fd30b10ad33",
+  "lock_version": "1.0",
+  "model_options": {
+    "contact resistance": "true",
+    "surface form": "differential",
+    "working electrode": "positive"
+  },
+  "name": "h1d0_parameter_lock",
+  "parameters": {
+    "Ambient temperature [K]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 298.15
+    },
+    "Cation transference number": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.38
+    },
+    "Contact resistance [Ohm]": {
+      "inherited": false,
+      "role": "ohmic_wiring",
+      "selected_before_forward_run": true,
+      "selection_reason": "feature enabled as in H0 half-cell wire; value 0: no contact loss assumed; at 61.6 uA even tens of Ohm are sub-mV",
+      "source_class": "C",
+      "source_reference": "H0 wiring default (feature on, value 0)",
+      "value": 0.0
+    },
+    "Electrode height [m]": {
+      "inherited": false,
+      "role": "geometry_A0_A1",
+      "selected_before_forward_run": true,
+      "selection_reason": "pybamm square-equivalent footprint of the 14 mm disc (H1-B frozen)",
+      "source_class": "A1",
+      "source_reference": "SINTEF A1 derived (sqrt(A) square footprint)",
+      "value": 0.012407175343324523
+    },
+    "Electrode width [m]": {
+      "inherited": false,
+      "role": "geometry_A0_A1",
+      "selected_before_forward_run": true,
+      "selection_reason": "pybamm square-equivalent footprint of the 14 mm disc (H1-B frozen)",
+      "source_class": "A1",
+      "source_reference": "SINTEF A1 derived (sqrt(A) square footprint)",
+      "value": 0.012407175343324523
+    },
+    "Electrolyte conductivity [S.m-1]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": {
+        "<function>": "electrolyte_conductivity_base_Landesfeind2019"
+      }
+    },
+    "Electrolyte density [kg.m-3]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1203.0
+    },
+    "Electrolyte diffusivity [m2.s-1]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": {
+        "<function>": "electrolyte_diffusivity_base_Landesfeind2019"
+      }
+    },
+    "Exchange-current density for lithium metal electrode [A.m-2]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": {
+        "<function>": "li_metal_electrolyte_exchange_current_density_Xu2019"
+      }
+    },
+    "Initial concentration in electrolyte [mol.m-3]": {
+      "inherited": false,
+      "role": "electrolyte_state",
+      "selected_before_forward_run": true,
+      "selection_reason": "SINTEF electrolyte not disclosed -> generic 1 M",
+      "source_class": "C",
+      "source_reference": "generic 1 M LiPF6 carbonate (prior bank row)",
+      "value": 1000.0
+    },
+    "Initial temperature [K]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 298.15
+    },
+    "Lithium metal partial molar volume [m3.mol-1]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1.3e-05
+    },
+    "Lower voltage cut-off [V]": {
+      "inherited": false,
+      "role": "protocol_A0",
+      "selected_before_forward_run": true,
+      "selection_reason": "experimental window fact",
+      "source_class": "A0",
+      "source_reference": "SINTEF p-OCV programme",
+      "value": 2.5
+    },
+    "Maximum concentration in positive electrode [mol.m-3]": {
+      "inherited": false,
+      "role": "capacity_axis",
+      "selected_before_forward_run": true,
+      "selection_reason": "prior c_smax; NOT selected to close 3.2878 mAh (H1-C Tightening 1)",
+      "source_class": "B2",
+      "source_reference": "ae94f3 Table I (equals theoretical rho/M ceiling)",
+      "value": 22820.0
+    },
+    "Negative electrode OCP [V]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.0
+    },
+    "Negative electrode OCP entropic change [V.K-1]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.0
+    },
+    "Negative electrode conductivity [S.m-1]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 10776000.0
+    },
+    "Negative electrode double-layer capacity [F.m-2]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 2.220446049250313e-16
+    },
+    "Negative electrode thickness [m]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.0001
+    },
+    "Nominal cell capacity [A.h]": {
+      "inherited": false,
+      "role": "inert_label_A0",
+      "selected_before_forward_run": true,
+      "selection_reason": "manufacturer label; carried for provenance, not used for closure",
+      "source_class": "A0",
+      "source_reference": "SINTEF metadata",
+      "value": 0.00307876
+    },
+    "Number of cells connected in series to make a battery": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1.0
+    },
+    "Number of electrodes connected in parallel to make a cell": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1.0
+    },
+    "Open-circuit voltage at 0% SOC [V]": {
+      "inherited": false,
+      "role": "inert_label",
+      "selected_before_forward_run": true,
+      "selection_reason": "label only (unused by half-cell build); kept for provenance",
+      "source_class": "A0",
+      "source_reference": "SINTEF window",
+      "value": 2.5
+    },
+    "Open-circuit voltage at 100% SOC [V]": {
+      "inherited": false,
+      "role": "inert_label",
+      "selected_before_forward_run": true,
+      "selection_reason": "label only (unused by half-cell build); kept for provenance",
+      "source_class": "A0",
+      "source_reference": "SINTEF window",
+      "value": 3.65
+    },
+    "Positive electrode Bruggeman coefficient (electrode)": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.0
+    },
+    "Positive electrode Bruggeman coefficient (electrolyte)": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1.9
+    },
+    "Positive electrode OCP [V]": {
+      "function": {
+        "analytic_source": "LFP_ocp_Afshar2017 from pybamm registered Prada2013 set (3.4077 - 0.020269*sto + 0.5*exp(-150*sto) - 0.9*exp(-30*(1-sto)))",
+        "domain": [
+          0.0,
+          1.0
+        ],
+        "grid_points": 4001,
+        "interpolator": "linear",
+        "kind": "ocp_afshar_interp"
+      },
+      "inherited": false,
+      "role": "ocp_thermodynamics",
+      "selected_before_forward_run": true,
+      "selection_reason": "external single-curve OCP required by D0-A (no SINTEF curve used); SINTEF two-branch hysteresis (~37.5 mV proxy) NOT represented",
+      "source_class": "C",
+      "source_reference": "Afshar2017 external LFP OCP via pybamm Prada2013 (full-cell surrogate chemistry prior; NOT a SINTEF half-cell reference)"
+    },
+    "Positive electrode OCP entropic change [V.K-1]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.0
+    },
+    "Positive electrode active material density [kg.m-3]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 4796.0
+    },
+    "Positive electrode active material volume fraction": {
+      "inherited": false,
+      "role": "capacity_axis",
+      "selected_before_forward_run": true,
+      "selection_reason": "central prior of unresolved (U) active fraction band; NOT capacity-tuned; eps_s x dx stays degenerate (H1-C Tightening 1)",
+      "source_class": "C",
+      "source_reference": "central of band 0.40-0.70 (acfc66/ae94f3/generic)",
+      "value": 0.5
+    },
+    "Positive electrode carbon-binder density [kg.m-3]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1860.0
+    },
+    "Positive electrode charge transfer coefficient": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.5
+    },
+    "Positive electrode conductivity [S.m-1]": {
+      "inherited": false,
+      "role": "transport_electronic",
+      "selected_before_forward_run": true,
+      "selection_reason": "generic prior; electronic ohmic loss negligible at C/50",
+      "source_class": "C",
+      "source_reference": "generic carbon-coated LFP composite",
+      "value": 1.0
+    },
+    "Positive electrode diffusivity scaling factor": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1.0
+    },
+    "Positive electrode double-layer capacity [F.m-2]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.00686
+    },
+    "Positive electrode exchange-current density [A.m-2]": {
+      "inherited": false,
+      "role": "kinetics",
+      "selected_before_forward_run": true,
+      "selection_reason": "prior j0; high uncertainty flagged; no tuning from SINTEF curve",
+      "source_class": "B2",
+      "source_reference": "ae94f3 Table I (assumed, NOT measured; P2D table value)",
+      "value": 50.0
+    },
+    "Positive electrode porosity": {
+      "inherited": false,
+      "role": "transport_electrolyte",
+      "selected_before_forward_run": true,
+      "selection_reason": "prior mean of two matched-LFP published porosities",
+      "source_class": "B2",
+      "source_reference": "mean(acfc66 0.254, ae94f3 0.45)",
+      "value": 0.35
+    },
+    "Positive electrode reaction activation energy [J.mol-1]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 56410.0
+    },
+    "Positive electrode reaction rate [A.m-2.(m3.mol-1)^1.5]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1.037e-06
+    },
+    "Positive electrode thickness [m]": {
+      "inherited": false,
+      "role": "geometry_A0",
+      "selected_before_forward_run": true,
+      "selection_reason": "cell geometry fact; no tuning possible/needed",
+      "source_class": "A0",
+      "source_reference": "SINTEF R2032 LFP-NMP-1 metadata",
+      "value": 7.8e-05
+    },
+    "Positive particle diffusivity [m2.s-1]": {
+      "inherited": false,
+      "role": "transport_solid",
+      "selected_before_forward_run": true,
+      "selection_reason": "prior constant solid diffusivity; SOC-dependence (ae94f3 GITT) flagged but not used in D0",
+      "source_class": "B2",
+      "source_reference": "acfc66 Table 1 (constant D_s from EIS)",
+      "value": 3.7e-16
+    },
+    "Positive particle radius [m]": {
+      "inherited": false,
+      "role": "transport_solid_kinetics",
+      "selected_before_forward_run": true,
+      "selection_reason": "published matched-LFP FESEM primary particle radius",
+      "source_class": "B2",
+      "source_reference": "acfc66 Table 1 / Sec.2 (FESEM mean, 1 um primary)",
+      "value": 1e-06
+    },
+    "Reference temperature [K]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 298.15
+    },
+    "Separator Bruggeman coefficient (electrode)": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.0
+    },
+    "Separator Bruggeman coefficient (electrolyte)": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1.5
+    },
+    "Separator porosity": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 0.39
+    },
+    "Separator thickness [m]": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 2.5e-05
+    },
+    "Thermodynamic factor": {
+      "inherited": true,
+      "role": "structural_default_unmatched",
+      "selected_before_forward_run": true,
+      "selection_reason": "inherited unmatched structural default (not a SINTEF-specific value)",
+      "source_class": "U",
+      "source_reference": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars).",
+      "value": 1.0
+    },
+    "Upper voltage cut-off [V]": {
+      "inherited": false,
+      "role": "protocol_A0",
+      "selected_before_forward_run": true,
+      "selection_reason": "experimental window fact",
+      "source_class": "A0",
+      "source_reference": "SINTEF p-OCV programme",
+      "value": 3.65
+    }
+  },
+  "per_leg_variables": {
+    "Current function [A]": {
+      "method": "constant current per driven leg; sign = +I for discharge (lithiation, V down) and -I for charge (delithiation, V up), H0 half-cell convention = flip of cycler sign (cycler discharge negative)",
+      "role": "drive",
+      "selected_before_forward_run": true,
+      "source_class": "A1",
+      "source_reference": "H1-B replay measured driven-leg median |I| = 61.6 uA"
+    },
+    "Initial concentration in positive electrode [mol.m-3]": {
+      "method": "x0 = brentq(U_afshar(x) - V0) on [1e-4, 0.9994]; initial concentration = x0*c_smax set before build; conditioning (dU/dx at x0) recorded in initialisation_audit.json; plateau dU/dx~0 regions -> weakly_determined_from_voltage flag (never a unique-x0 claim)",
+      "role": "initial_state",
+      "selected_before_forward_run": true,
+      "source_class": "A1+external OCP",
+      "source_reference": "measured preceding-rest-end voltage V0 inverted through the locked external Afshar OCP"
+    }
+  },
+  "selected_before_forward_run": true,
+  "solver": {
+    "atol": 1e-06,
+    "rtol": 1e-06
+  },
+  "stage": "H1-D0 Zero-fit Composite Forward Baseline",
+  "template": {
+    "keys": 51,
+    "parameter_set": "Jackowska2025_2mAh_cm2",
+    "source_note": "Jackowska2025_2mAh_cm2 (H0-grade-A exact matched Birmingham NCM920305||Li half-cell set); used here ONLY as unmatched structural defaults (separator / electrolyte / Li counter / double-layer / Bruggeman / inert thermal-chemistry scalars)."
+  },
+  "tuning_prohibition": "After the first forward run no parameter value in this file may be changed to reduce residual. Any parameter change becomes a new hypothesis run (D0-A2) writing to a new directory; this lock is immutable."
+}

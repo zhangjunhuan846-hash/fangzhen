@@ -1,0 +1,20 @@
+{
+  "dataset_name": "demo_birmingham_cover5",
+  "parameter_set": "Jackowska2025_2mAh_cm2",
+  "parameter_match_level": "design_matched_surrogate",
+  "parameter_match_grade": "B",
+  "parameter_match_provenance": {
+    "provenance": "matched_study",
+    "electrode_design": "matched_2mAh_cm2",
+    "fitted_to_user_dataset": false,
+    "executable_reproduction": "partial"
+  },
+  "fitted_to_dataset": false,
+  "models": [
+    "DFN"
+  ],
+  "rmse_time_aligned_mV": {
+    "DFN": 104.29166740174198
+  },
+  "warning": "Zero-fit baseline only. 参数集未经你的数据标定；RMSE 用于描述差异大小，不代表模型已被验证，也不代表误差来源于某个具体参数。"
+}

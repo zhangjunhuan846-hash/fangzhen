@@ -8,12 +8,8 @@
       "max_abs_diff_mV": 3.108624468950438e-11,
       "n_ok": 2000
     },
-    "calce_a123/007/DST": {
-      "max_abs_diff_mV": 2.4424906541753444e-11,
-      "n_ok": 2000
-    },
-    "calce_a123/008/DST": {
-      "max_abs_diff_mV": 1.9984014443252818e-11,
+    "calce_a123/008/FUDS": {
+      "max_abs_diff_mV": 2.3092638912203256e-11,
       "n_ok": 2000
     },
     "calce_cs2/33/C0p5": {
@@ -30,7 +26,7 @@
     }
   },
   "delta": 0.2,
-  "n_solved_cases": 126,
-  "wall_time_s": 189.43583959699754,
+  "n_solved_cases": 108,
+  "wall_time_s": 62.34253794400138,
   "note": "baseline mirror diff ~0 proves the perturbed replay shares the exact solver/parameter pipeline of the frozen baseline outputs"
 }

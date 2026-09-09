@@ -55,8 +55,7 @@ RUN_SHORT = {
     "calce_cs2/33/C0p5": "CS2 33 0p5C",
     "calce_20r/2/DST_50SOC": "20R DST50",
     "calce_20r/2/DST_80SOC": "20R DST80",
-    "calce_a123/007/DST": "A123 007",
-    "calce_a123/008/DST": "A123 008",
+    "calce_a123/008/FUDS": "A123 008 FUDS",
 }
 
 

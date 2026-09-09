@@ -1,0 +1,104 @@
+{
+  "caveats": [
+    "V0 is a measured rest-end voltage on one hysteresis branch; the locked external Afshar curve is a single median-style curve -> systematic x0 bias of order branch_offset/|slope| (branch proxy 37.5 mV) is possible.",
+    "x0 is NOT a fitted state: it is the D0 initialization convention (initial concentration = x0*c_smax set before model build)."
+  ],
+  "legs": [
+    {
+      "U_afshar_x0_V": 3.1677107811000003,
+      "V0_rest_V": 3.1677107811,
+      "dUdx_V_per_sto": -6.661824784825422,
+      "direction": "charge",
+      "leg": "c1_charge",
+      "x0": 0.9531422206678014,
+      "x0_status": "well_conditioned_from_voltage"
+    },
+    {
+      "U_afshar_x0_V": 3.2096462249999997,
+      "V0_rest_V": 3.209646225,
+      "dUdx_V_per_sto": -5.403809487910456,
+      "direction": "charge",
+      "leg": "c2_charge",
+      "x0": 0.9461431140455457,
+      "x0_status": "well_conditioned_from_voltage"
+    },
+    {
+      "U_afshar_x0_V": 2.9408383369000006,
+      "V0_rest_V": 2.9408383369,
+      "dUdx_V_per_sto": -13.46175965784517,
+      "direction": "charge",
+      "leg": "c3_charge",
+      "x0": 0.9766768104634099,
+      "x0_status": "well_conditioned_from_voltage"
+    },
+    {
+      "U_afshar_x0_V": 2.8131945133000005,
+      "V0_rest_V": 2.8131945133,
+      "dUdx_V_per_sto": -17.365996821270546,
+      "direction": "charge",
+      "leg": "c4_charge",
+      "x0": 0.9850390259040781,
+      "x0_status": "well_conditioned_from_voltage"
+    },
+    {
+      "U_afshar_x0_V": 2.808735132200001,
+      "V0_rest_V": 2.8087351322,
+      "dUdx_V_per_sto": -17.496578850436578,
+      "direction": "charge",
+      "leg": "c5_charge",
+      "x0": 0.9852964303070615,
+      "x0_status": "well_conditioned_from_voltage"
+    },
+    {
+      "U_afshar_x0_V": 3.4770736694,
+      "V0_rest_V": 3.4770736694,
+      "dUdx_V_per_sto": -10.300497398685797,
+      "direction": "discharge",
+      "leg": "c1_discharge",
+      "x0": 0.013142936876667607,
+      "x0_status": "well_conditioned_from_voltage"
+    },
+    {
+      "U_afshar_x0_V": 3.5322194099,
+      "V0_rest_V": 3.5322194099,
+      "dUdx_V_per_sto": -18.062631725728178,
+      "direction": "discharge",
+      "leg": "c2_discharge",
+      "x0": 0.00925774352920762,
+      "x0_status": "well_conditioned_from_voltage"
+    },
+    {
+      "U_afshar_x0_V": 3.5468790530999947,
+      "V0_rest_V": 3.5468790531,
+      "dUdx_V_per_sto": -20.210976575518718,
+      "direction": "discharge",
+      "leg": "c3_discharge",
+      "x0": 0.008517685925806272,
+      "x0_status": "well_conditioned_from_voltage"
+    },
+    {
+      "U_afshar_x0_V": 3.5509932041,
+      "V0_rest_V": 3.5509932041,
+      "dUdx_V_per_sto": -20.982503834474624,
+      "direction": "discharge",
+      "leg": "c4_discharge",
+      "x0": 0.00832456520105939,
+      "x0_status": "well_conditioned_from_voltage"
+    },
+    {
+      "U_afshar_x0_V": 3.5574374199,
+      "V0_rest_V": 3.5574374199,
+      "dUdx_V_per_sto": -21.783512690797462,
+      "direction": "discharge",
+      "leg": "c5_discharge",
+      "x0": 0.008031432451536457,
+      "x0_status": "well_conditioned_from_voltage"
+    }
+  ],
+  "method": "brentq(U_afshar(x) - V0_rest) on [1e-4, 0.9994] with xtol=1e-14; x0 = c_smax * sto; conditioning = |dU/dx| at x0 (V per sto).",
+  "thresholds": {
+    "moderate": "0.1-1.0",
+    "weak": "<0.1 V/sto (plateau)",
+    "well": ">=1.0"
+  }
+}

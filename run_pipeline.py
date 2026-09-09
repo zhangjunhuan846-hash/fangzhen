@@ -6,14 +6,13 @@
 #
 # Usage:
 #   python run_pipeline.py --list-datasets
-#   python run_pipeline.py --dataset chen2020 --mode reproduction \
-#       --model SPMe --cell 02
-#   python run_pipeline.py --dataset chen2020 --mode benchmark \
-#       --models SPMe DFN --cells all
-#   python run_pipeline.py --dataset chen2020 --mode sensitivity \
-#       --model SPMe --cell 02 --parameter Dsn
-#   python run_pipeline.py --dataset chen2020 --mode baseline \
-#       --model SPMe --cell 02
+#   python run_pipeline.py baseline  --dataset chen2020 --model SPMe --cell 02
+#   python run_pipeline.py benchmark --dataset chen2020 --models SPMe DFN --cells all
+#   python run_pipeline.py sensitivity --dataset chen2020 --model SPMe --cell 02 \
+#       --parameter Dsn
+#   python run_pipeline.py reproduction --dataset chen2020 --model SPMe --cell 02
+#
+# The task may also be given as --mode <task> (historical form, still supported).
 #
 # v0.1 formally supports only the Chen2020 LG M50 dataset.
 # ============================================================
@@ -54,6 +53,17 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
 
+    # Positional task: "python run_pipeline.py baseline ...".
+    # Optional and additive: --mode remains fully supported.
+    parser.add_argument(
+        "task",
+        nargs="?",
+        choices=MODES,
+        default=None,
+        metavar="{" + ",".join(MODES) + "}",
+        help="Task to run (same values as --mode).",
+    )
+
     parser.add_argument(
         "--dataset",
         default="chen2020",
@@ -63,8 +73,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--mode",
         choices=MODES,
-        default="reproduction",
-        help="Pipeline mode.",
+        default=None,
+        help="Pipeline mode (equivalent to the positional task).",
     )
 
     parser.add_argument(
@@ -196,6 +206,14 @@ def main(argv=None) -> int:
     if args.list_datasets:
         return cmd_list_datasets()
 
+    # Resolve the task: positional `task` and `--mode` are equivalent.
+    if args.task and args.mode and args.task != args.mode:
+        parser.error(
+            f"conflicting task '{args.task}' and --mode '{args.mode}'; "
+            "use one or the other"
+        )
+    mode = args.task or args.mode or "reproduction"
+
     dataset_id = args.dataset
 
     # ----------------------------------------------------------
@@ -206,7 +224,7 @@ def main(argv=None) -> int:
     banner("Battery Dataset Simulation Platform")
     kv("Dataset", cfg.name)
     kv("Chemistry", cfg.chemistry)
-    kv("Mode", args.mode)
+    kv("Mode", mode)
     kv("Parameter set", cfg.parameter_set)
 
     adapter = get_dataset(dataset_id)
@@ -214,19 +232,19 @@ def main(argv=None) -> int:
     # ----------------------------------------------------------
     # Dispatch
     # ----------------------------------------------------------
-    if args.mode == "reproduction":
+    if mode == "reproduction":
         return cmd_reproduction(adapter, cfg, args)
 
-    if args.mode == "benchmark":
+    if mode == "benchmark":
         return cmd_benchmark(adapter, cfg, args)
 
-    if args.mode == "baseline":
+    if mode == "baseline":
         return cmd_baseline(adapter, cfg, args)
 
-    if args.mode == "sensitivity":
+    if mode == "sensitivity":
         return cmd_sensitivity(adapter, cfg, args)
 
-    parser.error(f"Unknown mode: {args.mode}")
+    parser.error(f"Unknown mode: {mode}")
     return 2
 
 

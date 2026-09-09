@@ -1,0 +1,9 @@
+file,rate,leg,n_sign_segments,n_discharge_pulses,n_rest_segments,rest_total_h,rest_median_s
+gitt_0_17C.mat,C/6,charge,225,1,112,213.46341666666672,7019.900000000023
+gitt_0_17C.mat,C/6,discharge,292,122,144,215.60127777777709,7199.899999999907
+gitt_0_33C.mat,C/3,charge,59,0,30,115.34999999999998,14400.0
+gitt_0_33C.mat,C/3,discharge,59,29,30,107.41666666666667,14400.0
+gitt_0_5C.mat,C/2,charge,59,0,30,107.05000000000001,14400.0
+gitt_0_5C.mat,C/2,discharge,57,28,29,102.4,14400.0
+gitt_1C.mat,1C,charge,59,0,30,106.83333333333333,14400.0
+gitt_1C.mat,1C,discharge,49,24,25,87.06666666666666,14400.0

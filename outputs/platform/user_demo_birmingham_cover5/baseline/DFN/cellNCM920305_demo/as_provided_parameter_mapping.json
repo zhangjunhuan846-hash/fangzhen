@@ -1,0 +1,39 @@
+{
+  "dataset": "user_demo_birmingham_cover5",
+  "cell": "NCM920305_demo",
+  "model": "DFN",
+  "rate_slug": "as_provided",
+  "rate_label": "~0.22 C (from max|I| / declared nominal capacity)",
+  "c_rate": 0.22107910734530845,
+  "source_rate": "user_provided",
+  "parameter_set": "Jackowska2025_2mAh_cm2",
+  "external_repo_commit": "9f3b526",
+  "pybamm_version": "26.8.0.0",
+  "solver": {
+    "class": "IDAKLUSolver",
+    "rtol": 1e-06,
+    "atol": 1e-06
+  },
+  "source_file": "",
+  "dataset_file_sha256": "",
+  "ocp_file": "",
+  "ocp_file_sha256": "",
+  "mapping": [
+    {
+      "parameter_set": "Jackowska2025_2mAh_cm2",
+      "source_key": "Initial concentration in positive electrode [mol.m-3]",
+      "mapped_key": "Initial concentration in positive electrode [mol.m-3]",
+      "source_value": 5000.0,
+      "mapped_value": 14911.85437993138,
+      "mapping_reason": "inverse-OCP(rest OCV 4.1934 V) -> x0 = 0.3029 -> x0*c_max = 14911.9 mol/m3; user_tools: inverse-OCP(measured start voltage) -> x0. Not fitted. "
+    },
+    {
+      "parameter_set": "Jackowska2025_2mAh_cm2",
+      "source_key": "(absent from author dict)",
+      "mapped_key": "Positive particle diffusivity scaling factor",
+      "source_value": null,
+      "mapped_value": 1.0,
+      "mapping_reason": "auto-materialised by PyBaMM 26.8 (deprecated-key alias); value copied from the author's legacy key, model inputs unchanged"
+    }
+  ]
+}

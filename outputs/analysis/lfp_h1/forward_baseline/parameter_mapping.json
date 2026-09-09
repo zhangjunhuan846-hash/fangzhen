@@ -1,0 +1,10 @@
+{
+  "D0A_ocp": "ocp_afshar_interp grid from lock (4001 pt, Afshar2017/Prada2013)",
+  "D0B_ocp": "measured branch OCP interp (reference legs from lock d0b)",
+  "note": "Every key of the 51-key build dict maps to a locked parameter or a per-leg variable. Function-valued locks instantiate the pybamm callable from the lock 'function' spec.",
+  "parameter_lock_sha256": "1c0a52639a4a7d5e9eac141165f1170aae4aefd9a87e0f63d7223fd30b10ad33",
+  "per_leg": {
+    "Current function [A]": "constant I_model = +/- leg measured median",
+    "Initial concentration in positive electrode [mol.m-3]": "x0*c_smax"
+  }
+}
