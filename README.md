@@ -1,186 +1,427 @@
-# PyBaMM Battery Simulation Platform
+下面这个可以**直接复制到 GitHub 的 `README.md`**。格式已经是 Markdown，不需要再改。
 
-Physics-based lithium-ion battery simulation: replay measured cycling data with
-PyBaMM (SPM / SPMe / DFN), compare against experiment, and analyse residuals.
-**Zero-fit by design** — the platform never fits parameters to a dataset unless a
-phase explicitly says so.
+```markdown
+# 电池数据驱动仿真串联平台
 
-Platform core `battery_sim/` is **frozen at v0.4**. Scientific logic
-(runner / evaluator / model factory) must not be changed.
+## 项目简介
+
+本项目旨在构建一个面向电池研究的数据—模型串联仿真平台，实现实验数据、物理模型和数据分析流程之间的标准化连接。
+
+在当前电池研究中，实验测试数据、模型参数和仿真工具通常相互独立，存在以下问题：
+
+- 不同来源实验数据格式不统一；
+- 实验数据难以直接进入物理模型；
+- 不同电化学模型调用流程复杂；
+- 仿真参数和结果缺少完整记录；
+- 大规模模型比较和参数分析效率较低。
+
+本平台基于 **PyBaMM 电化学建模框架**，建立统一的数据接口、模型调用、自动化仿真、结果评价以及参数敏感性分析流程，为后续电池实验数据解析、模型参数优化以及智能化电池设计提供基础框架。
+
 
 ---
 
-## 1. Environment (read this first)
+# 平台整体架构
 
-All simulation runs in **WSL Ubuntu**, conda env `pybamm` (Python 3.11,
-PyBaMM 26.8.0.0, casadi 3.7.2, numpy 2.3.5). Windows Python has no PyBaMM.
+```
+
+实验数据
+|
+↓
+数据标准化接口
+|
+↓
+统一数据格式
+|
+↓
+PyBaMM模型调用
+|
+↓
+自动化仿真流程
+|
+↓
+误差评价与结果分析
+|
+↓
+参数敏感性分析
+|
+↓
+模型优化与实验反馈
+
+```
+
+
+---
+
+# 主要功能
+
+## 1. 多来源电池数据接入
+
+平台支持不同来源电池测试数据的统一处理。
+
+包括：
+
+- 恒流充放电数据；
+- 电压-时间曲线；
+- 电流-容量数据；
+- 不同采样频率实验数据。
+
+
+通过数据适配模块，将不同格式实验数据转换为统一输入格式，使其能够直接进入电化学模型。
+
+
+---
+
+## 2. 多物理模型调用
+
+平台支持多种 PyBaMM 电化学模型。
+
+
+### 单粒子模型（SPM）
+
+Single Particle Model
+
+特点：
+
+- 计算效率高；
+- 适用于快速模拟和参数扫描。
+
+
+### 含电解液单粒子模型（SPMe）
+
+Single Particle Model with Electrolyte
+
+考虑：
+
+- 电解液浓度变化；
+- 浓差极化影响。
+
+
+### Doyle-Fuller-Newman模型（DFN）
+
+考虑：
+
+- 固相扩散；
+- 电解液传输；
+- 电极动力学；
+- 电化学反应过程。
+
+
+平台支持在相同实验条件下对不同模型进行自动比较。
+
+
+---
+
+# 自动化仿真流程
+
+统一运行入口：
+
+```
+
+run_pipeline.py
+
+````
+
+支持以下任务：
+
+|任务|功能|
+|-|-|
+|reproduction|实验/文献结果复现|
+|benchmark|不同模型性能比较|
+|baseline|标准条件仿真|
+|sensitivity|模型参数敏感性分析|
+
+
+示例：
 
 ```bash
-wsl.exe -d Ubuntu -e bash -lc 'source ~/miniforge3/etc/profile.d/conda.sh \
-  && conda activate pybamm && cd /mnt/c/Users/24330/WorkBuddy/仿真模拟 \
-  && python run_pipeline.py --list-datasets'
-```
-
-Install: `pip install -r requirements.txt` (numpy **must stay <2.4**, PyBOP requires it).
+python run_pipeline.py --mode baseline
+````
 
 ---
 
-## 2. Entry point
+# 仿真结果评价
+
+平台不仅生成模拟曲线，同时自动进行模型性能评价。
+
+## 电压误差分析
+
+包括：
+
+* RMSE；
+* MAE；
+* 电压曲线偏差。
+
+## 容量分析
+
+比较：
+
+* 实验容量；
+* 模拟容量；
+* 容量误差。
+
+## 时间对齐
+
+针对实验数据和模型输出采样频率不同的问题，实现：
+
+* 时间同步；
+* 数据插值；
+* 曲线匹配。
+
+---
+
+# 参数敏感性分析
+
+平台支持分析模型参数变化对电池性能的影响。
+
+可分析参数包括：
+
+* 固相扩散系数；
+* 反应速率常数；
+* 孔隙率；
+* 电极相关参数。
+
+分析流程：
+
+```
+参数变化
+
+↓
+
+电化学模型响应
+
+↓
+
+性能指标变化
+
+↓
+
+关键参数识别
+```
+
+用于：
+
+* 确定主要影响因素；
+* 指导实验设计；
+* 支撑模型优化。
+
+---
+
+# 可追溯运行记录
+
+每一次仿真运行自动保存完整运行信息。
+
+包括：
+
+* 数据来源；
+* 模型类型；
+* 参数配置；
+* 运行环境；
+* 输出结果。
+
+生成：
+
+```
+run_metadata.json
+```
+
+保证所有模拟结果具有完整的来源追踪（provenance）。
+
+---
+
+# 平台特点
+
+## 1. 数据与模型解耦
+
+通过标准化接口连接：
+
+```
+实验数据
+
+↓
+
+数据适配
+
+↓
+
+电化学模型
+```
+
+降低不同数据源和模型之间的转换成本。
+
+---
+
+## 2. 自动化与可复现
+
+所有模拟过程：
+
+* 参数明确；
+* 配置保存；
+* 自动记录；
+* 结果可重复。
+
+---
+
+## 3. 可扩展性
+
+未来可进一步连接：
+
+* 文献数据自动抽取系统；
+* 电池参数数据库；
+* 机器学习模型；
+* AI Agent智能科研流程。
+
+---
+
+# 当前完成内容
+
+目前平台已实现：
+
+* [x] 电池实验数据标准化接口
+* [x] PyBaMM模型自动调用
+* [x] SPM/SPMe/DFN模型支持
+* [x] reproduction任务
+* [x] benchmark任务
+* [x] baseline任务
+* [x] sensitivity任务
+* [x] 自动误差评价
+* [x] 参数敏感性分析
+* [x] 运行结果追踪
+* [x] 自动化测试验证
+
+---
+
+# 后续发展方向
+
+## 第一阶段：实验数据—模型串联
+
+实现：
+
+```
+实验数据
+
+↓
+
+自动输入模型
+
+↓
+
+仿真结果
+
+↓
+
+误差分析
+```
+
+---
+
+## 第二阶段：文献数据—模型连接
+
+实现：
+
+```
+论文数据
+
+↓
+
+材料/电池参数
+
+↓
+
+自动仿真
+
+↓
+
+模型评价
+```
+
+---
+
+## 第三阶段：智能化科研流程
+
+进一步结合人工智能方法：
+
+```
+实验数据
+
+↓
+
+AI Agent
+
+↓
+
+模型选择
+
+↓
+
+自动仿真
+
+↓
+
+参数优化
+
+↓
+
+实验设计
+```
+
+---
+
+# 项目定位
+
+本项目定位为：
+
+**面向电池研究的数据—模型串联仿真基础平台**
+
+（Battery Data–Model Integration Framework）
+
+用于连接实验数据、电化学模型和智能化分析方法，为下一代电池数字化研究提供基础工具。
+
+````
+
+---
+
+## 修改方法
+
+在你的仓库：
 
 ```bash
-python run_pipeline.py <task> [options]      # positional task
-python run_pipeline.py --mode <task> [opts]  # equivalent, historical form
-```
+cd fangzhen
+````
 
-List registered datasets:
-
-```bash
-python run_pipeline.py --list-datasets
-```
-
----
-
-## 3. Available tasks
-
-| Task | What it does | Command |
-|---|---|---|
-| `baseline` | **Primary.** Time-aligned V(t) replay of the measured current profile; writes `*_time_aligned.csv` + `metrics.csv` (RMSE/MAE/bias, mV) | `python run_pipeline.py baseline --dataset chen2020 --model SPMe --cell 02` |
-| `benchmark` | Model × cell sweep + runtime/cost comparison | `python run_pipeline.py benchmark --dataset chen2020 --models SPM SPMe DFN --cells all` |
-| `reproduction` | Capacity-aligned (Q) replay, the v0.1 legacy metric | `python run_pipeline.py reproduction --dataset chen2020 --model SPMe --cell 02` |
-| `sensitivity` | One-at-a-time (OAT) parameter perturbation study | `python run_pipeline.py sensitivity --dataset chen2020 --model SPMe --cell 02 --parameter Dsn` |
-
-Common options: `--dataset`, `--model/--models`, `--cell/--cells`, `--rate`
-(or `--protocol`, dynamic datasets), `--parameter` (sensitivity), `--no-plot`.
-
-Tasks take **no positional arguments beyond the task name**; everything else is a flag.
-Default dataset is `chen2020`, default mode `reproduction`.
-
----
-
-## 4. Datasets (`configs/datasets.yaml`)
-
-| id | Chemistry | Parameter set | Match | Protocol |
-|---|---|---|---|---|
-| `chen2020` | NMC811/graphite (LG M50) | `Chen2020` | **A** exact | CC (C/10…1.5C) |
-| `calce_cs2` | LCO/graphite (CS2) | `Ramadass2004` | B surrogate | CC |
-| `calce_20r` | NMC/graphite (INR18650-20R) | `Chen2020` | B surrogate | DST/FUDS/US06 |
-| `calce_a123` | LFP/graphite (A123 18650) | `Prada2013` | B surrogate | DST/FUDS/US06 |
-| `birmingham_ncm920305` | NMC **half-cell** ‖ Li | `Jackowska2025_2mAh_cm2` | A | CC C/10…2C |
-
-Matching grade: **A** = exact parameter set for that cell; **B** = chemistry-compatible
-surrogate; **C** = incompatible. CALCE results are surrogates — **never call them validation**.
-
----
-
-## 5. Configs
-
-| File | Purpose |
-|---|---|
-| `configs/datasets.yaml` | Dataset registry: id, chemistry, cells, rates, parameter set, models, paths |
-| `configs/models.yaml` | Model ids (SPM / SPMe / DFN) and options |
-| `configs/sensitivity.yaml` | OAT parameter list, perturbation levels, metrics |
-
----
-
-## 6. Outputs
-
-```
-outputs/
-├── platform/<dataset>/<task>/<MODEL>/cell<id>/
-│     ├── metrics.csv              # one row per window: rmse/mae/bias/max_abs (mV)
-│     ├── <rate>_time_aligned.csv  # baseline: t, V_exp, V_sim, residual
-│     ├── <rate>_Vt.png
-│     └── run_metadata.json        # provenance: parameter set, pybamm version, options
-├── analysis/                      # scientific analysis (read-only consumer of platform outputs)
-│     ├── residual_atlas/          # A1: cross-dataset residual decomposition
-│     ├── targeted_sensitivity/    # A2: residual-aligned OAT sensitivity
-│     ├── lfp_h1/                  # half-cell H1-B/C/D0 (LFP)
-│     └── lfp_gitt_audit/          # new LFP CC+GITT+EV dataset audit
-├── user_datasets/                 # self-service imports (validation report + canonical)
-└── (legacy: baseline/, reproduction/, sensitivity/, protocol_reproduction/,
-     fitting/, validation/, _legacy_*, _golden_backup_* — v0.1–v0.3 leftovers, not current)
-```
-
----
-
-## 7. Repository layout
-
-```
-run_pipeline.py        CLI entry point (task dispatch)
-battery_sim/           FROZEN platform package
-  datasets/            one adapter per dataset (raw -> canonical)
-  simulation/          baseline.py benchmark.py reproduction.py sensitivity.py
-  models/              PyBaMM factory + external parameter-set routing
-  evaluation/          metrics + plotting
-  paths.py registry.py schemas.py rates.py protocols/
-analysis/              scientific analysis (A1/A2), does not modify battery_sim/
-scripts/               phase scripts (half-cell H0/H1-*, dataset audits)
-user_tools/            self-service importer (CSV/XLSX -> canonical -> zero-fit baseline)
-user_dataset_template/ double-click package for experimental users
-docs/                  phase reports and method notes
-tests/                 88 tests (regression gate)
-data/raw/              datasets (gitignored, ~13 GB)
-```
-
----
-
-## 8. Invariants — do not break
-
-1. **Frozen core**: do not modify runner / evaluator / model-factory scientific logic.
-2. **Run the gate**: `python -m pytest tests -q` must stay **88 passed** after any change.
-3. **Zero-fit**: baseline never fits parameters. Fitting requires its own phase and lock file.
-4. **Sign convention**: canonical `current_A` is **discharge = +**, charge = −.
-   Adapters convert from the source convention; never re-flip downstream.
-5. **Capacity semantics**: baseline capacity is `forced_current_window`
-   (`capacity_is_predictive = False`) — Q_sim ≈ Q_exp by construction, never a prediction.
-6. **Vocabulary**: surrogate results may be "consistent / inconsistent", never "validated".
-7. **Provenance**: every run writes `run_metadata.json`; never silently swap a parameter set.
-
----
-
-## 9. Sub-projects (separate from the frozen core)
-
-- **`analysis/`** — A1 Residual Atlas (`residual_atlas.py`) and A2 Residual-guided
-  Targeted Sensitivity (`targeted_sensitivity/`). Reads platform outputs; writes to
-  `outputs/analysis/`. **Not** a fitting stage: A2 reports *candidate explanatory
-  directions* only, never "identified parameter" / "root cause".
-- **`scripts/`** — half-cell work (H0 Birmingham reproduction, H1-A/B/C/D0 LFP‖Li) and
-  dataset audits (`lfp_gitt_audit.py`). All zero-pybamm unless a script says otherwise.
-- **`user_tools/` + `user_dataset_template/`** — self-service onboarding: an experimental
-  user drops CSV/XLSX into `raw/`, fills `dataset_info.xlsx`, double-clicks
-  `导入并检查数据.bat` then `运行仿真.bat`. Explicit mapping only — no guessing of
-  chemistry, units, sign, or parameter set.
-
----
-
-## 10. Tests
+打开：
 
 ```bash
-wsl.exe -d Ubuntu -e bash -lc 'source ~/miniforge3/etc/profile.d/conda.sh \
-  && conda activate pybamm && cd /path/to/this/repo \
-  && python -m pytest tests -q'
+nano README.md
 ```
 
-Golden regression values are asserted in `tests/` (e.g. Chen2020 SPMe cell02
-82.33 / 115.81 / 70.02 / 46.84 mV). Changing a number means a new phase, not an edit.
+或者 VS Code：
+
+```bash
+code README.md
+```
+
+然后：
+
+1. `Ctrl + A` 全选；
+2. 删除原 README；
+3. 粘贴上面内容；
+4. 保存。
+
+Git：
+
+```bash
+git add README.md
+git commit -m "update Chinese README for research platform introduction"
+git push
+```
 
 ---
 
-## 11. External code (vendored)
+我建议你**不要删除原英文 README 的工程信息**。更好的做法是：
 
-`external/Jackowska-2025-JPS` is vendored, not pip-installed. Upstream:
-https://github.com/Battery-Intelligence-Lab/Jackowska-2025-JPS
-(BSD 3-Clause, see `external/Jackowska-2025-JPS/LICENSE`), pinned at commit
-`9f3b526`. The `Jackowska2025_2mAh_cm2` parameter set loads its OCP CSVs
-(`2mAh_cm2/results/ocp_*.csv`) at runtime — keep the directory intact,
-do not modify it, do not `pip install` it (its own pyproject pins older
-PyBaMM versions and would break this environment).
+```
+README.md        英文/技术版（GitHub公开）
+README_CN.md     中文/导师汇报版
+```
 
----
-
-## 12. License
-
-This repository's own code (`battery_sim/`, `analysis/`, `scripts/`,
-`user_tools/`, `tests/`, configs) is released under the MIT License — see
-[`LICENSE`](LICENSE). Vendored third-party code retains its own license
-(`external/Jackowska-2025-JPS`: BSD 3-Clause).
+如果这个仓库主要给导师看，可以先用这个中文版；如果以后想作为论文补充材料或开源项目，再恢复双语结构。
