@@ -5,6 +5,7 @@
 # Single entry point for the platform.
 #
 # Usage:
+#   python run_pipeline.py --config configs/example.yaml
 #   python run_pipeline.py --list-datasets
 #   python run_pipeline.py baseline  --dataset chen2020 --model SPMe --cell 02
 #   python run_pipeline.py benchmark --dataset chen2020 --models SPMe DFN --cells all
@@ -13,6 +14,7 @@
 #   python run_pipeline.py reproduction --dataset chen2020 --model SPMe --cell 02
 #
 # The task may also be given as --mode <task> (historical form, still supported).
+# A YAML config (--config) is merged first; explicit CLI flags win.
 #
 # v0.1 formally supports only the Chen2020 LG M50 dataset.
 # ============================================================
@@ -22,6 +24,8 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+
+import yaml
 
 # Make the project root importable regardless of CWD.
 ROOT = Path(__file__).resolve().parent
@@ -66,8 +70,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--dataset",
-        default="chen2020",
-        help="Dataset id (see configs/datasets.yaml).",
+        default=None,
+        help="Dataset id (see configs/datasets.yaml). Default: chen2020.",
+    )
+
+    parser.add_argument(
+        "--config",
+        default=None,
+        help=(
+            "YAML run config (see configs/example.yaml). Merged first; "
+            "explicit CLI flags win over config values."
+        ),
     )
 
     parser.add_argument(
@@ -160,6 +173,145 @@ def cmd_list_datasets() -> int:
     return 0
 
 
+# ------------------------------------------------------------------
+# YAML run-config support (--config, v0.4.1, additive)
+#
+# Precedence: explicit CLI flags > --config YAML > built-in defaults.
+# The config mirrors the CLI; nothing here bypasses the runners or
+# the dataset registry - it only fills the same argparse fields.
+# ------------------------------------------------------------------
+
+_CONFIG_TASK_KEY = "task"
+
+
+def load_run_config(path) -> dict:
+    """Load and sanity-check a one-shot run config (configs/example.yaml)."""
+    cfg_path = Path(path)
+    if not cfg_path.is_absolute():
+        cfg_path = ROOT / cfg_path
+    if not cfg_path.is_file():
+        raise FileNotFoundError(f"Run config not found: {cfg_path}")
+
+    with cfg_path.open("r", encoding="utf-8") as fh:
+        data = yaml.safe_load(fh) or {}
+
+    if not isinstance(data, dict):
+        raise ValueError(f"Run config must be a YAML mapping: {cfg_path}")
+
+    task = data.get(_CONFIG_TASK_KEY)
+    if task is not None and task not in MODES:
+        raise ValueError(
+            f"Run config task '{task}' is not one of {MODES}"
+        )
+
+    return data
+
+
+def _config_model_names(run_cfg) -> list:
+    """Extract model name(s) from the config `model:` block."""
+    model_block = run_cfg.get("model")
+    if model_block is None:
+        return []
+    if isinstance(model_block, str):
+        return [model_block]
+    if isinstance(model_block, dict):
+        names = model_block.get("models") or model_block.get("name")
+        if names is None:
+            return []
+        if isinstance(names, str):
+            return [names]
+        return [str(m) for m in names]
+    raise ValueError("config 'model' must be a name or a block with name/models")
+
+
+def _user_set(parser, args, dest) -> bool:
+    """True if the user explicitly passed `dest` on the command line."""
+    default = parser.get_default(dest)
+    return getattr(args, dest) != default
+
+
+def apply_run_config(parser, args, run_cfg) -> None:
+    """Fill unset CLI fields from the YAML config (CLI flags win)."""
+    # task: only if neither positional task nor --mode was given.
+    if not _user_set(parser, args, "task") and not _user_set(parser, args, "mode"):
+        cfg_task = run_cfg.get(_CONFIG_TASK_KEY)
+        if cfg_task is not None:
+            args.task = cfg_task
+
+    if not _user_set(parser, args, "dataset"):
+        args.dataset = run_cfg.get("dataset")
+
+    if not _user_set(parser, args, "model"):
+        names = _config_model_names(run_cfg)
+        if names:
+            args.model = names[0]
+
+    if not _user_set(parser, args, "models"):
+        names = _config_model_names(run_cfg)
+        if len(names) > 1:
+            args.models = names
+
+    for arg_dest, cfg_key in (("cell", "cell"), ("cells", "cells")):
+        if not _user_set(parser, args, arg_dest) and run_cfg.get(cfg_key) is not None:
+            setattr(args, arg_dest, str(run_cfg[cfg_key]))
+
+    if not _user_set(parser, args, "rate"):
+        cond = run_cfg.get("condition") or {}
+        rate = cond.get("rate")
+        if rate is not None:
+            args.rate = str(rate)
+
+    if not _user_set(parser, args, "protocol"):
+        cond = run_cfg.get("condition") or {}
+        protocol = cond.get("protocol")
+        if protocol is not None:
+            args.protocol = str(protocol)
+
+    if not _user_set(parser, args, "parameter") and run_cfg.get("parameter"):
+        args.parameter = str(run_cfg["parameter"])
+
+    if not _user_set(parser, args, "no_plot"):
+        out = run_cfg.get("output") or {}
+        if out.get("save_curve") is False:
+            args.no_plot = True
+
+
+def describe_run_config(run_cfg) -> None:
+    """Echo config-level condition/output intent (no silent overrides)."""
+    cond = run_cfg.get("condition") or {}
+    temperature = cond.get("temperature")
+    if temperature is not None:
+        kv("Requested T", f"{temperature} K (dataset-native T is used; "
+                          "zero-fit: no silent override)")
+
+    out = run_cfg.get("output") or {}
+    if out.get("save_metrics") is False:
+        print("Note: save_metrics=false is advisory only; "
+              "metrics.csv is always written by the runners.")
+
+
+def load_chemistry_description(chemistry_id):
+    """Resolve a chemistry id against configs/chemistry.yaml (read-only)."""
+    chem_path = ROOT / "configs" / "chemistry.yaml"
+    if not chem_path.is_file():
+        return None
+    with chem_path.open("r", encoding="utf-8") as fh:
+        registry = yaml.safe_load(fh) or {}
+    entry = registry.get(chemistry_id)
+    if not isinstance(entry, dict):
+        return None
+    return {
+        "detail": (
+            f"{entry.get('positive_electrode', '?')} || "
+            f"{entry.get('negative_electrode', '?')} "
+            f"({entry.get('electrolyte', '?')}), "
+            f"{entry.get('cell_form', '?')}"
+        ),
+        "default_parameter_set": entry.get("default_parameter_set"),
+        "grade": entry.get("parameter_set_grade"),
+    }
+
+
 def _resolve_cells(cfg, cells_arg):
     """Normalise --cell/--cells to a concrete list of cell ids."""
     if cells_arg in (None, "all"):
@@ -206,6 +358,14 @@ def main(argv=None) -> int:
     if args.list_datasets:
         return cmd_list_datasets()
 
+    # ----------------------------------------------------------
+    # YAML run config (merged first; explicit CLI flags win)
+    # ----------------------------------------------------------
+    run_cfg = {}
+    if args.config:
+        run_cfg = load_run_config(args.config)
+        apply_run_config(parser, args, run_cfg)
+
     # Resolve the task: positional `task` and `--mode` are equivalent.
     if args.task and args.mode and args.task != args.mode:
         parser.error(
@@ -214,7 +374,7 @@ def main(argv=None) -> int:
         )
     mode = args.task or args.mode or "reproduction"
 
-    dataset_id = args.dataset
+    dataset_id = args.dataset or "chen2020"
 
     # ----------------------------------------------------------
     # Load dataset config + adapter
@@ -226,6 +386,22 @@ def main(argv=None) -> int:
     kv("Chemistry", cfg.chemistry)
     kv("Mode", mode)
     kv("Parameter set", cfg.parameter_set)
+
+    chem = load_chemistry_description(cfg.chemistry)
+    if chem is not None:
+        kv("Chemistry detail", chem["detail"])
+        grade = chem.get("grade")
+        if grade and grade != "A-exact":
+            kv("Parameter grade", f"{grade} (surrogate baseline, "
+                                  f"NOT a validation run)")
+        if chem.get("default_parameter_set") not in (None, cfg.parameter_set):
+            print(f"Note: chemistry default parameter set is "
+                  f"'{chem['default_parameter_set']}', dataset uses "
+                  f"'{cfg.parameter_set}' (see configs/datasets.yaml).")
+
+    if run_cfg:
+        kv("Run config", str(args.config))
+        describe_run_config(run_cfg)
 
     adapter = get_dataset(dataset_id)
 

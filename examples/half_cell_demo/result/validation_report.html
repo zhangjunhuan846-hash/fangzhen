@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>数据导入检查报告</title>
+<style>
+ body{font-family:"Microsoft YaHei",-apple-system,Segoe UI,sans-serif;
+       margin:28px;color:#222;background:#fff;line-height:1.55}
+ h1{font-size:22px;margin:0 0 4px}
+ h2{font-size:17px;margin:26px 0 8px;border-left:4px solid #1f4e79;padding-left:8px}
+ table{border-collapse:collapse;width:100%;font-size:13px;margin-top:6px}
+ th,td{border:1px solid #d8d8d8;padding:6px 8px;text-align:left;vertical-align:top}
+ th{background:#f2f5f8}
+ .box{border:1px solid #d8d8d8;border-radius:6px;padding:12px 14px;background:#fafbfc}
+ .big{font-size:16px}
+ img{max-width:100%;border:1px solid #d8d8d8;border-radius:4px;margin-top:8px}
+ .note{background:#fff8e1;border-left:4px solid #f9a825;padding:8px 12px;margin-top:10px}
+</style></head><body>
+
+<h1>数据导入检查报告</h1>
+<div style="color:#666">Self-Service Data Onboarding Layer · zero-fit baseline 前置检查</div>
+
+<h2>1. 结论</h2>
+<div class="box big">
+  数据导入：<span style="color:#2e7d32;font-weight:700">PASS</span><br>
+  仿真：<span style='color:#2e7d32;font-weight:700'>SIMULATION = AVAILABLE</span> —— 可以运行<br>
+  检查项：12 条（严重 0 条，警告 2 条）<br>
+  有效数据行：679
+</div>
+<div class="note">
+  本层只做“数据检查 + zero-fit baseline”。<b>不做任何拟合、不做参数辨识</b>。
+  即使仿真可用，结果也不代表模型已被验证。
+</div>
+
+<h2>2. 协议 / 倍率解释</h2><div class='box'>
+原始数据标签 source_protocol_label = <b>CC_Cover5</b>（你在 experiment.protocol 填的名字，如 cycler 档位名）<br>平台换算出的实际倍率 effective_c_rate = <b>0.221 C</b>（= max|I| / nominal_capacity）<br><span style='color:#777'>source_protocol_label 是你在 experiment.protocol 里填写的原始档位/协议名；effective_c_rate = max|I| / nominal_capacity 是平台换算出的实际倍率。两者分开记录，勿把原始标签读成精确倍率。</span></div>
+
+<h2>3. 参数集匹配（S6）</h2>
+<div class="box"><b>参数集</b>：Jackowska2025_2mAh_cm2<br><b>匹配等级</b>：design_matched_surrogate (grade B)<br><b>结构化溯源</b>：provenance=matched_study · electrode_design=matched_2mAh_cm2 · fitted_to_user_dataset=False · executable_reproduction=partial<br><b>是否用你的数据标定过</b>：否（zero-fit）<br><b>说明</b>：电极设计尺度匹配（面容量 2 mAh/cm2，参数集标定值 2 +/-0.2）。此数据源即参数集作者研究的同一电极体系（matched_study），但仍不是用你的材料/批次标定的，结果只能作为 zero-fit baseline，不能作为模型验证。</div>
+
+<h2>4. 你填写的实验信息</h2>
+<table><tr><th>字段</th><th>取值</th></tr><tr><td style='font-family:monospace'>dataset_name</td><td>demo_birmingham_cover5</td></tr><tr><td style='font-family:monospace'>sample_id</td><td>NCM920305_demo</td></tr><tr><td style='font-family:monospace'>chemistry</td><td>NMC</td></tr><tr><td style='font-family:monospace'>cell_configuration</td><td>half_cell</td></tr><tr><td style='font-family:monospace'>working_electrode</td><td>positive</td></tr><tr><td style='font-family:monospace'>counter_electrode</td><td>lithium_metal</td></tr><tr><td style='font-family:monospace'>nominal_capacity</td><td>0.003112</td></tr><tr><td style='font-family:monospace'>active_material_loading</td><td>2.0</td></tr><tr><td style='font-family:monospace'>electrode_area</td><td>1.72</td></tr><tr><td style='font-family:monospace'>electrolyte</td><td>LiPF6 (Celgard 2325)</td></tr><tr><td style='font-family:monospace'>voltage_lower</td><td>2.5</td></tr><tr><td style='font-family:monospace'>voltage_upper</td><td>4.2</td></tr><tr><td style='font-family:monospace'>temperature</td><td>25.0</td></tr><tr><td style='font-family:monospace'>protocol</td><td>CC_Cover5</td></tr><tr><td style='font-family:monospace'>current_sign</td><td>discharge_negative</td></tr><tr><td style='font-family:monospace'>initial_soc</td><td>（未填）</td></tr></table>
+
+<h2>5. 列映射与单位换算</h2>
+<table>
+<tr><th>canonical 字段</th><th>你的原始列名</th><th>你填的单位</th><th>符号处理</th></tr>
+<tr><td>time</td><td>Time [s]</td><td>s</td><td></td></tr><tr><td>current</td><td>Current [mA]</td><td>mA</td><td>乘以 -1（原始放电为负）</td></tr><tr><td>voltage</td><td>Voltage [V]</td><td>V</td><td></td></tr><tr><td>capacity</td><td>Capacity [mAh]</td><td>mAh</td><td></td></tr><tr><td>temperature</td><td>Temperature [K]</td><td>K</td><td></td></tr>
+</table>
+<div style="margin-top:6px;color:#555">
+  电流已统一为平台约定：<b>放电 = 正</b>。
+</div>
+
+<h2>6. 检查明细</h2>
+<table>
+<tr><th style="width:70px">级别</th><th style="width:190px">检查项</th><th>说明</th><th style="width:260px">证据</th></tr>
+<tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>NAN_IN_REQUIRED</td><td>time 列没有空值</td><td style='font-family:monospace;font-size:12px'>679/679</td></tr><tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>NAN_IN_REQUIRED</td><td>current 列没有空值</td><td style='font-family:monospace;font-size:12px'>679/679</td></tr><tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>NAN_IN_REQUIRED</td><td>voltage 列没有空值</td><td style='font-family:monospace;font-size:12px'>679/679</td></tr><tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>DUPLICATE_TIMESTAMP</td><td>没有重复时间戳</td><td style='font-family:monospace;font-size:12px'>0</td></tr><tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>NON_MONOTONIC_TIME</td><td>时间单调递增</td><td style='font-family:monospace;font-size:12px'>0 back steps</td></tr><tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>CURRENT_SIGN_CONFLICT</td><td>电流符号与声明自洽（discharge_negative），转换后放电为正，符合平台约定</td><td style='font-family:monospace;font-size:12px'>median I during V-decline = 0.000687969 A</td></tr><tr><td style='color:#ef6c00;font-weight:700'>WARN</td><td>VOLTAGE_RANGE</td><td>有 2 个点（0.3%）在声明窗口之外</td><td style='font-family:monospace;font-size:12px'>measured V range [2.5, 4.193] V</td></tr><tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>CURRENT_RANGE</td><td>电流幅值在合理范围</td><td style='font-family:monospace;font-size:12px'>max|I| = 0.000687998 A（约 0.22 C，按标称容量 0.003112 Ah）</td></tr><tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>CAPACITY_CONSISTENCY</td><td>容量列与电流积分一致</td><td style='font-family:monospace;font-size:12px'>dQ_col=0.00298761 Ah, integral=0.00298761 Ah, rel diff 0.0%</td></tr><tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>SAMPLING_INTERVAL</td><td>采样间隔统计已记录</td><td style='font-family:monospace;font-size:12px'>median dt=3.544 s, max dt=120 s, duration=1.75e+04 s</td></tr><tr><td style='color:#ef6c00;font-weight:700'>WARN</td><td>SAMPLING_INTERVAL_GAP</td><td>存在明显采样间断（最大间隔是中位数间隔的 34 倍）</td><td style='font-family:monospace;font-size:12px'>median 3.544 s vs max 120 s</td></tr><tr><td style='color:#2e7d32;font-weight:700'>PASS</td><td>AMBIENT_TEMPERATURE</td><td>使用你填写的环境温度 25 C</td><td style='font-family:monospace;font-size:12px'>user declared</td></tr>
+</table>
+
+<h2>7. 数据预览</h2>
+<img src="voltage_capacity_preview.png" alt="preview">
+
+</body></html>

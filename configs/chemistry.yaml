@@ -1,0 +1,76 @@
+# ============================================================
+# Battery Dataset Simulation Platform
+# Chemistry registry (explicit chemistry layer)
+#
+# Purpose: make "chemistry" a first-class, human-readable entry
+# instead of an implicit string buried in dataset configs.
+# A literature agent (or a person) can map
+#   "NMC811||graphite"  ->  a key below
+# and the platform resolves electrode/electrolyte/parameter set
+# from here.
+#
+# Keys are the values used in configs/datasets.yaml `chemistry:`.
+# `grade` follows the platform provenance vocabulary:
+#   A-exact              : parameter set fitted to this exact cell
+#   B-compatible_surrogate : same chemistry, different cell
+#   C-mismatched         : chemistry mismatch (screening only)
+# WARNING: surrogate grades are NEVER "validation" runs.
+# ============================================================
+
+NMC_Graphite:
+  description: "LiNiMnCoO2 || graphite full cell, LiPF6 electrolyte"
+  positive_electrode: "NMC"
+  negative_electrode: "graphite"
+  electrolyte: "LiPF6"
+  cell_form: "full_cell"
+  default_parameter_set: "Chen2020"
+  parameter_set_grade: "A-exact"
+  notes: >
+    Chen2020 (LG M50, 21700) is an exact-A set for this chemistry;
+    CALCE 20R reuses it as a compatible surrogate (same chemistry,
+    different cell) - see datasets.yaml for per-dataset grade.
+
+LCO_Graphite:
+  description: "LiCoO2 || graphite full cell, LiPF6 electrolyte"
+  positive_electrode: "LCO"
+  negative_electrode: "graphite"
+  electrolyte: "LiPF6"
+  cell_form: "full_cell"
+  default_parameter_set: "Ramadass2004"
+  parameter_set_grade: "B-compatible_surrogate"
+  notes: >
+    Ramadass2004 is a mixed ("Frankenstein") set for LCO cells -
+    compatible surrogate only. All CALCE CS2 runs are unfitted
+    surrogate baselines, NOT physics-model validation.
+
+NCM_LiMetal:
+  description: "NCM || Li metal half cell"
+  positive_electrode: "NMC"
+  negative_electrode: "Li metal"
+  electrolyte: "LiPF6"
+  cell_form: "half_cell"
+  default_parameter_set: "Jackowska2025_2mAh_cm2"
+  parameter_set_grade: "A-exact"
+  notes: >
+    Jackowska2025 half-cell set at 2.0 mAh/cm2 (pinned upstream
+    commit, vendored under external/Jackowska-2025-JPS). Applies
+    to areal loadings 2.0 +/- 0.2 mAh/cm2 only.
+
+LFP_Graphite:
+  description: "LiFePO4 || graphite full cell, LiPF6 electrolyte"
+  positive_electrode: "LFP"
+  negative_electrode: "graphite"
+  electrolyte: "LiPF6"
+  cell_form: "full_cell"
+  default_parameter_set: "Prada2013"
+  parameter_set_grade: "B-compatible_surrogate"
+  notes: >
+    Prada2013 is a compatible surrogate for CALCE A123 cells.
+    Half-cell LFP||Li work (SINTEF R2032) is tracked separately
+    in the H1 line with Jackowska2025_2mAh_cm2.
+
+# ---- Literature-agent mapping examples ----
+# "NMC811||graphite"          -> NMC_Graphite
+# "LCO||graphite"             -> LCO_Graphite
+# "NMC||Li"                   -> NCM_LiMetal
+# "LFP||graphite"             -> LFP_Graphite

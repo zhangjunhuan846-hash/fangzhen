@@ -1,0 +1,174 @@
+{
+  "dataset_name": "demo_birmingham_cover5",
+  "sample_id": "NCM920305_demo",
+  "experiment": {
+    "dataset_name": "demo_birmingham_cover5",
+    "sample_id": "NCM920305_demo",
+    "chemistry": "NMC",
+    "cell_configuration": "half_cell",
+    "working_electrode": "positive",
+    "counter_electrode": "lithium_metal",
+    "nominal_capacity": 0.003112,
+    "active_material_loading": 2.0,
+    "electrode_area": 1.72,
+    "electrolyte": "LiPF6 (Celgard 2325)",
+    "voltage_lower": 2.5,
+    "voltage_upper": 4.2,
+    "temperature": 25.0,
+    "protocol": "CC_Cover5",
+    "current_sign": "discharge_negative",
+    "initial_soc": null
+  },
+  "source_file": "demo_birmingham_cover5.csv",
+  "ignored_files": [],
+  "canonical_path": "outputs/user_datasets/demo_birmingham_cover5/canonical_data.csv",
+  "n_rows": 679,
+  "conversion": {
+    "source_file": "demo_birmingham_cover5.csv",
+    "n_rows_raw": 679,
+    "declared_current_sign": "discharge_negative",
+    "columns": {
+      "time": {
+        "source_column": "Time [s]",
+        "source_unit": "s",
+        "factor": 1.0,
+        "offset": 0.0,
+        "n_nan": 0
+      },
+      "current": {
+        "source_column": "Current [mA]",
+        "source_unit": "mA",
+        "factor": 0.001,
+        "offset": 0.0,
+        "n_nan": 0
+      },
+      "voltage": {
+        "source_column": "Voltage [V]",
+        "source_unit": "V",
+        "factor": 1.0,
+        "offset": 0.0,
+        "n_nan": 0
+      },
+      "capacity": {
+        "source_column": "Capacity [mAh]",
+        "source_unit": "mAh",
+        "factor": 0.001,
+        "offset": 0.0,
+        "n_nan": 0
+      },
+      "temperature": {
+        "source_column": "Temperature [K]",
+        "source_unit": "K",
+        "factor": 1.0,
+        "offset": -273.15,
+        "n_nan": 0
+      }
+    },
+    "current_sign_transform": "乘以 -1（原始放电为负）",
+    "time_offset_s": 557463.7828848138,
+    "n_duplicate_timestamps_dropped": 0
+  },
+  "validation": {
+    "import_status": "PASS",
+    "simulation_allowed": true,
+    "n_fail": 0,
+    "n_warn": 2,
+    "n_checks": 12
+  },
+  "protocol_interpretation": {
+    "source_protocol_label": "CC_Cover5",
+    "effective_c_rate": 0.22107910734531888,
+    "note": "source_protocol_label 是你在 experiment.protocol 里填写的原始档位/协议名；effective_c_rate = max|I| / nominal_capacity 是平台换算出的实际倍率。两者分开记录，勿把原始标签读成精确倍率。"
+  },
+  "issues": [
+    {
+      "code": "NAN_IN_REQUIRED",
+      "severity": "PASS",
+      "message": "time 列没有空值",
+      "evidence": "679/679"
+    },
+    {
+      "code": "NAN_IN_REQUIRED",
+      "severity": "PASS",
+      "message": "current 列没有空值",
+      "evidence": "679/679"
+    },
+    {
+      "code": "NAN_IN_REQUIRED",
+      "severity": "PASS",
+      "message": "voltage 列没有空值",
+      "evidence": "679/679"
+    },
+    {
+      "code": "DUPLICATE_TIMESTAMP",
+      "severity": "PASS",
+      "message": "没有重复时间戳",
+      "evidence": "0"
+    },
+    {
+      "code": "NON_MONOTONIC_TIME",
+      "severity": "PASS",
+      "message": "时间单调递增",
+      "evidence": "0 back steps"
+    },
+    {
+      "code": "CURRENT_SIGN_CONFLICT",
+      "severity": "PASS",
+      "message": "电流符号与声明自洽（discharge_negative），转换后放电为正，符合平台约定",
+      "evidence": "median I during V-decline = 0.000687969 A"
+    },
+    {
+      "code": "VOLTAGE_RANGE",
+      "severity": "WARN",
+      "message": "有 2 个点（0.3%）在声明窗口之外",
+      "evidence": "measured V range [2.5, 4.193] V"
+    },
+    {
+      "code": "CURRENT_RANGE",
+      "severity": "PASS",
+      "message": "电流幅值在合理范围",
+      "evidence": "max|I| = 0.000687998 A（约 0.22 C，按标称容量 0.003112 Ah）"
+    },
+    {
+      "code": "CAPACITY_CONSISTENCY",
+      "severity": "PASS",
+      "message": "容量列与电流积分一致",
+      "evidence": "dQ_col=0.00298761 Ah, integral=0.00298761 Ah, rel diff 0.0%"
+    },
+    {
+      "code": "SAMPLING_INTERVAL",
+      "severity": "PASS",
+      "message": "采样间隔统计已记录",
+      "evidence": "median dt=3.544 s, max dt=120 s, duration=1.75e+04 s"
+    },
+    {
+      "code": "SAMPLING_INTERVAL_GAP",
+      "severity": "WARN",
+      "message": "存在明显采样间断（最大间隔是中位数间隔的 34 倍）",
+      "evidence": "median 3.544 s vs max 120 s"
+    },
+    {
+      "code": "AMBIENT_TEMPERATURE",
+      "severity": "PASS",
+      "message": "使用你填写的环境温度 25 C",
+      "evidence": "user declared"
+    }
+  ],
+  "parameter_gate": {
+    "available": true,
+    "parameter_set": "Jackowska2025_2mAh_cm2",
+    "level": "design_matched_surrogate",
+    "grade": "B",
+    "provenance": {
+      "provenance": "matched_study",
+      "electrode_design": "matched_2mAh_cm2",
+      "fitted_to_user_dataset": false,
+      "executable_reproduction": "partial"
+    },
+    "fitted_to_dataset": false,
+    "reason": "电极设计尺度匹配（面容量 2 mAh/cm2，参数集标定值 2 +/-0.2）。此数据源即参数集作者研究的同一电极体系（matched_study），但仍不是用你的材料/批次标定的，结果只能作为 zero-fit baseline，不能作为模型验证。",
+    "blockers": []
+  },
+  "fitted_to_dataset": false,
+  "note": "Self-Service Data Onboarding Layer. Zero-fit baseline only: no fitting, no parameter identification."
+}

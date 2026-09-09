@@ -28,6 +28,7 @@ Install: `pip install -r requirements.txt` (numpy **must stay <2.4**, PyBOP requ
 ## 2. Entry point
 
 ```bash
+python run_pipeline.py --config configs/example.yaml  # one-shot YAML run (recommended)
 python run_pipeline.py <task> [options]      # positional task
 python run_pipeline.py --mode <task> [opts]  # equivalent, historical form
 ```
@@ -37,6 +38,10 @@ List registered datasets:
 ```bash
 python run_pipeline.py --list-datasets
 ```
+
+Minimal end-to-end case with a real experimental CSV (no 13 GB data dir needed):
+see **`examples/half_cell_demo/`** — raw CSV → import/validate → zero-fit DFN
+baseline → committed expected results (`RMSE 104.29 mV`).
 
 ---
 
@@ -51,6 +56,11 @@ python run_pipeline.py --list-datasets
 
 Common options: `--dataset`, `--model/--models`, `--cell/--cells`, `--rate`
 (or `--protocol`, dynamic datasets), `--parameter` (sensitivity), `--no-plot`.
+
+**One-shot config**: `--config <yaml>` mirrors all of the above in a single
+file (`configs/example.yaml` documents the schema). Explicit CLI flags win
+over config values. A `condition.temperature` entry is echoed for the record
+but never silently overrides the dataset-native experiment (zero-fit discipline).
 
 Tasks take **no positional arguments beyond the task name**; everything else is a flag.
 Default dataset is `chen2020`, default mode `reproduction`.
@@ -77,8 +87,10 @@ surrogate; **C** = incompatible. CALCE results are surrogates — **never call t
 | File | Purpose |
 |---|---|
 | `configs/datasets.yaml` | Dataset registry: id, chemistry, cells, rates, parameter set, models, paths |
+| `configs/chemistry.yaml` | **Explicit chemistry layer**: chemistry id → electrodes/electrolyte/cell form/parameter set + provenance grade. This is the mapping target for literature-agent output like `NMC811\|\|graphite` |
 | `configs/models.yaml` | Model ids (SPM / SPMe / DFN) and options |
 | `configs/sensitivity.yaml` | OAT parameter list, perturbation levels, metrics |
+| `configs/example.yaml` | One-shot run config schema (use with `--config`) |
 
 ---
 
@@ -117,8 +129,10 @@ analysis/              scientific analysis (A1/A2), does not modify battery_sim/
 scripts/               phase scripts (half-cell H0/H1-*, dataset audits)
 user_tools/            self-service importer (CSV/XLSX -> canonical -> zero-fit baseline)
 user_dataset_template/ double-click package for experimental users
+examples/              minimal reproducible cases (half_cell_demo: real CSV in,
+                       platform out, committed expected results)
 docs/                  phase reports and method notes
-tests/                 88 tests (regression gate)
+tests/                 98 tests (regression gate)
 data/raw/              datasets (gitignored, ~13 GB)
 ```
 
@@ -127,7 +141,8 @@ data/raw/              datasets (gitignored, ~13 GB)
 ## 8. Invariants — do not break
 
 1. **Frozen core**: do not modify runner / evaluator / model-factory scientific logic.
-2. **Run the gate**: `python -m pytest tests -q` must stay **88 passed** after any change.
+2. **Run the gate**: `python -m pytest tests -q` must stay **98 passed** after any change
+   (88 core + 10 run-config/chemistry registry).
 3. **Zero-fit**: baseline never fits parameters. Fitting requires its own phase and lock file.
 4. **Sign convention**: canonical `current_A` is **discharge = +**, charge = −.
    Adapters convert from the source convention; never re-flip downstream.

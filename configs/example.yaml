@@ -1,0 +1,45 @@
+# ============================================================
+# Battery Dataset Simulation Platform - one-shot run config
+#
+# Usage:
+#   python run_pipeline.py --config configs/example.yaml
+#
+# Any value overridden on the command line wins, e.g.
+#   python run_pipeline.py --config configs/example.yaml --model DFN
+#
+# Schema (all keys optional unless noted):
+#   task      : baseline | reproduction | benchmark | sensitivity
+#   dataset   : dataset id (see `python run_pipeline.py --list-datasets`)
+#   cell      : cell id (string!) or "all"
+#   model     : model name, or list under `models:` for benchmark
+#   condition : rate / protocol / temperature
+#   parameter : sensitivity parameter (sensitivity task only)
+#   output    : save_curve (PNG plot), save_metrics
+#
+# Note on condition.temperature: the v0.4 protocol-replay runners
+# use the dataset-native ambient temperature (zero-fit discipline).
+# A temperature value here is echoed to the console and recorded,
+# but does NOT silently override the experiment - deviations from
+# the native condition require a new phase, not a flag.
+# ============================================================
+
+task: baseline
+
+dataset: chen2020
+cell: "02"
+
+model:
+  name: SPMe
+  # For `task: benchmark`, list models instead:
+  # models: [SPM, SPMe, DFN]
+
+chemistry: NMC_Graphite   # cross-checked against configs/chemistry.yaml
+
+condition:
+  rate: C10
+  # protocol: DST          # alias of rate for dynamic datasets
+  temperature: 298.15      # dataset-native value; see note above
+
+output:
+  save_curve: true
+  save_metrics: true
