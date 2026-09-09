@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: Please cite this software using the metadata from 'preferred-citation'.
+authors:
+  - family-names: Jackowska
+    given-names: Roksana
+    orcid: "https://orcid.org/0000-0003-0533-0415"
+  - family-names: Courtier
+    given-names: Nicola E.
+    orcid: "https://orcid.org/0000-0002-5714-1096"
+title: Jackowska-2025-JPS
+version: 1.0
+url: "https://github.com/Battery-Intelligence-Lab/Jackowska-2025-JPS"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Jackowska
+      given-names: Roksana
+      orcid: "https://orcid.org/0000-0003-0533-0415"
+    - family-names: Courtier
+      given-names: Nicola E.
+      orcid: "https://orcid.org/0000-0002-5714-1096"
+    - family-names: Chen
+      given-names: Yongxiu
+      orcid: "https://orcid.org/0000-0002-3064-6844"
+    - family-names: Planden
+      given-names: Brady
+      orcid: "https://orcid.org/0000-0002-1082-9125"
+    - family-names: Howey
+      given-names: David
+      orcid: "https://orcid.org/0000-0002-0620-3955"
+    - family-names: Lopez
+      given-names: Carmen
+      orcid: "https://orcid.org/0000-0002-6096-0674"
+    - family-names: Spathara
+      given-names: Dimitra
+      orcid: "https://orcid.org/0000-0003-4861-0388"
+    - family-names: Kendrick
+      given-names: Emma
+      orcid: "https://orcid.org/0000-0002-4219-964X"
+  title: "Transport limitations in single-crystal NCM cathode electrodes"
+  year: 2025

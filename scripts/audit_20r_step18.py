@@ -10,9 +10,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path("/mnt/c/Users/24330/WorkBuddy/仿真模拟/data/raw/LIB/NMC_Graphite/CALCE_INR18650_20R")
+ROOT = Path(__file__).resolve().parents[1]  # repo root
+BASE = ROOT / "data/raw/LIB/NMC_Graphite/CALCE_INR18650_20R"
 RAW = BASE / "raw"
-OUT = Path("/mnt/c/Users/24330/WorkBuddy/仿真模拟/outputs/audit")
+OUT = ROOT / "outputs/audit"
 OUT.mkdir(parents=True, exist_ok=True)
 
 

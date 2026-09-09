@@ -157,9 +157,30 @@ data/raw/              datasets (gitignored, ~13 GB)
 
 ```bash
 wsl.exe -d Ubuntu -e bash -lc 'source ~/miniforge3/etc/profile.d/conda.sh \
-  && conda activate pybamm && cd /mnt/c/Users/24330/WorkBuddy/仿真模拟 \
+  && conda activate pybamm && cd /path/to/this/repo \
   && python -m pytest tests -q'
 ```
 
 Golden regression values are asserted in `tests/` (e.g. Chen2020 SPMe cell02
 82.33 / 115.81 / 70.02 / 46.84 mV). Changing a number means a new phase, not an edit.
+
+---
+
+## 11. External code (vendored)
+
+`external/Jackowska-2025-JPS` is vendored, not pip-installed. Upstream:
+https://github.com/Battery-Intelligence-Lab/Jackowska-2025-JPS
+(BSD 3-Clause, see `external/Jackowska-2025-JPS/LICENSE`), pinned at commit
+`9f3b526`. The `Jackowska2025_2mAh_cm2` parameter set loads its OCP CSVs
+(`2mAh_cm2/results/ocp_*.csv`) at runtime — keep the directory intact,
+do not modify it, do not `pip install` it (its own pyproject pins older
+PyBaMM versions and would break this environment).
+
+---
+
+## 12. License
+
+This repository's own code (`battery_sim/`, `analysis/`, `scripts/`,
+`user_tools/`, `tests/`, configs) is released under the MIT License — see
+[`LICENSE`](LICENSE). Vendored third-party code retains its own license
+(`external/Jackowska-2025-JPS`: BSD 3-Clause).

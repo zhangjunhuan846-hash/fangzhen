@@ -13,8 +13,9 @@ from __future__ import annotations
 import glob
 import os
 import sys
+from pathlib import Path
 
-BASE = "/mnt/c/Users/24330/WorkBuddy/仿真模拟/data/raw/LIB/NMC_LiMetal/Birmingham_NCM920305/raw"
+BASE = str(Path(__file__).resolve().parents[2] / "data/raw/LIB/NMC_LiMetal/Birmingham_NCM920305/raw")
 
 
 def main() -> int:

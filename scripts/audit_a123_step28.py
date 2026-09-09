@@ -6,8 +6,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-RAW = Path("/mnt/c/Users/24330/WorkBuddy/仿真模拟/data/raw/LIB/LFP_Graphite/CALCE_A123/raw/DST-US06-FUDS-25")
-OUT = Path("/mnt/c/Users/24330/WorkBuddy/仿真模拟/outputs/audit")
+ROOT = Path(__file__).resolve().parents[1]  # repo root
+RAW = ROOT / "data/raw/LIB/LFP_Graphite/CALCE_A123/raw/DST-US06-FUDS-25"
+OUT = ROOT / "outputs/audit"
 OUT.mkdir(parents=True, exist_ok=True)
 
 report = {}

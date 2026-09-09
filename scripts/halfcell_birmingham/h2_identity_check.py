@@ -14,12 +14,14 @@ from __future__ import annotations
 
 import os
 import sys
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-RAW = "/mnt/c/Users/24330/WorkBuddy/仿真模拟/data/raw/LIB/NMC_LiMetal/Birmingham_NCM920305/raw"
-RES = "/mnt/c/Users/24330/WorkBuddy/仿真模拟/external/Jackowska-2025-JPS/2mAh_cm2/results"
+ROOT = Path(__file__).resolve().parents[2]  # repo root
+RAW = str(ROOT / "data/raw/LIB/NMC_LiMetal/Birmingham_NCM920305/raw")
+RES = str(ROOT / "external/Jackowska-2025-JPS/2mAh_cm2/results")
 
 PAIRS = [
     ("RateCapability_Cover10_2mAhcm_2_NCM920305.csv", "C_10_discharge.csv"),

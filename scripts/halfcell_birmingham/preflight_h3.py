@@ -23,11 +23,12 @@ from __future__ import annotations
 import os
 import sys
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-ROOT = "/mnt/c/Users/24330/WorkBuddy/仿真模拟"
+ROOT = str(Path(__file__).resolve().parents[2])  # repo root
 REPO = os.path.join(ROOT, "external", "Jackowska-2025-JPS")
 
 import pybamm  # noqa: E402

@@ -1,10 +1,11 @@
 """H1-A local evidence probe: SINTEF LFP||Li parquet + PyBaMM_Reference tree."""
 import os
 import sys
+from pathlib import Path
 
 import pandas as pd
 
-ROOT = r"/mnt/c/Users/24330/WorkBuddy/仿真模拟"
+ROOT = str(Path(__file__).resolve().parents[2])  # repo root
 
 SINTEF = (
     ROOT

@@ -1,11 +1,9 @@
 """Parse SINTEF metadata.csv for LFP rows (H1-A screening evidence)."""
 import csv
 import sys
+from pathlib import Path
 
-P = (
-    r"C:\Users\24330\WorkBuddy\仿真模拟\data\raw\LIB\LFP_LiMetal"
-    r"\SINTEF_R2032\meta\metadata.csv"
-)
+P = Path(__file__).resolve().parents[2] / "data/raw/LIB/LFP_LiMetal/SINTEF_R2032/meta/metadata.csv"
 
 with open(P, newline="", encoding="utf-8") as f:
     rows = list(csv.DictReader(f))

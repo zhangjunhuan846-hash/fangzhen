@@ -3,10 +3,11 @@
 Pure pandas/pyarrow — NO pybamm import. Run inside WSL pybamm env.
 """
 import sys
+from pathlib import Path
 
 import pandas as pd
 
-ROOT = "/mnt/c/Users/24330/WorkBuddy/仿真模拟"
+ROOT = str(Path(__file__).resolve().parents[2])  # repo root
 META = ROOT + "/data/raw/LIB/LFP_LiMetal/SINTEF_R2032/meta/metadata.csv"
 RAW = (
     ROOT + "/data/raw/LIB/LFP_LiMetal/SINTEF_R2032/raw/"

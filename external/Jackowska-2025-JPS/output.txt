@@ -1,0 +1,936 @@
+
+ Cell type: 2mAh_cm2
+Maximum stoichiometry 1 at 3.51 V
+Minimum stoichiometry 0.3106468004333277 at 4.20074892044067 V
+Formation loss [mA.h]: 0.4354092636954401
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/shifted_OCV_2mAh_cm2.pdf
+Saved at: /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/results/ocp_charge.csv
+Saved at: /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/results/ocp_discharge.csv
+
+ Cell type: 4mAh_cm2
+Maximum stoichiometry 1 at 3.51 V
+Minimum stoichiometry 0.2989636055093292 at 4.19988584518432 V
+Formation loss [mA.h]: 0.6232857111795207
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/shifted_OCV_4mAh_cm2.pdf
+Saved at: /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/results/ocp_charge.csv
+Saved at: /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/results/ocp_discharge.csv
+--------------- End of script ---------------
+
+ Cell type: 2mAh_cm2
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.05 1.  ]
+  Optimised parameters: [0.04657138 0.95322695]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 5.702032244292665
+  Optimisation time: 0.008153915405273438 seconds
+  Number of iterations: 28
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: No
+Theoretical capacity [A.h]: 0.0048757637343877615
+GITT charge / theoretical capacity: 1.2003220501263994
+Theoretical GITT charge capacity [A.h]: 0.005852486721592267
+Saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/results/gitt_ocp_charge.csv
+23170
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.05 1.  ]
+  Optimised parameters: [0.04242777 0.95049766]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 12.376236008944378
+  Optimisation time: 0.020526647567749023 seconds
+  Number of iterations: 36
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: No
+GITT discharge / theoretical capacity: 1.32179881809312
+Theoretical GITT discharge capacity [A.h]: 0.00644477874141504
+Saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/results/gitt_ocp_discharge.csv
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/comparing_OCVs_2mAh_cm2.pdf
+
+ Cell type: 4mAh_cm2
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.05 1.  ]
+  Optimised parameters: [0.03981316 0.95814135]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 6.057542957111517
+  Optimisation time: 0.014350414276123047 seconds
+  Number of iterations: 41
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: No
+Theoretical capacity [A.h]: 0.010355252898007292
+GITT charge / theoretical capacity: 0.9431827290929374
+Theoretical GITT charge capacity [A.h]: 0.009766895688790068
+Saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/results/gitt_ocp_charge.csv
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.05 1.  ]
+  Optimised parameters: [0.04154324 0.95512652]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 2.706129420072603
+  Optimisation time: 0.013665199279785156 seconds
+  Number of iterations: 34
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: No
+GITT discharge / theoretical capacity: 1.011925892902071
+Theoretical GITT discharge capacity [A.h]: 0.010478748535042787
+Saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/results/gitt_ocp_discharge.csv
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/comparing_OCVs_4mAh_cm2.pdf
+--------------- End of script ---------------
+
+ Cell type: 2mAh_cm2
+Saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/results/gitt_charge.csv
+Saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/results/gitt_discharge.csv
+
+ Cell type: 4mAh_cm2
+Saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/results/gitt_charge.csv
+Saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/results/gitt_discharge.csv
+--------------- End of script ---------------
+
+ Cell type: 2mAh_cm2
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/gitt_charge_2mAh_cm2.pdf
+2mAh_cm2 GITT charge RMSE: 0.0033699546878839734
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/gitt_discharge_2mAh_cm2.pdf
+2mAh_cm2 GITT discharge RMSE: 0.20780044267342215
+Saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/results/diffusivity_discharge.csv
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/gitt_results_2mAh_cm2.pdf
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/diffusivity_2mAh_cm2.pdf
+
+ Cell type: 4mAh_cm2
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/gitt_charge_4mAh_cm2.pdf
+4mAh_cm2 GITT charge RMSE: 0.005557142944010029
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/gitt_discharge_4mAh_cm2.pdf
+4mAh_cm2 GITT discharge RMSE: 0.20527427384270294
+Saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/results/diffusivity_discharge.csv
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/gitt_results_4mAh_cm2.pdf
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/diffusivity_4mAh_cm2.pdf
+--------------- End of script ---------------
+
+ Cell type: 2mAh_cm2
+Reaction rate [A.m-2.(m3.mol-1)^1.5]: 1.0365238238053349e-06
+Activation energy [J.mol-1]: 56410.131541204224
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/exchange_2mAh_cm2.pdf
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/activation_2mAh_cm2.pdf
+
+ Cell type: 4mAh_cm2
+Reaction rate [A.m-2.(m3.mol-1)^1.5]: 4.34822065671908e-07
+Activation energy [J.mol-1]: 46040.10714409964
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/exchange_4mAh_cm2.pdf
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/activation_4mAh_cm2.pdf
+--------------- End of script ---------------
+
+ Cell type: 2mAh_cm2
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [20.]
+  Optimised parameters: [22.36973488]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.007690448858032214
+  Optimisation time: 1.9991004467010498 seconds
+  Number of iterations: 29
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+
+ Cell type: 4mAh_cm2
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [20.]
+  Optimised parameters: [23.42381421]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.005955640589877687
+  Optimisation time: 2.6655006408691406 seconds
+  Number of iterations: 30
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+--------------- End of script ---------------
+
+ Cell type: 2mAh_cm2
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [1.16]
+  Optimised parameters: [1.15738746]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.023936810962720875
+  Optimisation time: 1313.775093793869 seconds
+  Number of iterations: 250
+  Number of evaluations: None
+  Reason for stopping: Maximum number of iterations has been exceeded.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/C_10_discharge_2mAh_cm2.pdf
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [2.09]
+  Optimised parameters: [2.09262781]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.021499334573948876
+  Optimisation time: 854.4127242565155 seconds
+  Number of iterations: 250
+  Number of evaluations: None
+  Reason for stopping: Maximum number of iterations has been exceeded.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/C_5_discharge_2mAh_cm2.pdf
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [3.89]
+  Optimised parameters: [3.89074792]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.027676745489376677
+  Optimisation time: 106.03302097320557 seconds
+  Number of iterations: 54
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/C_2_discharge_2mAh_cm2.pdf
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [8.58]
+  Optimised parameters: [8.57989608]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.044272791217947464
+  Optimisation time: 70.235835313797 seconds
+  Number of iterations: 50
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/1C_discharge_2mAh_cm2.pdf
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [12.26]
+  Optimised parameters: [12.2622399]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.05347705490529502
+  Optimisation time: 36.818981409072876 seconds
+  Number of iterations: 42
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/2C_discharge_2mAh_cm2.pdf
+c_s_max: 55370.27036223915
+Scaling: [1.1573874574378131, 2.092627807617187, 3.8907479189224548, 8.579896081924439, 12.26223990392462]
+RMSE [V]: [0.023936810962720875, 0.021499334573948876, 0.027676745489376677, 0.044272791217947464, 0.05347705490529502]
+
+ Cell type: 4mAh_cm2
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [1.03]
+  Optimised parameters: [1.03885156]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.025699315304531768
+  Optimisation time: 232.78462529182434 seconds
+  Number of iterations: 50
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/C_10_discharge_4mAh_cm2.pdf
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [1.43]
+  Optimised parameters: [1.43041923]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.028796630307019313
+  Optimisation time: 767.5445544719696 seconds
+  Number of iterations: 250
+  Number of evaluations: None
+  Reason for stopping: Maximum number of iterations has been exceeded.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/C_5_discharge_4mAh_cm2.pdf
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [1.98]
+  Optimised parameters: [1.98193661]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.04217088997080284
+  Optimisation time: 74.73477149009705 seconds
+  Number of iterations: 51
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/C_2_discharge_4mAh_cm2.pdf
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [2.46]
+  Optimised parameters: [2.46372352]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.052067397023607874
+  Optimisation time: 52.77876400947571 seconds
+  Number of iterations: 50
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/1C_discharge_4mAh_cm2.pdf
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.32]
+  Optimised parameters: [0.32812793]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 0.09962836547031617
+  Optimisation time: 11.205676317214966 seconds
+  Number of iterations: 16
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/2C_discharge_4mAh_cm2.pdf
+c_s_max: 48979.823259087134
+Scaling: [1.0388515625, 1.430419226586818, 1.9819366149902344, 2.463723515481921, 0.32812792968750004]
+RMSE [V]: [0.025699315304531768, 0.028796630307019313, 0.04217088997080284, 0.052067397023607874, 0.09962836547031617]
+--------------- End of script ---------------
+
+ Cell type: 2mAh_cm2
+Prefactor: 5.996983803551003
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/vscaling_2mAh_cm2.pdf
+Plot saved at /home/nicola/GitHub/NCM-optimisation/2mAh_cm2/figures/validation_2mAh_cm2.pdf
+{'Ambient temperature [K]': 298.15,
+ 'Boltzmann constant [J.K-1]': 1.380649e-23,
+ 'Cation transference number': 0.38,
+ 'Contact resistance [Ohm]': 22.36973488330841,
+ 'Current function [A]': 0.003112,
+ 'Electrode height [m]': 0.013116158496700819,
+ 'Electrode width [m]': 0.013116158496700819,
+ 'Electrolyte conductivity [S.m-1]': <function electrolyte_conductivity_base_Landesfeind2019 at 0x7ad7351ffce0>,
+ 'Electrolyte density [kg.m-3]': 1203.0,
+ 'Electrolyte diffusivity [m2.s-1]': <function electrolyte_diffusivity_base_Landesfeind2019 at 0x7ad7351ffc40>,
+ 'Electron charge [C]': 1.602176634e-19,
+ 'Exchange-current density for lithium metal electrode [A.m-2]': <function li_metal_electrolyte_exchange_current_density_Xu2019 at 0x7ad7351fc360>,
+ 'Faraday constant [C.mol-1]': 96485.33212331001,
+ 'Ideal gas constant [J.K-1.mol-1]': 8.31446261815324,
+ 'Initial concentration in electrolyte [mol.m-3]': 1000.0,
+ 'Initial concentration in positive electrode [mol.m-3]': Multiplication(-0x47fa0168c9934450, *, children=['0.3049316406249998', 'Maximum concentration in positive electrode [mol.m-3]'], domains={}),
+ 'Initial temperature [K]': 298.15,
+ 'Lithium metal partial molar volume [m3.mol-1]': 1.3e-05,
+ 'Lower voltage cut-off [V]': 2.5,
+ 'Maximum concentration in positive electrode [mol.m-3]': 55370.27036223915,
+ 'Negative electrode OCP [V]': 0.0,
+ 'Negative electrode OCP entropic change [V.K-1]': 0.0,
+ 'Negative electrode conductivity [S.m-1]': 10776000.0,
+ 'Negative electrode double-layer capacity [F.m-2]': 2.220446049250313e-16,
+ 'Negative electrode thickness [m]': 0.0001,
+ 'Nominal cell capacity [A.h]': 0.003112,
+ 'Number of cells connected in series to make a battery': 1.0,
+ 'Number of electrodes connected in parallel to make a cell': 1.0,
+ 'Open-circuit voltage at 0% SOC [V]': Parameter(0x35c8bedc559db71a, Lower voltage cut-off [V], children=[], domains={}),
+ 'Open-circuit voltage at 100% SOC [V]': Parameter(0x48493881e93970b4, Upper voltage cut-off [V], children=[], domains={}),
+ 'Positive electrode Bruggeman coefficient (electrode)': 0,
+ 'Positive electrode Bruggeman coefficient (electrolyte)': 1.9,
+ 'Positive electrode OCP [V]': <function ncm_ocp_Jackowska2024_power at 0x7ad7351ff740>,
+ 'Positive electrode OCP entropic change [V.K-1]': <function nmc_ocp_entropic_change_Jackowska2024_power at 0x7ad7351ff6a0>,
+ 'Positive electrode active material density [kg.m-3]': 4796.0,
+ 'Positive electrode active material volume fraction': 0.661,
+ 'Positive electrode carbon-binder density [kg.m-3]': 1860.0,
+ 'Positive electrode charge transfer coefficient': 0.5,
+ 'Positive electrode conductivity [S.m-1]': 0.416,
+ 'Positive electrode diffusivity scaling factor': 6.996983803551003,
+ 'Positive electrode double-layer capacity [F.m-2]': 0.00686,
+ 'Positive electrode exchange-current density [A.m-2]': <function nmc_electrolyte_exchange_current_density_Jackowska2024 at 0x7ad7351ffba0>,
+ 'Positive electrode porosity': 0.259,
+ 'Positive electrode reaction activation energy [J.mol-1]': 56410.131541204224,
+ 'Positive electrode reaction rate [A.m-2.(m3.mol-1)^1.5]': 1.0365238238053349e-06,
+ 'Positive electrode thickness [m]': 3.25e-05,
+ 'Positive particle diffusivity [m2.s-1]': <function nmc_diffusivity_Jackowska2024_power at 0x7ad7351ffa60>,
+ 'Positive particle diffusivity scaling factor': 6.996983803551003,
+ 'Positive particle radius [m]': 1.88e-06,
+ 'RMSE values': [0.023936810962720875,
+                 0.021499334573948876,
+                 0.027676745489376677,
+                 0.044272791217947464,
+                 0.05347705490529502],
+ 'Reference temperature [K]': 298.15,
+ 'Scaling values': [1.1573874574378131,
+                    2.092627807617187,
+                    3.8907479189224548,
+                    8.579896081924439,
+                    12.26223990392462],
+ 'Separator Bruggeman coefficient (electrode)': 0,
+ 'Separator Bruggeman coefficient (electrolyte)': 1.5,
+ 'Separator porosity': 0.39,
+ 'Separator thickness [m]': 2.5e-05,
+ 'Theoretical GITT charge capacity [A.h]': 0.005852486721592267,
+ 'Theoretical GITT discharge capacity [A.h]': 0.00644477874141504,
+ 'Thermodynamic factor': 1.0,
+ 'Upper voltage cut-off [V]': 4.2,
+ 'citations': ['Jackowska2024',
+               'Xu2019',
+               'Landesfeind2019']}
+
+ Cell type: 4mAh_cm2
+Prefactor: 1.572816019688906
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/vscaling_4mAh_cm2.pdf
+Plot saved at /home/nicola/GitHub/NCM-optimisation/4mAh_cm2/figures/validation_4mAh_cm2.pdf
+{'Ambient temperature [K]': 298.15,
+ 'Boltzmann constant [J.K-1]': 1.380649e-23,
+ 'Cation transference number': 0.38,
+ 'Contact resistance [Ohm]': 23.423814207315445,
+ 'Current function [A]': 0.006636,
+ 'Electrode height [m]': 0.013116158496700819,
+ 'Electrode width [m]': 0.013116158496700819,
+ 'Electrolyte conductivity [S.m-1]': <function electrolyte_conductivity_base_Landesfeind2019 at 0x7ad7351ffce0>,
+ 'Electrolyte density [kg.m-3]': 1203.0,
+ 'Electrolyte diffusivity [m2.s-1]': <function electrolyte_diffusivity_base_Landesfeind2019 at 0x7ad7351ffc40>,
+ 'Electron charge [C]': 1.602176634e-19,
+ 'Exchange-current density for lithium metal electrode [A.m-2]': <function li_metal_electrolyte_exchange_current_density_Xu2019 at 0x7ad7351fc360>,
+ 'Faraday constant [C.mol-1]': 96485.33212331001,
+ 'Ideal gas constant [J.K-1.mol-1]': 8.31446261815324,
+ 'Initial concentration in electrolyte [mol.m-3]': 1000.0,
+ 'Initial concentration in positive electrode [mol.m-3]': Multiplication(-0x37c9943864ee5a85, *, children=['0.28212890624999976', 'Maximum concentration in positive electrode [mol.m-3]'], domains={}),
+ 'Initial temperature [K]': 298.15,
+ 'Lithium metal partial molar volume [m3.mol-1]': 1.3e-05,
+ 'Lower voltage cut-off [V]': 2.5,
+ 'Maximum concentration in positive electrode [mol.m-3]': 48979.823259087134,
+ 'Negative electrode OCP [V]': 0.0,
+ 'Negative electrode OCP entropic change [V.K-1]': 0.0,
+ 'Negative electrode conductivity [S.m-1]': 10776000.0,
+ 'Negative electrode double-layer capacity [F.m-2]': 2.220446049250313e-16,
+ 'Negative electrode thickness [m]': 0.0001,
+ 'Nominal cell capacity [A.h]': 0.006636,
+ 'Number of cells connected in series to make a battery': 1.0,
+ 'Number of electrodes connected in parallel to make a cell': 1.0,
+ 'Open-circuit voltage at 0% SOC [V]': Parameter(0x35c8bedc559db71a, Lower voltage cut-off [V], children=[], domains={}),
+ 'Open-circuit voltage at 100% SOC [V]': Parameter(0x48493881e93970b4, Upper voltage cut-off [V], children=[], domains={}),
+ 'Positive electrode Bruggeman coefficient (electrode)': 0,
+ 'Positive electrode Bruggeman coefficient (electrolyte)': 2.12,
+ 'Positive electrode OCP [V]': <function ncm_ocp_Jackowska2024_energy at 0x7ad7351ff880>,
+ 'Positive electrode OCP entropic change [V.K-1]': <function nmc_ocp_entropic_change_Jackowska2024_energy at 0x7ad7351ff9c0>,
+ 'Positive electrode active material density [kg.m-3]': 4796.0,
+ 'Positive electrode active material volume fraction': 0.625,
+ 'Positive electrode carbon-binder density [kg.m-3]': 1860.0,
+ 'Positive electrode charge transfer coefficient': 0.5,
+ 'Positive electrode conductivity [S.m-1]': 0.427,
+ 'Positive electrode diffusivity scaling factor': 2.572816019688906,
+ 'Positive electrode double-layer capacity [F.m-2]': 0.00374,
+ 'Positive electrode exchange-current density [A.m-2]': <function nmc_electrolyte_exchange_current_density_Jackowska2024 at 0x7ad7351ffba0>,
+ 'Positive electrode porosity': 0.299,
+ 'Positive electrode reaction activation energy [J.mol-1]': 46040.10714409964,
+ 'Positive electrode reaction rate [A.m-2.(m3.mol-1)^1.5]': 4.34822065671908e-07,
+ 'Positive electrode thickness [m]': 7.3e-05,
+ 'Positive particle diffusivity [m2.s-1]': <function nmc_diffusivity_Jackowska2024_energy at 0x7ad7351ffb00>,
+ 'Positive particle diffusivity scaling factor': 2.572816019688906,
+ 'Positive particle radius [m]': 1.88e-06,
+ 'RMSE values': [0.025699315304531768,
+                 0.028796630307019313,
+                 0.04217088997080284,
+                 0.052067397023607874,
+                 0.09962836547031617],
+ 'Reference temperature [K]': 298.15,
+ 'Scaling values': [1.0388515625,
+                    1.430419226586818,
+                    1.9819366149902344,
+                    2.463723515481921,
+                    0.32812792968750004],
+ 'Separator Bruggeman coefficient (electrode)': 0,
+ 'Separator Bruggeman coefficient (electrolyte)': 1.5,
+ 'Separator porosity': 0.39,
+ 'Separator thickness [m]': 2.5e-05,
+ 'Theoretical GITT charge capacity [A.h]': 0.009766895688790068,
+ 'Theoretical GITT discharge capacity [A.h]': 0.010478748535042787,
+ 'Thermodynamic factor': 1.0,
+ 'Upper voltage cut-off [V]': 4.2,
+ 'citations': ['Jackowska2024',
+               'Xu2019',
+               'Landesfeind2019']}
+--------------- End of script ---------------
+{'Ambient temperature [K]': 298.15,
+ 'Boltzmann constant [J.K-1]': 1.380649e-23,
+ 'Cation transference number': 0.38,
+ 'Contact resistance [Ohm]': Addition(-0xf43692c6f7528f7, +, children=['21.523868759105234', '26026.64997548236 * Positive electrode thickness [m]'], domains={}),
+ 'Current function [A]': 0.003112,
+ 'Electrode height [m]': 0.013116158496700819,
+ 'Electrode width [m]': 0.013116158496700819,
+ 'Electrolyte conductivity [S.m-1]': <function electrolyte_conductivity_base_Landesfeind2019 at 0x7850e455bd80>,
+ 'Electrolyte density [kg.m-3]': 1203.0,
+ 'Electrolyte diffusivity [m2.s-1]': <function electrolyte_diffusivity_base_Landesfeind2019 at 0x7850e455bce0>,
+ 'Electron charge [C]': 1.602176634e-19,
+ 'Exchange-current density for lithium metal electrode [A.m-2]': <function li_metal_electrolyte_exchange_current_density_Xu2019 at 0x7850e4e66200>,
+ 'Faraday constant [C.mol-1]': 96485.33212331001,
+ 'Ideal gas constant [J.K-1.mol-1]': 8.31446261815324,
+ 'Initial concentration in electrolyte [mol.m-3]': 1000.0,
+ 'Initial concentration in positive electrode [mol.m-3]': 16383.172064030372,
+ 'Initial temperature [K]': 298.15,
+ 'Lithium metal partial molar volume [m3.mol-1]': 1.3e-05,
+ 'Lower voltage cut-off [V]': 2.5,
+ 'Maximum concentration in positive electrode [mol.m-3]': 55370.27036223915,
+ 'Negative electrode OCP [V]': 0.0,
+ 'Negative electrode OCP entropic change [V.K-1]': 0.0,
+ 'Negative electrode conductivity [S.m-1]': 10776000.0,
+ 'Negative electrode double-layer capacity [F.m-2]': 2.220446049250313e-16,
+ 'Negative electrode thickness [m]': 0.0001,
+ 'Nominal cell capacity [A.h]': 0.003112,
+ 'Number of cells connected in series to make a battery': 1.0,
+ 'Number of electrodes connected in parallel to make a cell': 1.0,
+ 'Open-circuit voltage at 0% SOC [V]': Parameter(0x35c8bedc559db71a, Lower voltage cut-off [V], children=[], domains={}),
+ 'Open-circuit voltage at 100% SOC [V]': Parameter(0x48493881e93970b4, Upper voltage cut-off [V], children=[], domains={}),
+ 'Positive electrode Bruggeman coefficient (electrode)': 0,
+ 'Positive electrode Bruggeman coefficient (electrolyte)': Addition(0x61269fec99e50785, +, children=['1.7234567901234565', '5432.098765432104 * Positive electrode thickness [m]'], domains={}),
+ 'Positive electrode OCP [V]': <function ncm_ocp_Jackowska2024_power at 0x7850e455b7e0>,
+ 'Positive electrode OCP entropic change [V.K-1]': <function nmc_ocp_entropic_change_Jackowska2024_power at 0x7850e455b9c0>,
+ 'Positive electrode active material density [kg.m-3]': 4796.0,
+ 'Positive electrode active material volume fraction': 0.661,
+ 'Positive electrode carbon-binder density [kg.m-3]': 1860.0,
+ 'Positive electrode charge transfer coefficient': 0.5,
+ 'Positive electrode conductivity [S.m-1]': 0.4215,
+ 'Positive electrode diffusivity scaling factor': Addition(-0x4f2dc1a653604625, +, children=['1.0', '5.5097649267141094e-09 / (Positive electrode thickness [m] ** 2.0)'], domains={}),
+ 'Positive electrode double-layer capacity [F.m-2]': Division(-0x3d9e8f4bdf45d19e, /, children=['2.47985e-07', 'Positive electrode thickness [m]'], domains={}),
+ 'Positive electrode exchange-current density [A.m-2]': <function nmc_electrolyte_exchange_current_density_Jackowska2024 at 0x7850e455bc40>,
+ 'Positive electrode porosity': Subtraction(0x4cebbe7dcaf7cf86, -, children=['0.925', 'Positive electrode active material volume fraction'], domains={}),
+ 'Positive electrode reaction activation energy [J.mol-1]': 51225.11934265193,
+ 'Positive electrode reaction rate [A.m-2.(m3.mol-1)^1.5]': Division(-0x5fc00d20b95ecf6, /, children=['3.271451753386133e-11', 'Positive electrode thickness [m]'], domains={}),
+ 'Positive electrode thickness [m]': 3.25e-05,
+ 'Positive particle diffusivity [m2.s-1]': <function nmc_diffusivity_Jackowska2024_power at 0x7850e455ba60>,
+ 'Positive particle diffusivity scaling factor': Addition(-0x4f2dc1a653604625, +, children=['1.0', '5.5097649267141094e-09 / (Positive electrode thickness [m] ** 2.0)'], domains={}),
+ 'Positive particle radius [m]': 1.88e-06,
+ 'RMSE values': [0.023936810962720875,
+                 0.021499334573948876,
+                 0.027676745489376677,
+                 0.044272791217947464,
+                 0.05347705490529502],
+ 'Reference temperature [K]': 298.15,
+ 'Scaling values': [1.1573874574378131,
+                    2.092627807617187,
+                    3.8907479189224548,
+                    8.579896081924439,
+                    12.26223990392462],
+ 'Separator Bruggeman coefficient (electrode)': 0,
+ 'Separator Bruggeman coefficient (electrolyte)': 1.5,
+ 'Separator porosity': 0.39,
+ 'Separator thickness [m]': 2.5e-05,
+ 'Theoretical GITT charge capacity [A.h]': 0.005852486721592267,
+ 'Theoretical GITT discharge capacity [A.h]': 0.00644477874141504,
+ 'Thermodynamic factor': 1.0,
+ 'Upper voltage cut-off [V]': 4.2,
+ 'citations': ['Jackowska2024',
+               'Xu2019',
+               'Landesfeind2019']}
+21.523868759105234 26026.64997548236 -7.42277907977471e-05 1.7234567901234565 5432.098765432104 2.47985e-07 3.271451753386133e-11
+--------------- End of script ---------------
+Ignoring x0. Initial conditions are not used for differential_evolution.
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [None None 0.003]
+  Optimised parameters: [4.54937607e-05 8.17897771e-01 5.00099440e-03]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 133.39861806146314
+  Optimisation time: 2537.6476583480835 seconds
+  Number of iterations: 25
+  Number of evaluations: None
+  Reason for stopping: Maximum number of iterations has been exceeded.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+--------------- End of script ---------------
+Optimising index (0, 0)
+Optimising index (0, 1)
+Optimising index (0, 2)
+Optimising index (0, 3)
+Optimising index (0, 4)
+Optimising index (0, 5)
+Optimising index (0, 6)
+Optimising index (0, 7)
+Optimising index (0, 8)
+Optimising index (0, 9)
+Optimising index (0, 10)
+Optimising index (1, 0)
+Optimising index (1, 1)
+Optimising index (1, 2)
+Optimising index (1, 3)
+Optimising index (1, 4)
+Optimising index (1, 5)
+Optimising index (1, 6)
+Optimising index (1, 7)
+Optimising index (1, 8)
+Optimising index (1, 9)
+Optimising index (1, 10)
+Optimising index (2, 0)
+Optimising index (2, 1)
+Optimising index (2, 2)
+Optimising index (2, 3)
+Optimising index (2, 4)
+Optimising index (2, 5)
+Optimising index (2, 6)
+Optimising index (2, 7)
+Optimising index (2, 8)
+Optimising index (2, 9)
+Optimising index (2, 10)
+Optimising index (3, 0)
+Optimising index (3, 1)
+Optimising index (3, 2)
+Optimising index (3, 3)
+Optimising index (3, 4)
+Optimising index (3, 5)
+Optimising index (3, 6)
+Optimising index (3, 7)
+Optimising index (3, 8)
+Optimising index (3, 9)
+Optimising index (3, 10)
+Optimising index (4, 0)
+Optimising index (4, 1)
+Optimising index (4, 2)
+Optimising index (4, 3)
+Optimising index (4, 4)
+Optimising index (4, 5)
+Optimising index (4, 6)
+Optimising index (4, 7)
+Optimising index (4, 8)
+Optimising index (4, 9)
+Optimising index (4, 10)
+Optimising index (5, 0)
+Optimising index (5, 1)
+Optimising index (5, 2)
+Optimising index (5, 3)
+Optimising index (5, 4)
+Optimising index (5, 5)
+Optimising index (5, 6)
+Optimising index (5, 7)
+Optimising index (5, 8)
+Optimising index (5, 9)
+Optimising index (5, 10)
+Optimising index (6, 0)
+Optimising index (6, 1)
+Optimising index (6, 2)
+Optimising index (6, 3)
+Optimising index (6, 4)
+Optimising index (6, 5)
+Optimising index (6, 6)
+Optimising index (6, 7)
+Optimising index (6, 8)
+Optimising index (6, 9)
+Optimising index (6, 10)
+Optimising index (7, 0)
+Optimising index (7, 1)
+Optimising index (7, 2)
+Optimising index (7, 3)
+Optimising index (7, 4)
+Optimising index (7, 5)
+Optimising index (7, 6)
+Optimising index (7, 7)
+Optimising index (7, 8)
+Optimising index (7, 9)
+Optimising index (7, 10)
+[[ 98.37615733 101.20664636 103.3003932  104.92597734 106.15020099
+  107.14987235 107.99463972 108.73411879 109.35927218 109.87749819
+  110.36107182]
+ [103.73656155 106.58430641 108.63985351 110.16739886 111.35299396
+  112.30159779 113.10199226 113.80181092 114.39269045 114.9087792
+  115.36343197]
+ [108.67560286 111.52053087 113.50933736 114.95336087 116.07585392
+  116.98934811 117.75905214 118.41643928 118.97071736 119.45441345
+  119.89226646]
+ [113.35675541 116.06753094 117.94951684 119.34075794 120.41592871
+  121.27310226 121.99443765 122.62391    123.15417969 123.61655536
+  124.04632954]
+ [117.58530025 120.25751142 122.04805949 123.37738733 124.38537802
+  125.20292811 125.90465638 126.5027568  127.01860587 127.49153859
+  127.9734207 ]
+ [121.57028058 124.11796951 125.83837008 127.10369739 128.07753999
+  128.86645214 129.57072058 130.19627644 130.81955473 131.55346475
+  129.91643969]
+ [125.2586002  127.71745615 129.37375354 130.62490871 131.6516529
+  132.64429782 131.2637387  123.29575576 116.02419927 107.4359094
+   98.75832016]
+ [128.70461132 131.2236874  129.39545025 117.27944893 103.3129858
+   89.64120032  73.446256    63.86796548  59.74326471  57.62806787
+   51.82067308]]
+Specific capacity [mA.h.g-1]: 112.32581316033234
+Specific capacity [mA.h.g-1]: 119.46365550774308
+Specific capacity [mA.h.g-1]: 133.39861806146314
+Plot saved at /home/nicola/GitHub/NCM-optimisation/specific_capacity.pdf
+Plot saved at /home/nicola/GitHub/NCM-optimisation/specific_discharge.pdf
+--------------- End of script ---------------
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.75   0.0035]
+  Optimised parameters: [0.84992065 0.00354101]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 20.75478533441118
+  Optimisation time: 59.052080392837524 seconds
+  Number of iterations: 23
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.75   0.0035]
+  Optimised parameters: [0.8330788  0.00452746]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 26.536603262961325
+  Optimisation time: 158.0432469844818 seconds
+  Number of iterations: 46
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.75   0.0035]
+  Optimised parameters: [0.80768153 0.00539308]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 32.65520899006079
+  Optimisation time: 188.85327911376953 seconds
+  Number of iterations: 54
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.75   0.0035]
+  Optimised parameters: [0.78266992 0.00619713]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 37.52375052691651
+  Optimisation time: 304.8023829460144 seconds
+  Number of iterations: 84
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.75   0.0035]
+  Optimised parameters: [0.75844234 0.00694157]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 41.358812294014875
+  Optimisation time: 438.32038593292236 seconds
+  Number of iterations: 107
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+--------------- End of script ---------------
+Optimising index (0, 0)
+Optimising index (0, 1)
+Optimising index (0, 2)
+Optimising index (0, 3)
+Optimising index (0, 4)
+Optimising index (0, 5)
+Optimising index (0, 6)
+Optimising index (0, 7)
+Optimising index (0, 8)
+Optimising index (0, 9)
+Optimising index (0, 10)
+Optimising index (1, 0)
+Optimising index (1, 1)
+Optimising index (1, 2)
+Optimising index (1, 3)
+Optimising index (1, 4)
+Optimising index (1, 5)
+Optimising index (1, 6)
+Optimising index (1, 7)
+Optimising index (1, 8)
+Optimising index (1, 9)
+Optimising index (1, 10)
+Optimising index (2, 0)
+Optimising index (2, 1)
+Optimising index (2, 2)
+Optimising index (2, 3)
+Optimising index (2, 4)
+Optimising index (2, 5)
+Optimising index (2, 6)
+Optimising index (2, 7)
+Optimising index (2, 8)
+Optimising index (2, 9)
+Optimising index (2, 10)
+Optimising index (3, 0)
+Optimising index (3, 1)
+Optimising index (3, 2)
+Optimising index (3, 3)
+Optimising index (3, 4)
+Optimising index (3, 5)
+Optimising index (3, 6)
+Optimising index (3, 7)
+Optimising index (3, 8)
+Optimising index (3, 9)
+Optimising index (3, 10)
+Optimising index (4, 0)
+Optimising index (4, 1)
+Optimising index (4, 2)
+Optimising index (4, 3)
+Optimising index (4, 4)
+Optimising index (4, 5)
+Optimising index (4, 6)
+Optimising index (4, 7)
+Optimising index (4, 8)
+Optimising index (4, 9)
+Optimising index (4, 10)
+Optimising index (5, 0)
+Optimising index (5, 1)
+Optimising index (5, 2)
+Optimising index (5, 3)
+Optimising index (5, 4)
+Optimising index (5, 5)
+Optimising index (5, 6)
+Optimising index (5, 7)
+Optimising index (5, 8)
+Optimising index (5, 9)
+Optimising index (5, 10)
+Optimising index (6, 0)
+Optimising index (6, 1)
+Optimising index (6, 2)
+Optimising index (6, 3)
+Optimising index (6, 4)
+Optimising index (6, 5)
+Optimising index (6, 6)
+Optimising index (6, 7)
+Optimising index (6, 8)
+Optimising index (6, 9)
+Optimising index (6, 10)
+Optimising index (7, 0)
+Optimising index (7, 1)
+Optimising index (7, 2)
+Optimising index (7, 3)
+Optimising index (7, 4)
+Optimising index (7, 5)
+Optimising index (7, 6)
+Optimising index (7, 7)
+Optimising index (7, 8)
+Optimising index (7, 9)
+Optimising index (7, 10)
+[[10.35794124 12.20904546 14.03496459 15.8471464  17.65131477 19.45090403
+  21.25049329 23.05122733 24.85081659 26.64582674 28.44312645]
+ [11.39281954 13.42937762 15.43731627 17.43037283 19.41427117 21.39473518
+  23.37290963 25.35451842 27.33269287 29.30857777 31.28560745]
+ [12.42769785 14.648565   16.83966796 19.01245448 21.17722757 23.33742155
+  25.49647075 27.65780951 29.81571393 31.97247358 34.13152278]
+ [13.46257615 15.86775238 18.24087486 20.59568091 22.94132875 25.28010792
+  27.62003187 29.96224537 32.29987977 34.63980372 36.98545155]
+ [14.49630968 17.08693976 19.64208177 22.17776256 24.70428515 27.22508384
+  29.7481721  32.27240512 34.79663815 37.3300294  39.87944751]
+ [15.53118798 18.30612714 21.04328867 23.76213377 26.47182065 29.18036276
+  31.89577353 34.61805296 37.36551748 40.17136562 42.23768789]
+ [16.56377673 19.52416975 22.44907469 25.35909752 28.27484425 31.22607905
+  33.5969131  35.25110519 34.52647193 34.06913244 33.00897651]
+ [17.59865503 20.76854222 23.26701777 24.39214423 23.00829819 22.0718707
+  20.66509129 19.23410599 16.00492693 17.03486321 16.41546189]]
+Areal capacity [mA.h.cm-2]: 1.5668561204928169
+Areal capacity [mA.h.cm-2]: 3.3100078810499136
+Areal capacity [mA.h.cm-2]: 4.068631128110406
+Plot saved at /home/nicola/GitHub/NCM-optimisation/areal_capacity.pdf
+Plot saved at /home/nicola/GitHub/NCM-optimisation/areal_discharge.pdf
+--------------- End of script ---------------
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.7]
+  Optimised parameters: [0.78654297]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 55.90017480095512
+  Optimisation time: 25.364372968673706 seconds
+  Number of iterations: 11
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.7]
+  Optimised parameters: [0.76220703]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 56.70096267779179
+  Optimisation time: 26.064242839813232 seconds
+  Number of iterations: 11
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.7]
+  Optimised parameters: [0.73561523]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 57.20281618487235
+  Optimisation time: 23.615541458129883 seconds
+  Number of iterations: 10
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.7]
+  Optimised parameters: [0.71039063]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 57.50838872183225
+  Optimisation time: 25.349428415298462 seconds
+  Number of iterations: 10
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+OptimisationResult:
+  Best result from 1 run(s).
+  Initial parameters: [0.7]
+  Optimised parameters: [0.68810547]
+  Total-order sensitivities:
+  Diagonal Fisher Information entries: None
+  Final cost: 57.70575692436252
+  Optimisation time: 24.38606548309326 seconds
+  Number of iterations: 10
+  Number of evaluations: None
+  Reason for stopping: Optimization terminated successfully.
+  SciPy result available: Yes
+  PyBaMM Solution available: Yes
+--------------- End of script ---------------
+[[36.55378767 43.7406459  50.90558937 55.2773952  55.73248382 56.08399709
+  56.38232277 56.64106819 56.8659477  57.05871797 57.21948358]
+ [41.47276302 48.96373675 55.08464428 55.71592817 56.11401611 56.44508259
+  56.72774717 56.96943317 57.1710663  57.33577648 57.47253352]
+ [45.27097039 52.7939994  55.59418148 56.05884564 56.43411227 56.74832024
+  57.01241977 57.22827105 57.40075456 57.54044881 57.65352894]
+ [48.98659504 55.30013707 55.90668554 56.3430521  56.698345   56.99201832
+  57.22823676 57.41191867 57.55627121 57.66988114 57.7610468 ]
+ [52.64948823 55.63064387 56.15558943 56.56516075 56.89602928 57.15802588
+  57.35608833 57.50491185 57.61672584 57.70144995 57.76562942]
+ [55.04556444 55.83722525 56.32023207 56.69399406 56.98286616 57.19337156
+  57.34011301 57.43991249 57.50495901 57.54289882 57.55810481]
+ [55.29177265 55.88713966 56.2978593  56.59024243 56.7804909  56.88437332
+  56.92156367 56.90681719 56.84908962 56.756933   56.64159361]
+ [54.8809736  55.16933579 55.13231752 54.91319195 54.64576802 51.03112451
+  54.0233222  54.42095796 43.61165254 29.89108239 33.15677564]]
+Areal energy [mW.h.cm-2]: 5.522545691561984
+Areal energy [mW.h.cm-2]: 5.760163998551354
+Areal energy [mW.h.cm-2]: 5.770575711205163
+Plot saved at /home/nicola/GitHub/NCM-optimisation/fixed_areal_energy.pdf
+Plot saved at /home/nicola/GitHub/NCM-optimisation/fixed_areal_discharge.pdf
