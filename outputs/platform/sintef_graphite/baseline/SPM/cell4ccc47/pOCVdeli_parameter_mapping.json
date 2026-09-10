@@ -2,7 +2,7 @@
   "dataset": "sintef_graphite",
   "cell": "4ccc47",
   "model": "SPM",
-  "rate_slug": "pOCV",
+  "rate_slug": "pOCVdeli",
   "rate_label": "C/50 (p-OCV delithiation)",
   "c_rate": 0.02,
   "source_rate": "p-ocv",
@@ -25,7 +25,7 @@
       "mapped_key": "Initial concentration in positive electrode [mol.m-3]",
       "source_value": 26120.05,
       "mapped_value": 30585.99922295806,
-      "mapping_reason": "inverse-OCP(rest OCV 0.0824 V) -> x0 = 0.9582 -> x0*c_max = 30586.0 mol/m3; graphite occupies the positive electrode slot of Ecker2015_graphite_halfcell (audited); initial Li fraction x0 = 0.9582 from the measured pre-branch rest OCV 0.0824 V via the same graphite OCP table PyBaMM interpolates"
+      "mapping_reason": "inverse-OCP(rest OCV 0.0824 V) -> x0 = 0.9582 -> x0*c_max = 30586.0 mol/m3; graphite occupies the positive electrode slot of Ecker2015_graphite_halfcell (audited); initial Li fraction x0 = 0.9582 from the pre-branch rest OCV 0.0824 V"
     }
   ]
 }

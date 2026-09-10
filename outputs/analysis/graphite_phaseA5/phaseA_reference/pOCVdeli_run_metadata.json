@@ -4,19 +4,15 @@
   "cell": "4ccc47",
   "mode": "baseline",
   "rates": [
-    "pOCVdeli",
-    "pOCVlith"
+    "pOCVdeli"
   ],
   "rate_labels": [
-    "C/50 (p-OCV delithiation)",
-    "C/50 (p-OCV lithiation)"
+    "C/50 (p-OCV delithiation)"
   ],
   "c_rates": [
-    0.02,
     0.02
   ],
   "source_rates": [
-    "p-ocv",
     "p-ocv"
   ],
   "parameter_set": "Ecker2015_graphite_halfcell",
@@ -42,6 +38,6 @@
   "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
   "reused_reference": "scripts/run_baseline.py",
   "pybamm_version": "26.8.0.0",
-  "timestamp": "2026-09-10T10:16:05+00:00",
-  "runtime_s": 0.8150074439981836
+  "timestamp": "2026-09-10T10:11:37+00:00",
+  "runtime_s": 0.41510170599940466
 }

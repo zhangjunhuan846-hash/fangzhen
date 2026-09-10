@@ -4,22 +4,18 @@
   "cell": "4ccc47",
   "mode": "baseline",
   "rates": [
-    "pOCVdeli",
     "pOCVlith"
   ],
   "rate_labels": [
-    "C/50 (p-OCV delithiation)",
     "C/50 (p-OCV lithiation)"
   ],
   "c_rates": [
-    0.02,
     0.02
   ],
   "source_rates": [
-    "p-ocv",
     "p-ocv"
   ],
-  "parameter_set": "Ecker2015_graphite_halfcell",
+  "parameter_set": "sintef_graphite_geometry_v1",
   "capacity_metric_type": "forced_current_window",
   "capacity_is_predictive": false,
   "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
@@ -42,6 +38,6 @@
   "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
   "reused_reference": "scripts/run_baseline.py",
   "pybamm_version": "26.8.0.0",
-  "timestamp": "2026-09-10T10:16:05+00:00",
-  "runtime_s": 0.8150074439981836
+  "timestamp": "2026-09-10T10:11:39+00:00",
+  "runtime_s": 0.5031171849987004
 }

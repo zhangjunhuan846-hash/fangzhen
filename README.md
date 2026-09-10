@@ -202,7 +202,7 @@ python run_pipeline.py baseline --dataset chen2020 --model SPMe --cell 02
 ├── user_tools/            # 自助入口：实验 CSV → 校验 → zero-fit baseline
 ├── outputs/               # Simulation results
 ├── external/              # Vendored upstream parameter-set repo (BSD-3)
-├── tests/                 # Regression tests (115 passed gate)
+├── tests/                 # Regression tests (126 passed gate)
 └── README.md
 ```
 
@@ -240,10 +240,11 @@ run_metadata.json
 * [x] Baseline simulation
 * [x] Sensitivity analysis
 * [x] Result tracking
-* [x] Regression testing (115 tests)
+* [x] Regression testing (126 tests)
 * [x] Experimental-CSV self-service entry (`user_tools/` + example case)
 * [x] Graphite half-cell line, Phase A: SINTEF graphite R2032 → zero-fit SPM chain
-* [ ] Graphite Phase B/C: OCP + GITT extraction, geometry-matched parameter set
+* [x] Graphite Phase A.5: geometry-aware zero-fit (measured electrode geometry)
+* [ ] Graphite Phase B: OCP (both branches) + GITT→D_s extraction
 
 ---
 

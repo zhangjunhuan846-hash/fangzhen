@@ -1,0 +1,78 @@
+{
+  "parameter_set_id": "sintef_graphite_geometry_v1",
+  "reference_parameter_set": "Ecker2015_graphite_halfcell",
+  "purpose": "Phase A.5 geometry-aware ZERO-FIT: remove the electrode-scale mismatch of Phase A without fitting anything to voltage",
+  "measured_structure": {
+    "cell_id": "4ccc47",
+    "metadata_csv": "data/metadata.csv",
+    "source_file": "sintef__sintef-graphite-R2032-intelligent-4ccc47__20250514__p-ocv__RT.bdf.parquet",
+    "public_label": "Gr-AQ-1",
+    "active_material_type": "Graphite",
+    "mass_active_material_mg": 5.816164537524997,
+    "active_material_wt_pct": 90.98419274124022,
+    "theoretical_capacity_mAh_g": 372.0,
+    "electrode_diameter_mm": 14.0,
+    "dry_thickness_um": 64.0,
+    "nominal_areal_capacity_mAh_cm2": 1.404943641532012,
+    "electrode_loading_g_cm2": 0.003776730219172,
+    "unit_note": "the catalog column labelled 'Electrode Diameter / cm' holds MILLIMETRES (14 = standard 14 mm R2032 disc); taken as mm here",
+    "electrode_area_cm2": 1.5393804002589984
+  },
+  "override": {
+    "Electrode height [m]": 0.013524592868773139,
+    "Electrode width [m]": 0.011382083107383334,
+    "Positive electrode thickness [m]": 6.4e-05,
+    "Positive electrode active material volume fraction": 0.26121752979470236,
+    "Nominal cell capacity [A.h]": 0.0022016583309734375
+  },
+  "kept_unchanged": [
+    "Positive electrode OCP [V]",
+    "Positive particle diffusivity [m2.s-1]",
+    "Positive electrode exchange-current density [A.m-2]",
+    "Maximum concentration in positive electrode [mol.m-3]",
+    "Positive electrode porosity",
+    "Positive particle radius [m]"
+  ],
+  "derivations": {
+    "electrode_area_m2": "pi * (d/2)^2 with d = 14.0 mm (catalog column labelled 'cm', values are mm)",
+    "electrode_width_m": "sqrt(area / aspect) with aspect = 1.188235 preserved from Ecker2015_graphite_halfcell (height 0.101 / width 0.085); scale-only change",
+    "electrode_height_m": "aspect * width",
+    "electrode_thickness_m": "measured dry thickness 64.0 um",
+    "active_material_volume_fraction": "PRIMARY (active mass): eps_am = m_AM / (rho_graphite * thickness * area) with m_AM 5.816164537524997 mg, rho 2260.0 kg/m3, thickness 6.400e-05 m, area 1.539380e-04 m2",
+    "nominal_cell_capacity_Ah": "area * thickness * eps_am * c_max * F / 3600 with c_max 31920.0 mol/m3 carried over unchanged"
+  },
+  "derivations_by_parameter": {
+    "Electrode height [m]": "aspect * width",
+    "Electrode width [m]": "sqrt(area / aspect) with aspect = 1.188235 preserved from Ecker2015_graphite_halfcell (height 0.101 / width 0.085); scale-only change",
+    "Positive electrode thickness [m]": "measured dry thickness 64.0 um",
+    "Positive electrode active material volume fraction": "PRIMARY (active mass): eps_am = m_AM / (rho_graphite * thickness * area) with m_AM 5.816164537524997 mg, rho 2260.0 kg/m3, thickness 6.400e-05 m, area 1.539380e-04 m2",
+    "Nominal cell capacity [A.h]": "area * thickness * eps_am * c_max * F / 3600 with c_max 31920.0 mol/m3 carried over unchanged"
+  },
+  "cross_checks": {
+    "eps_am_active_mass_route": 0.26121752979470236,
+    "eps_am_loading_column_route": 0.23757103857357,
+    "eps_am_areal_capacity_route": 2.5660035396830796e-05,
+    "eps_am_relative_difference_loading_vs_mass_pct": -9.052413610877014,
+    "eps_am_relative_difference_areal_vs_mass_pct": -99.99017675597155,
+    "catalog_nominal_areal_capacity_mAh_cm2": 1.404943641532012,
+    "mass_implied_areal_capacity_mAh_cm2": 1.2782766307172595,
+    "catalog_internal_inconsistency": "the catalog is ~10 % internally inconsistent: its (coating mass / loading) implies a larger electrode area than the punched-disc diameter gives.  The disc diameter (14 mm -> 1.5394 cm2) is used for the AREA because it is the physical electrode; the active mass is used for eps_am; both alternatives are reported and neither is silently corrected."
+  },
+  "reference_values": {
+    "area_m2": 0.008585,
+    "thickness_m": 7.4e-05,
+    "eps_am": 0.372403,
+    "nominal_cell_capacity_Ah": 0.15625
+  },
+  "scale_ratios_vs_reference": {
+    "area_ratio_reference_over_measured": 55.769191283425386,
+    "thickness_ratio": 1.15625,
+    "per_area_capacity_ratio": 1.2725526400702516
+  },
+  "not_measured_kept_from_reference": [
+    "Electrode height [m]",
+    "Positive electrode porosity",
+    "Positive particle radius [m]"
+  ],
+  "wording": "geometry override from measured structure; OCP / diffusivity / kinetics unchanged; still a reference (surrogate) parameter set, still zero-fit, NOT validation"
+}

@@ -317,3 +317,88 @@ SINTEF .parquet / DLR .txt（只读）
 - ❌ 参数集构建与几何匹配（Phase C）
 - ❌ `parameter_summary.json` / `report.md` 产物（Phase D/E）
 - ❌ DLR adapter（Phase D）
+
+---
+
+# Phase A.5 执行记录：geometry-aware zero-fit（2026-09-10）
+
+目标：验证 Phase A 的"voltage frozen"是**纯尺度伪影**——用 SINTEF 实测电极几何替换参考
+参数集的几何，**OCP / 扩散 / 动力学一律不动**，不拟合任何电压。
+
+## 0. 先修了一个更根本的错误：符号约定
+
+Phase A 的 adapter **保留了原始电流符号**，理由是"负电流=锂化=充电，与平台一致"。**这是错的**：
+
+- cycler 约定（SINTEF 与 Birmingham 原始文件相同）：**负电流 = 放电**；
+- 石墨‖Li 电池的**放电本身就是锂化**（Li 从锂金属溶出、插入石墨，V 从 ~3 V 降到 0.01 V）
+  ——所以"负电流段驱动 3.0 V → 0.01 V"恰好证明它是**放电**，不是充电；
+- 平台 canonical：**放电 = +** → 必须**翻转**原始符号（与 Birmingham adapter 一致）；
+- 实测反证（本机 PyBaMM 探针）：石墨在正极槽位时，**正电流使 x 0.964→0.987（锂化）且
+  V→0 V**；**负电流使 x→0.930（脱锂）且 V 上升**。
+
+修正内容：
+1. adapter **翻转符号**（`current_A = -raw`），`capacity_Ah` 改为对 canonical 电流积分；
+2. provenance 重写：`raw = negative current = DISCHARGE`、`action = raw sign FLIPPED to canonical`、
+   附 PyBaMM 方向探针结论；
+3. **两个分支都暴露为 rate**（rule-based 识别，不猜 step 号）：
+   - `pOCV-deli` 脱锂支（0.01→1.0 V）= 用户指定的主窗口；在平台约定下这是**充电方向**窗口
+     （负电流）→ runner 面向放电的列（`Q_sim` / `capacity_error_pct` /
+     `current_peak_discharge_A`）对它没有意义，V(t) 类指标有效；
+   - `pOCV-lith` 锂化支（3.0→0.01 V）= 电池自身的**放电方向**，约定干净，作交叉校验；
+4. 温度/单位不变；`x0` 规则增加**表边界回退**（新鲜态 rest OCV 2.97 V 高于参考 OCP 表顶
+   1.4325 V 时，取表的脱锂边界并标注 `ocp_table_edge_fallback`）。
+
+## 1. 几何覆盖（parameters/sintef_graphite_geometry.py）
+
+| 参数 | 参考集 | A.5（由实测推导） |
+|---|---|---|
+| 电极面积 | 85.85 cm² | **1.5391 cm²**（14 mm 圆片） |
+| 正极厚度 | 74 µm | **64 µm** |
+| 活性物质体积分数 ε_am | 0.372403 | **0.2612** |
+| 标称容量 | 156.25 mAh | **2.2017 mAh** |
+
+推导（全部写入 `geometry_override.json`）：
+- 面积 = π(d/2)²，d = **14 mm**（目录列名写 cm，实为 mm——**单位陷阱**，Phase A 的
+  provenance 里曾因此算出 153.9 cm²，本次一并修正）
+- 宽/高：保持参考电极长宽比（0.101/0.085）→ 只改尺度
+- ε_am 主路线 = m_AM /(ρ_石墨 × 厚度 × 面积)，ρ_石墨 = 2260 kg/m³（与参考集自洽性交叉验证：
+  31920 mol/m³ ↔ 372 mAh/g）；另两条交叉路线（载量列、面容量+c_max）一并报告，
+  差异与**目录内部约 10% 不一致**（(涂层质量/载量) 与圆片面积不符）都写入 JSON，不静默修正
+- 孔隙率、粒径：目录未测 → **保留参考值并显式标注**
+- 容量 = 面积 × 厚度 × ε_am × c_max × F/3600
+
+注入方式（**不改任何仓库文件**）：PyBaMM 的 `parameter_sets` 是惰性 EntryPoint 映射，
+不可赋值 → 用一个**只读视图**对象替换模块属性，其中托管我们的派生集；
+随后 `run_baseline_cell(..., parameter_set="sintef_graphite_geometry_v1")` 走**未修改的公共 runner**。
+
+## 2. 结果（zero-fit，无任何拟合）
+
+| 窗口 | 几何 | RMSE(t) | V_sim 跨度 | 冻结伪影 |
+|---|---|---|---|---|
+| `pOCV-deli`（脱锂） | 参考几何 | 150.06 mV | 1.6 mV | **PRESENT** |
+| `pOCV-deli`（脱锂） | **实测几何** | **109.12 mV** | 116 mV | PARTIAL |
+| `pOCV-lith`（锂化=放电） | 参考几何 | 875.75 mV | 620 mV | PARTIAL |
+| `pOCV-lith`（锂化=放电） | **实测几何** | **81.39 mV** | 1289 mV | PARTIAL |
+
+**结论：尺度修正确实消除了"voltage frozen"伪影**——放电方向窗口从 876 mV 降到 81 mV
+（10.8×），模型电压跨度从 620 mV 增至 1289 mV；脱锂窗口从 150 mV 降到 109 mV。
+
+## 3. 剩余残差不是尺度（Phase B 的动机）
+
+| 现象 | 归因 |
+|---|---|
+| 锂化窗口：V_sim 起点 1.372 V vs 实验 3.016 V | **参考石墨 OCP 表最高只到 1.4325 V**，新鲜态（~3 V）落在表的有效范围之外 |
+| 脱锂窗口：V_sim 终点 0.196 V vs 实验 1.000 V | 模型容量 2.20 mAh、支路电荷 1.785 mAh → Δx≈0.81，x 只走到 ~0.15；参考 OCP 要到 x≈0.004 才到 1.0 V → **OCP 形状/容量差异** |
+| 两部分残差 | 均指向**OCP 曲线本身**，而非尺度 → **Phase B（从 p-OCV 提取实测 OCP、双支）** 的直接依据 |
+
+## 4. 措辞（强制）
+
+geometry-aware **zero-fit reference replay**：几何来自实测，OCP/扩散/动力学来自公开参考集，
+**未对任何电压做拟合**，结果**不是**对该石墨的模型验证。剩余残差是 Phase B 的**假设**，
+不是结论。禁止写"模型误差 81 mV"。
+
+## 5. Phase A.5 未做（按范围）
+
+- ❌ OCP / GITT 提取（Phase B）
+- ❌ 全电池、DLR adapter（Phase D）
+- ❌ 参数拟合（须独立立项 + 锁文件）

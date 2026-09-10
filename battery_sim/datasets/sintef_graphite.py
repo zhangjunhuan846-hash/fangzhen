@@ -14,21 +14,36 @@
 #   * the capacity column is PER-STEP cumulative (resets to 0 at
 #     each step; agrees with the trapezoidal current integral to
 #     <0.5 % on the delithiation branch)
-#   * sign convention: NEGATIVE current = lithiation (charge).
-#     That COINCIDES with the platform canonical convention
-#     (discharge = +, charge = -), so the raw sign is kept as-is
-#     -- unlike the Birmingham adapter, which had to flip.
-#     (Verified from the data: the negative-current step drives
-#     3.0 V -> 0.01 V = lithiation.)
+#   * sign convention: NEGATIVE current = DISCHARGE (standard cycler
+#     convention, same as the Birmingham raw files).  For a
+#     graphite||Li cell the spontaneous discharge LITHIATES the
+#     graphite (Li dissolves from the Li metal and intercalates),
+#     driving V from ~3 V (fresh) down to 0.01 V.  Verified in-data:
+#     the negative-current step runs 3.0 V -> 0.01 V.
+#     The platform canonical convention is DISCHARGE = +, so the raw
+#     sign is FLIPPED (as in the Birmingham adapter).  Checked
+#     against PyBaMM: with graphite in the positive slot a POSITIVE
+#     current inserts Li (x: 0.964 -> 0.987, V -> 0 V) while a
+#     NEGATIVE current extracts it (x -> 0.930, V rises), so after
+#     the flip the canonical discharge direction and the model agree.
 #   * p-OCV programme per cycle:
-#       step 2 = lithiation  (-43.3 uA, 44-46 h, down to 0.01 V)
+#       step 2 = lithiation  (-43.3 uA, 44-46 h, 3.0 -> 0.01 V)  = canonical +
 #       step 3 = rest        (8 h)
-#       step 4 = delithiation (+43.3 uA, 41-46 h, up to 1.0 V)
+#       step 4 = delithiation (+43.3 uA, 41-46 h, 0.01 -> 1.0 V) = canonical -
 #       step 5 = rest        (8 h)
-#     -> the DELITHIATION branch is the half-cell "discharge" and
-#        is therefore the baseline replay window (user decision
-#        2026-09-10).  Branch selection is RULE-BASED on the
-#        measured current sign, never guessed from the step index.
+#     BOTH branches are exposed as rates (user decision 2026-09-10
+#     selects the delithiation branch as the primary window):
+#       pOCV-lith  lithiation    = the cell's own DISCHARGE direction
+#       pOCV-deli  delithiation  = the user-selected window; under the
+#                                  platform convention this is a
+#                                  CHARGE-direction window, so the
+#                                  runner's discharge-oriented columns
+#                                  (current_peak_discharge_A, Q_sim,
+#                                  capacity_error_pct) are NOT
+#                                  meaningful for it -- the
+#                                  time-aligned V(t) metrics are.
+#     Branch selection is RULE-BASED on the measured current sign,
+#     never guessed from the step index.
 #   * no temperature channel -> ambient temperature is the
 #     dataset-declared room temperature (see datasets.yaml);
 #     provenance records
@@ -143,7 +158,7 @@ _STRUCTURE_FIELDS = [
     (META_COATING_G, "electrode_coating_mass_g", float),
     (META_WT_PCT, "active_material_wt_pct", float),
     (META_THEO_CAP, "theoretical_capacity_mAh_g", float),
-    (META_DIAMETER_CM, "electrode_diameter_cm", float),
+    (META_DIAMETER_CM, "electrode_diameter_mm", float),
     (META_THICKNESS_UM, "dry_thickness_um", float),
     (META_AREAL_CAP, "nominal_areal_capacity_mAh_cm2", float),
     (META_LOADING, "electrode_loading_g_cm2", float),
@@ -263,10 +278,10 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
                     raise ValueError(
                         f"rates_meta['{rid}'] missing key '{key}'"
                     )
-            if str(meta["branch"]) != "delithiation":
+            if str(meta["branch"]) not in ("lithiation", "delithiation"):
                 raise ValueError(
-                    f"rates_meta['{rid}']: Phase A supports only the "
-                    f"delithiation branch (got {meta['branch']!r})"
+                    f"rates_meta['{rid}']: branch must be 'lithiation' or "
+                    f"'delithiation' (got {meta['branch']!r})"
                 )
 
         # ---- initialisation OCP table (vendored, pybamm-free) ----
@@ -427,14 +442,36 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
                     out[key] = None
             else:
                 out[key] = None if pd.isna(val) else str(val)
-        # derived quantities (no hidden assumptions: diameter in cm)
-        d_cm = out.get("electrode_diameter_cm")
-        if isinstance(d_cm, float):
-            area_cm2 = float(np.pi * (d_cm / 2.0) ** 2)
+        # derived quantities
+        # UNIT TRAP (audited): the catalog header says "Electrode
+        # Diameter / cm" but the values are MILLIMETRES (14 -> a 14 mm
+        # coin-cell disc, the standard R2032 punching).  Reading it as
+        # cm inflates the area by 100x, so the value is taken as mm and
+        # the inconsistency with the "g cm-2" loading column (which
+        # implies ~1.69 cm2 rather than 1.539 cm2) is recorded.
+        d_mm = out.get("electrode_diameter_mm")
+        if isinstance(d_mm, float):
+            area_cm2 = float(np.pi * (d_mm / 20.0) ** 2)
             out["electrode_area_cm2"] = area_cm2
+            out["electrode_area_source"] = (
+                f"pi*(d/2)^2 with d = {d_mm:g} mm read from the catalog "
+                f"column labelled 'Electrode Diameter / cm' (values are mm)"
+            )
             areal = out.get("nominal_areal_capacity_mAh_cm2")
             if isinstance(areal, float):
                 out["nominal_cell_capacity_mAh"] = areal * area_cm2
+            loading = out.get("electrode_loading_g_cm2")
+            coating = out.get("electrode_coating_mass_g")
+            if isinstance(loading, float) and loading > 0 and isinstance(
+                coating, float
+            ):
+                out["area_implied_by_mass_over_loading_cm2"] = coating / loading
+                out["area_inconsistency_note"] = (
+                    "the catalog's own (coating mass / loading) implies "
+                    f"{coating / loading:.4f} cm2 vs {area_cm2:.4f} cm2 from "
+                    "the punched-disc diameter; ~10 % internal "
+                    "inconsistency in the catalog, recorded not corrected"
+                )
         return out
 
     # ------------------------------------------------------------------
@@ -578,11 +615,11 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
     # Window identification (rule-based, fail-loud)
     # ------------------------------------------------------------------
     def _identify_branches(
-        self, steps: pd.DataFrame, path: Path
+        self, steps: pd.DataFrame, path: Path, branch: str
     ) -> Tuple[int, int, int, int]:
         """
-        For the configured cycle return
-        (cycle, rest_step, delithiation_step).
+        For the configured cycle and requested branch return
+        (n_branch_rows, rest_step, branch_step, n_rest_rows).
 
         Classification is by MEASURED mean current relative to the
         file's peak |I|; nothing is inferred from step numbering.
@@ -599,36 +636,41 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
                 f"(cycles: {sorted(steps['cycle'].unique())})"
             )
 
-        deli = cand[cand["mean_current_A"] >= thr]
-        if deli.empty:
+        if branch == "lithiation":
+            # raw negative current = discharge = lithiation
+            sel = cand[cand["mean_current_A"] <= -thr]
+        elif branch == "delithiation":
+            sel = cand[cand["mean_current_A"] >= thr]
+        else:
+            raise ValueError(f"unknown branch '{branch}'")
+
+        if sel.empty:
             raise ValueError(
-                f"{path.name}: no delithiation (positive current) step in "
-                f"cycle {self._target_cycle} "
-                f"(mean currents: "
+                f"{path.name}: no {branch} step in cycle "
+                f"{self._target_cycle} (mean currents: "
                 f"{[round(v * 1e6, 2) for v in cand['mean_current_A']]})"
             )
-        if len(deli) > 1:
+        if len(sel) > 1:
             raise ValueError(
-                f"{path.name}: {len(deli)} delithiation steps in cycle "
-                f"{self._target_cycle}: "
-                f"{sorted(deli['step'].tolist())}; expected exactly one"
+                f"{path.name}: {len(sel)} {branch} steps in cycle "
+                f"{self._target_cycle}: {sorted(sel['step'].tolist())}; "
+                f"expected exactly one"
             )
-        deli_step = int(deli.iloc[0]["step"])
+        br_step = int(sel.iloc[0]["step"])
 
         rest = cand[
-            (cand["step"] < deli_step)
-            & (cand["mean_current_A"].abs() < thr)
+            (cand["step"] < br_step) & (cand["mean_current_A"].abs() < thr)
         ]
         if rest.empty:
             raise ValueError(
-                f"{path.name}: no rest step before the delithiation step "
-                f"{deli_step} in cycle {self._target_cycle}"
+                f"{path.name}: no rest step before the {branch} step "
+                f"{br_step} in cycle {self._target_cycle}"
             )
         rest_step = int(rest["step"].max())
 
-        deli_n = int(deli.iloc[0]["n_rows"])
+        br_n = int(sel.iloc[0]["n_rows"])
         rest_n = int(rest[rest["step"] == rest_step].iloc[0]["n_rows"])
-        return deli_n, rest_step, deli_step, rest_n
+        return br_n, rest_step, br_step, rest_n
 
     # ------------------------------------------------------------------
     # Public data interface
@@ -671,13 +713,14 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
 
     def load_processed_discharge(self, cell: str, rate: str) -> pd.DataFrame:
         """
-        Canonical replay window for the baseline runner:
-        the pre-branch rest tail (60 s) followed by the DELITHIATION
-        branch of the configured p-OCV cycle.
+        Canonical replay window: the pre-branch rest tail (60 s)
+        followed by the requested p-OCV branch.
 
         Columns: time_s (relative to the window start) / current_A
-        [platform sign: discharge = +, and the raw SINTEF sign already
-        follows it] / voltage_V / capacity_Ah / temperature_ambient_C.
+        [platform canonical: DISCHARGE = +; the raw cycler sign
+        (negative = discharge) is FLIPPED here] / voltage_V /
+        capacity_Ah [signed by the canonical current] /
+        temperature_ambient_C.
         """
         cell = str(cell)
         if cell not in [str(c) for c in self.config.cells]:
@@ -687,28 +730,33 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
             )
 
         info = self.rate_info(rate)
+        branch = str(self._rate_table[str(rate)]["branch"])
         path = self._raw_path(cell, str(rate))
         structure = self._structural_metadata(cell)
 
         steps = self._scan_steps(path)
-        deli_n, rest_step, deli_step, rest_n = self._identify_branches(
-            steps, path
+        br_n, rest_step, br_step, rest_n = self._identify_branches(
+            steps, path, branch
         )
 
         win = self._read_window(
             path,
             [
                 (self._target_cycle, rest_step),
-                (self._target_cycle, deli_step),
+                (self._target_cycle, br_step),
             ],
-            deli_n + rest_n,
+            br_n + rest_n,
         )
 
         is_rest = win[COL_STEP].to_numpy(np.int64) == rest_step
         t = win[COL_TIME].to_numpy(float)
-        I = win[COL_CURRENT].to_numpy(float)
+        I_raw = win[COL_CURRENT].to_numpy(float)
         V = win[COL_VOLTAGE].to_numpy(float)
-        Ah = win[COL_CAPACITY].to_numpy(float)
+        Ah_raw = win[COL_CAPACITY].to_numpy(float)
+
+        # canonical sign: platform discharge = +, raw cycler negative =
+        # discharge -> FLIP (verified in-data and against PyBaMM)
+        I = -I_raw
 
         # ---- rest tail ----
         if not is_rest.any():
@@ -726,35 +774,61 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
         br_mask = ~is_rest
         if not br_mask.any():
             raise ValueError(
-                f"{path.name}: delithiation step {deli_step} empty"
+                f"{path.name}: {branch} step {br_step} empty"
             )
         I_br = I[br_mask]
         V_br = V[br_mask]
-        Ah_br = Ah[br_mask]
+        Ah_br = Ah_raw[br_mask]
 
         med_I = float(np.median(I_br))
-        if med_I <= DISCHARGE_SIGN_MIN_MEDIAN_A:
-            raise ValueError(
-                f"{path.name}: delithiation branch median current "
-                f"{med_I:.3e} A is not a discharge (canonical +)"
+        if branch == "lithiation":
+            # canonical discharge = positive current
+            if med_I <= 0:
+                raise ValueError(
+                    f"{path.name}: lithiation branch median canonical "
+                    f"current {med_I:.3e} A is not a discharge (+)"
+                )
+            if V_br[-1] > V_br[0] - BRANCH_V_RISE_MIN_V:
+                raise ValueError(
+                    f"{path.name}: lithiation branch lowers V by only "
+                    f"{V_br[0] - V_br[-1]:.3f} V "
+                    f"(< {BRANCH_V_RISE_MIN_V} V)"
+                )
+            end_cut = (
+                self.config.lower_voltage_cutoff_V
+                if self.config.lower_voltage_cutoff_V is not None
+                else 0.01
             )
-        v_rise = float(V_br[-1] - V_br[0])
-        if v_rise < BRANCH_V_RISE_MIN_V:
-            raise ValueError(
-                f"{path.name}: delithiation branch raises V by only "
-                f"{v_rise:.3f} V (< {BRANCH_V_RISE_MIN_V} V)"
+            if abs(float(V_br[-1]) - end_cut) > BRANCH_CUTOFF_TOL_V:
+                raise ValueError(
+                    f"{path.name}: lithiation ends at {V_br[-1]:.4f} V, "
+                    f"not at the {end_cut} V cutoff "
+                    f"(+/-{BRANCH_CUTOFF_TOL_V} V)"
+                )
+        else:
+            # delithiation = canonical charge = negative current
+            if med_I >= DISCHARGE_SIGN_MIN_MEDIAN_A:
+                raise ValueError(
+                    f"{path.name}: delithiation branch median canonical "
+                    f"current {med_I:.3e} A is not a charge (-)"
+                )
+            if V_br[-1] - V_br[0] < BRANCH_V_RISE_MIN_V:
+                raise ValueError(
+                    f"{path.name}: delithiation branch raises V by only "
+                    f"{V_br[-1] - V_br[0]:.3f} V "
+                    f"(< {BRANCH_V_RISE_MIN_V} V)"
+                )
+            end_cut = (
+                self.config.upper_voltage_cutoff_V
+                if self.config.upper_voltage_cutoff_V is not None
+                else 1.0
             )
-        upper_cut = (
-            self.config.upper_voltage_cutoff_V
-            if self.config.upper_voltage_cutoff_V is not None
-            else 1.0
-        )
-        if abs(float(V_br[-1]) - upper_cut) > BRANCH_CUTOFF_TOL_V:
-            raise ValueError(
-                f"{path.name}: delithiation ends at {V_br[-1]:.4f} V, not "
-                f"at the {upper_cut} V cutoff "
-                f"(+/-{BRANCH_CUTOFF_TOL_V} V)"
-            )
+            if abs(float(V_br[-1]) - end_cut) > BRANCH_CUTOFF_TOL_V:
+                raise ValueError(
+                    f"{path.name}: delithiation ends at {V_br[-1]:.4f} V, "
+                    f"not at the {end_cut} V cutoff "
+                    f"(+/-{BRANCH_CUTOFF_TOL_V} V)"
+                )
 
         # ---- assemble ----
         sel = tail_mask | br_mask
@@ -763,11 +837,12 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
         I_sel = I[sel]
         V_sel = V[sel]
 
-        # capacity: 0 over the rest, per-step cumulative over the branch
+        # capacity: 0 over the rest, cumulative canonical charge over
+        # the branch (negative for a charge-direction window)
         cap = np.zeros(len(t_sel), dtype=float)
         br_sel = br_mask[sel]
         if br_sel.any():
-            cap[br_sel] = Ah[br_mask] - float(Ah_br[0])
+            cap[br_sel] = _cumulative_capacity(t_sel[br_sel], I_sel[br_sel])
 
         out = pd.DataFrame(
             {
@@ -783,17 +858,26 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
         t_tail = t[tail_mask]
         V_tail = V[tail_mask]
         v0 = float(np.median(V_tail))
-        x0 = self.inverse_ocp(v0)
+        init_edge_fallback = False
+        try:
+            x0 = self.inverse_ocp(v0)
+        except ValueError:
+            # fresh cell: the rest OCV lies ABOVE the reference OCP
+            # table (2.97 V vs the table top 1.4325 V) -> start at the
+            # table's delithiated edge and flag it
+            sto, _vv = self._load_ocp_curve()
+            x0 = float(np.min(sto))
+            init_edge_fallback = True
 
         cap_integral_Ah = float(
             np.trapezoid(I_sel, t_sel - float(t_sel[0])) / 3600.0
         )
-        cap_column_Ah = float(cap[-1])
+        cap_column_raw_Ah = float(Ah_br[-1] - Ah_br[0])
 
         # measured rate check (declared rate comes from the config)
         nominal_mAh = structure.get("nominal_cell_capacity_mAh")
         c_rate_measured = (
-            float(med_I * 1000.0 / nominal_mAh)
+            float(abs(med_I) * 1000.0 / nominal_mAh)
             if isinstance(nominal_mAh, float) and nominal_mAh > 0
             else float("nan")
         )
@@ -807,36 +891,56 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
             ),
             "identification": (
                 "rule-based: pre-branch rest (60 s tail) + the unique "
-                "delithiation (positive-current) step of the configured "
-                "p-OCV cycle; classification by measured current, never "
-                "by step numbering"
+                f"{branch} step of the configured p-OCV cycle; "
+                "classification by measured current, never by step "
+                "numbering"
             ),
             "window_cycle": self._target_cycle,
             "rest_step": rest_step,
-            "delithiation_step": deli_step,
-            "branch": "delithiation",
-            "branch_physics": (
-                "half-cell discharge = Li extraction from graphite "
-                "(delithiation)"
-            ),
+            "branch_step": br_step,
+            "branch": branch,
+            "branch_physics": {
+                "lithiation": (
+                    "the cell's own DISCHARGE direction (Li dissolves "
+                    "from the Li metal and intercalates into graphite)"
+                ),
+                "delithiation": (
+                    "Li extraction from graphite; under the platform "
+                    "canonical convention this is a CHARGE-direction "
+                    "window"
+                ),
+            }[branch],
             "sign_convention": {
-                "raw": "negative current = lithiation (charge)",
-                "platform_canonical": "discharge = +, charge = -",
-                "action": "raw sign KEPT (conventions already agree)",
+                "raw": (
+                    "negative current = DISCHARGE (standard cycler "
+                    "convention; same as the Birmingham raw files)"
+                ),
                 "verified_from_data": (
-                    "the negative-current step drives 3.0 V -> 0.01 V "
-                    "(lithiation); the positive-current step drives "
-                    "0.01 V -> 1.0 V (delithiation)"
+                    "the negative-current step drives 3.0 V -> 0.01 V, "
+                    "i.e. lithiation of graphite, which is the "
+                    "spontaneous (discharge) direction for a "
+                    "graphite||Li cell"
+                ),
+                "platform_canonical": "discharge = +, charge = -",
+                "action": "raw sign FLIPPED to canonical",
+                "model_check": (
+                    "with graphite in the PyBaMM POSITIVE slot a "
+                    "positive current inserts Li (x 0.964 -> 0.987, "
+                    "V -> 0 V) and a negative current extracts it "
+                    "(x -> 0.930, V rises)"
                 ),
             },
             "unit_conversion": {
                 "time_s": "raw 'Test Time / s' used as-is (seconds)",
-                "current_A": "raw 'Current / A' used as-is (amperes)",
+                "current_A": (
+                    "raw 'Current / A' negated (cycler sign -> platform "
+                    "canonical discharge = +)"
+                ),
                 "voltage_V": "raw 'Voltage / V' used as-is (volts)",
                 "capacity_Ah": (
-                    "raw per-step cumulative 'Cumulative Capacity / Ah', "
-                    "zeroed at the branch start; cross-checked against the "
-                    "trapezoidal current integral"
+                    "trapezoidal integral of the CANONICAL current; the "
+                    "file's own per-step cumulative column is carried in "
+                    "branch_charge_raw_column_Ah for cross-check"
                 ),
                 "temperature": (
                     "no temperature channel in the file; the dataset-"
@@ -862,11 +966,16 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
             "rest_tail_s": float(t_tail[-1] - t_tail[0]),
             "rest_ocv_V": v0,
             "initial_stoichiometry_from_ocp": x0,
+            "initial_state_source": (
+                "ocp_table_edge_fallback"
+                if init_edge_fallback
+                else "inverse_ocp_of_measured_rest_ocv"
+            ),
             "voltage_start_V": float(V_br[0]),
             "voltage_end_V": float(V_br[-1]),
             "median_current_A": med_I,
-            "branch_charge_column_Ah": cap_column_Ah,
-            "branch_charge_integral_Ah": cap_integral_Ah,
+            "branch_charge_raw_column_Ah": cap_column_raw_Ah,
+            "branch_charge_canonical_Ah": cap_integral_Ah,
             "measured_structure": structure,
             "ambient_temperature_C": float(self._ambient_C),
             "ambient_temperature_source": self._temperature_source,
@@ -880,14 +989,18 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
                               "electrode slot = graphite)",
                 "source": (
                     f"inverse-OCP(rest OCV {v0:.4f} V) on the vendored "
-                    f"graphite OCP table "
-                    f"(external/pybamm-input-data/"
-                    f"graphite_ocp_Ecker2015.csv)"
+                    f"graphite OCP table"
+                    if not init_edge_fallback
+                    else (
+                        f"rest OCV {v0:.4f} V lies above the reference "
+                        f"graphite OCP table top; initial Li fraction set "
+                        f"to the table's delithiated edge"
+                    )
                 ),
                 "history_replayed": False,
                 "is_exact_electrochemical_state": False,
                 "purpose": (
-                    "initialise the delithiation replay at the measured "
+                    "initialise the branch replay at the measured "
                     "pre-branch equilibrium state; not a fitted parameter "
                     "and not a battery SOC"
                 ),
@@ -912,9 +1025,8 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
             "mapping_reason": (
                 "graphite occupies the positive electrode slot of "
                 "Ecker2015_graphite_halfcell (audited); initial Li "
-                f"fraction x0 = {x0:.4f} from the measured pre-branch "
-                f"rest OCV {v0:.4f} V via the same graphite OCP table "
-                "PyBaMM interpolates"
+                f"fraction x0 = {x0:.4f} from the pre-branch rest OCV "
+                f"{v0:.4f} V"
             ),
         }
         return out

@@ -1,0 +1,31 @@
+{
+  "dataset": "sintef_graphite",
+  "cell": "4ccc47",
+  "model": "SPM",
+  "rate_slug": "pOCVlith",
+  "rate_label": "C/50 (p-OCV lithiation)",
+  "c_rate": 0.02,
+  "source_rate": "p-ocv",
+  "parameter_set": "Ecker2015_graphite_halfcell",
+  "external_repo_commit": "",
+  "pybamm_version": "26.8.0.0",
+  "solver": {
+    "class": "IDAKLUSolver",
+    "rtol": 1e-06,
+    "atol": 1e-06
+  },
+  "source_file": "sintef__sintef-graphite-R2032-intelligent-4ccc47__20250514__p-ocv__RT.bdf.parquet",
+  "dataset_file_sha256": "",
+  "ocp_file": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/external/pybamm-input-data/graphite_ocp_Ecker2015.csv",
+  "ocp_file_sha256": "427504eabeae9b0cb0417932c93d1d733c743945fbc4f54f43dbcfb0abf04185",
+  "mapping": [
+    {
+      "parameter_set": "Ecker2015_graphite_halfcell",
+      "source_key": "Initial concentration in positive electrode [mol.m-3]",
+      "mapped_key": "Initial concentration in positive electrode [mol.m-3]",
+      "source_value": 26120.05,
+      "mapped_value": 48.363636363632686,
+      "mapping_reason": "inverse-OCP(rest OCV 3.0161 V) -> x0 = 0.0015 -> x0*c_max = 48.4 mol/m3; graphite occupies the positive electrode slot of Ecker2015_graphite_halfcell (audited); initial Li fraction x0 = 0.0015 from the pre-branch rest OCV 3.0161 V"
+    }
+  ]
+}

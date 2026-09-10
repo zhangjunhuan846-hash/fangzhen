@@ -496,20 +496,40 @@ sintef_graphite:
   # modified.  c_rate declared from the catalog nominal areal
   # capacity (1.4049 mAh/cm2) x electrode area (1.539 cm2 = 2.162 mAh);
   # the adapter also records the value measured from the data.
+  #
+  # BOTH p-OCV branches are exposed, ordered with the primary first:
+  #   pOCV-deli  delithiation (0.01 -> 1.0 V) = the primary window
+  #              (user decision 2026-09-10).  NOTE under the platform
+  #              canonical convention (discharge = +) this is a
+  #              CHARGE-direction window (raw cycler positive current),
+  #              so the runner's discharge-oriented columns
+  #              (current_peak_discharge_A, Q_sim, capacity_error_pct)
+  #              are not meaningful for it -- the time-aligned V(t)
+  #              metrics (RMSE/MAE/bias) are.
+  #   pOCV-lith  lithiation (3.0 -> 0.01 V) = the cell's own DISCHARGE
+  #              direction; convention-clean cross-check.
   rates_meta:
-    pOCV:
+    pOCV-deli:
       programme: "p-ocv"
       branch: "delithiation"
       c_rate: 0.02
       rate_label: "C/50 (p-OCV delithiation)"
-      rate_slug: "pOCV"
-      legacy_rate: "pOCV"
+      rate_slug: "pOCVdeli"
+      legacy_rate: "pOCVdeli"
+    pOCV-lith:
+      programme: "p-ocv"
+      branch: "lithiation"
+      c_rate: 0.02
+      rate_label: "C/50 (p-OCV lithiation)"
+      rate_slug: "pOCVlith"
+      legacy_rate: "pOCVlith"
 
   cells:
     - "4ccc47"
 
   rates:
-    - "pOCV"
+    - "pOCV-deli"
+    - "pOCV-lith"
 
   supported_models:
     - "SPM"

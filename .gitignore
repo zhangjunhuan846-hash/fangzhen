@@ -40,3 +40,5 @@ outputs/analysis/residual_atlas/*.png
 # lfp_gitt_audit: keep small audit tables only; canonical previews + figs are regenerable by scripts/lfp_gitt_audit.py
 outputs/analysis/lfp_gitt_audit/canonical_preview/
 outputs/analysis/lfp_gitt_audit/*.png
+# Phase A.5: per-run V(t) PNGs are regenerable; the comparison figure is kept
+outputs/analysis/graphite_phaseA5/**/*_Vt.png

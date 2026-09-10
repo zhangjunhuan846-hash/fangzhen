@@ -40,6 +40,23 @@ def _write_parquet(path, cycles=1, include_delithiation=True):
     frames = []
     step = 0
     for cyc in range(1, cycles + 1):
+        # step 1 (cycle 1 only, as in the real file): initial rest,
+        # fresh cell ~2.97 V = ABOVE the reference graphite OCP table
+        # top, which exercises the table-edge fallback for the
+        # lithiation branch
+        if cyc == 1:
+            step += 1
+            n = 20
+            t0 = 0.0
+            frames.append(pd.DataFrame({
+                COL_TIME: t0 + np.arange(n) * 10.0,
+                COL_UNIX: 1.7e9 + t0 + np.arange(n) * 10.0,
+                COL_CURRENT: np.zeros(n),
+                COL_VOLTAGE: np.linspace(2.73, 2.97, n),
+                COL_CYCLE: cyc,
+                COL_STEP: 1,
+                COL_CAPACITY: np.zeros(n),
+            }))
         # step 2: lithiation (negative current), 3.0 V -> 0.01 V
         step += 1
         n = 20
@@ -144,14 +161,22 @@ def make_config(tmp_path, cell="4ccc47", **extra_overrides):
         "initialisation_ocp_file_rel": OCP_FILE_REL,
         "metadata_csv_rel": str(tmp_path / "metadata.csv"),
         "rates_meta": {
-            "pOCV": {
+            "pOCV-deli": {
                 "programme": "p-ocv",
                 "branch": "delithiation",
                 "c_rate": 0.02,
                 "rate_label": "C/50 (p-OCV delithiation)",
-                "rate_slug": "pOCV",
-                "legacy_rate": "pOCV",
-            }
+                "rate_slug": "pOCVdeli",
+                "legacy_rate": "pOCVdeli",
+            },
+            "pOCV-lith": {
+                "programme": "p-ocv",
+                "branch": "lithiation",
+                "c_rate": 0.02,
+                "rate_label": "C/50 (p-OCV lithiation)",
+                "rate_slug": "pOCVlith",
+                "legacy_rate": "pOCVlith",
+            },
         },
         "ambient_temperature": {
             "value_C": 25.0,
@@ -171,7 +196,7 @@ def make_config(tmp_path, cell="4ccc47", **extra_overrides):
         "protocol": "sintef_graphite_pocv",
         "parameter_set": "Ecker2015_graphite_halfcell",
         "cells": [cell],
-        "rates": ["pOCV"],
+        "rates": ["pOCV-deli", "pOCV-lith"],
         "supported_models": ["SPM", "SPMe", "DFN"],
         "nominal_capacity_Ah": 0.002162,
         "lower_voltage_cutoff_V": 0.01,
@@ -196,7 +221,8 @@ def test_dataset_entry_declares_half_cell_and_slot_convention():
     assert extra["ambient_temperature"]["source"] == (
         "declared_room_temperature_not_measured"
     )
-    assert extra["rates_meta"]["pOCV"]["branch"] == "delithiation"
+    assert extra["rates_meta"]["pOCV-deli"]["branch"] == "delithiation"
+    assert extra["rates_meta"]["pOCV-lith"]["branch"] == "lithiation"
 
 
 # ------------------------------------------------------------------
@@ -236,7 +262,7 @@ def test_inverse_ocp_rejects_far_out_of_range(tmp_path):
 # ------------------------------------------------------------------
 def test_load_processed_discharge_contract(tmp_path):
     adapter = SintefGraphiteAdapter(make_config(tmp_path))
-    df = adapter.load_processed_discharge("4ccc47", "pOCV")
+    df = adapter.load_processed_discharge("4ccc47", "pOCV-deli")
 
     for col in ("time_s", "current_A", "voltage_V", "capacity_Ah",
                 "temperature_ambient_C"):
@@ -246,16 +272,17 @@ def test_load_processed_discharge_contract(tmp_path):
     assert float(df["time_s"].iloc[0]) == 0.0
     assert np.all(np.diff(df["time_s"].to_numpy(float)) > 0)
 
-    # platform sign convention: the delithiation branch is a discharge (+)
-    branch = df[df["current_A"] > 0]
+    # platform canonical sign: the DELITHIATION branch is a
+    # CHARGE-direction window -> negative current
+    branch = df[df["current_A"] < 0]
     rest = df[df["current_A"] == 0]
     assert len(branch) > 10
     assert len(rest) > 0
-    assert float(np.median(branch["current_A"])) > 0
+    assert float(np.median(branch["current_A"])) < 0
 
-    # capacity: zero over the rest, cumulative over the branch
+    # capacity: zero over the rest, negative (charge) over the branch
     assert float(df["capacity_Ah"].iloc[0]) == 0.0
-    assert abs(float(df["capacity_Ah"].iloc[-1]) - 0.00179) < 1e-4
+    assert float(df["capacity_Ah"].iloc[-1]) < 0
 
     # voltage rises across the branch
     assert float(branch["voltage_V"].iloc[-1]) - float(
@@ -263,13 +290,31 @@ def test_load_processed_discharge_contract(tmp_path):
     ) > 0.5
 
 
+def test_lithiation_branch_is_canonical_discharge(tmp_path):
+    """The lithiation window is the cell's own discharge (canonical +)."""
+    adapter = SintefGraphiteAdapter(make_config(tmp_path))
+    df = adapter.load_processed_discharge("4ccc47", "pOCV-lith")
+
+    branch = df[df["current_A"] > 0]
+    assert len(branch) > 10
+    assert float(np.median(branch["current_A"])) > 0
+    assert float(df["capacity_Ah"].iloc[-1]) > 0
+    # lithiation lowers the graphite potential
+    assert float(branch["voltage_V"].iloc[-1]) < float(
+        branch["voltage_V"].iloc[0]
+    )
+    assert abs(float(branch["voltage_V"].iloc[-1]) - 0.01) < 0.05
+
+
 def test_provenance_records_sign_units_and_full_hash(tmp_path):
     adapter = SintefGraphiteAdapter(make_config(tmp_path))
-    df = adapter.load_processed_discharge("4ccc47", "pOCV")
+    df = adapter.load_processed_discharge("4ccc47", "pOCV-deli")
     prov = df.attrs["provenance"]
 
-    assert prov["sign_convention"]["action"] == "raw sign KEPT (conventions already agree)"
-    assert "lithiation" in prov["sign_convention"]["raw"]
+    # raw cycler sign = discharge (negative) -> flipped to canonical
+    assert prov["sign_convention"]["action"] == "raw sign FLIPPED to canonical"
+    assert "DISCHARGE" in prov["sign_convention"]["raw"]
+    assert "lithiation" in prov["sign_convention"]["verified_from_data"]
     assert prov["ambient_temperature_source"] == (
         "declared_room_temperature_not_measured"
     )
@@ -282,13 +327,15 @@ def test_provenance_records_sign_units_and_full_hash(tmp_path):
         "time_s", "current_A", "voltage_V", "capacity_Ah", "temperature"
     }
     # measured electrode structure travels with the window
-    assert prov["measured_structure"]["electrode_diameter_cm"] == 14.0
+    # (the catalog column is LABELLED cm but holds MILLIMETRES)
+    assert prov["measured_structure"]["electrode_diameter_mm"] == 14.0
+    assert abs(prov["measured_structure"]["electrode_area_cm2"] - 1.5394) < 0.001
     assert prov["measured_structure"]["nominal_cell_capacity_mAh"] > 2.0
 
 
 def test_initialisation_block_matches_half_cell_slot(tmp_path):
     adapter = SintefGraphiteAdapter(make_config(tmp_path))
-    df = adapter.load_processed_discharge("4ccc47", "pOCV")
+    df = adapter.load_processed_discharge("4ccc47", "pOCV-deli")
     init = df.attrs["initialisation"]
 
     # baseline.py only supports these two methods
@@ -306,18 +353,18 @@ def test_initialisation_block_matches_half_cell_slot(tmp_path):
 
 def test_rate_table_resolves_aliases(tmp_path):
     adapter = SintefGraphiteAdapter(make_config(tmp_path))
-    for alias in ("pOCV", "pOCV", 0.02, "0.02"):
+    for alias in ("pOCV-deli", "pOCVdeli", 0.02, "0.02"):
         info = adapter.rate_info(alias)
-        assert info["rate_slug"] == "pOCV"
+        assert info["rate_slug"] == "pOCVdeli"
         assert abs(float(info["c_rate"]) - 0.02) < 1e-9
-    assert adapter.list_rate_slugs() == ["pOCV"]
+    assert adapter.list_rate_slugs() == ["pOCVdeli", "pOCVlith"]
     with pytest.raises(ValueError, match="Unknown rate"):
         adapter.rate_info("GITT")  # Phase B, not declared in Phase A
 
 
 def test_decimation_bounds_memory(tmp_path):
     adapter = SintefGraphiteAdapter(make_config(tmp_path, max_points=50))
-    df = adapter.load_processed_discharge("4ccc47", "pOCV")
+    df = adapter.load_processed_discharge("4ccc47", "pOCV-deli")
     # 60 s rest tail + 50-point branch, capped by max_points
     assert len(df) <= 50 + 5
     assert df.attrs["provenance"]["decimation_stride"] > 1
@@ -336,13 +383,13 @@ def test_missing_delithiation_step_raises(tmp_path):
     )
     adapter = SintefGraphiteAdapter(cfg)
     with pytest.raises(ValueError, match="no delithiation"):
-        adapter.load_processed_discharge("4ccc47", "pOCV")
+        adapter.load_processed_discharge("4ccc47", "pOCV-deli")
 
 
 def test_unknown_cell_raises(tmp_path):
     adapter = SintefGraphiteAdapter(make_config(tmp_path))
     with pytest.raises(ValueError, match="unknown cell"):
-        adapter.load_processed_discharge("deadbeef", "pOCV")
+        adapter.load_processed_discharge("deadbeef", "pOCV-deli")
 
 
 def test_adapter_rejects_negative_slot_declaration(tmp_path):
@@ -365,17 +412,17 @@ def test_adapter_rejects_non_delithiation_branch(tmp_path):
     cfg = make_config(
         tmp_path,
         rates_meta={
-            "pOCV": {
+            "weird": {
                 "programme": "p-ocv",
-                "branch": "lithiation",
+                "branch": "sideways",
                 "c_rate": 0.02,
                 "rate_label": "x",
-                "rate_slug": "pOCV",
-                "legacy_rate": "pOCV",
+                "rate_slug": "weird",
+                "legacy_rate": "weird",
             }
         },
     )
-    with pytest.raises(ValueError, match="delithiation branch"):
+    with pytest.raises(ValueError, match="lithiation.*or.*delithiation"):
         SintefGraphiteAdapter(cfg)
 
 
@@ -403,18 +450,16 @@ def test_real_pocv_file_window():
     if not any(raw_dir.glob("*4ccc47*p-ocv*.parquet")):
         pytest.skip("SINTEF p-OCV parquet not present")
     adapter = SintefGraphiteAdapter(cfg)
-    df = adapter.load_processed_discharge("4ccc47", "pOCV")
+    df = adapter.load_processed_discharge("4ccc47", "pOCV-deli")
     prov = df.attrs["provenance"]
 
     # audited facts (docs/graphite_dataset_triage.md)
     assert prov["window_cycle"] == 1
     assert prov["rest_step"] == 3
-    assert prov["delithiation_step"] == 4
+    assert prov["branch_step"] == 4
     assert 0.07 < prov["rest_ocv_V"] < 0.10
     assert 0.90 < prov["initial_stoichiometry_from_ocp"] <= 1.0
     assert abs(prov["voltage_end_V"] - 1.0) < 0.05
-    assert 1.7e-3 < prov["branch_charge_column_Ah"] < 1.9e-3
-    # column vs integral cross-check
-    assert abs(
-        prov["branch_charge_column_Ah"] - prov["branch_charge_integral_Ah"]
-    ) < 1e-4
+    # raw per-step column vs canonical (flipped) integral
+    assert 1.7e-3 < prov["branch_charge_raw_column_Ah"] < 1.9e-3
+    assert -1.9e-3 < prov["branch_charge_canonical_Ah"] < -1.7e-3

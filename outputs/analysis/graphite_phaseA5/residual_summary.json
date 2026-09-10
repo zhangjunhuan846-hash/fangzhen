@@ -1,0 +1,139 @@
+{
+  "dataset": "sintef_graphite",
+  "cell": "4ccc47",
+  "model": "SPM",
+  "window": "p-OCV cycle 1 rest tail (60 s) + one branch",
+  "parameter_sets": {
+    "phase_A": "Ecker2015_graphite_halfcell",
+    "phase_A5": "sintef_graphite_geometry_v1"
+  },
+  "geometry_override": {
+    "Electrode height [m]": 0.013524592868773139,
+    "Electrode width [m]": 0.011382083107383334,
+    "Positive electrode thickness [m]": 6.4e-05,
+    "Positive electrode active material volume fraction": 0.26121752979470236,
+    "Nominal cell capacity [A.h]": 0.0022016583309734375
+  },
+  "geometry_cross_checks": {
+    "eps_am_active_mass_route": 0.26121752979470236,
+    "eps_am_loading_column_route": 0.23757103857357,
+    "eps_am_areal_capacity_route": 2.5660035396830796e-05,
+    "eps_am_relative_difference_loading_vs_mass_pct": -9.052413610877014,
+    "eps_am_relative_difference_areal_vs_mass_pct": -99.99017675597155,
+    "catalog_nominal_areal_capacity_mAh_cm2": 1.404943641532012,
+    "mass_implied_areal_capacity_mAh_cm2": 1.2782766307172595,
+    "catalog_internal_inconsistency": "the catalog is ~10 % internally inconsistent: its (coating mass / loading) implies a larger electrode area than the punched-disc diameter gives.  The disc diameter (14 mm -> 1.5394 cm2) is used for the AREA because it is the physical electrode; the active mass is used for eps_am; both alternatives are reported and neither is silently corrected."
+  },
+  "scale_ratios_vs_reference": {
+    "area_ratio_reference_over_measured": 55.769191283425386,
+    "thickness_ratio": 1.15625,
+    "per_area_capacity_ratio": 1.2725526400702516
+  },
+  "rates": {
+    "pOCV-deli": {
+      "phase_A": {
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 150.05925543689233,
+          "mae_mV": 98.62621218318718,
+          "bias_mV": -98.62621218318718,
+          "max_abs_mV": 918.7561038004017,
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 1.0000014305,
+          "v_sim_start_V": 0.0800975099516614,
+          "v_sim_end_V": 0.0812453266995982,
+          "v_exp_span_mV": 917.5975397,
+          "v_sim_span_mV": 1.1478167479368055,
+          "v_sim_span_ratio": 0.001250893445411889
+        },
+        "frozen_artifact": "PRESENT"
+      },
+      "phase_A5": {
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 109.12307106829822,
+          "mae_mV": 61.86313988576123,
+          "bias_mV": -61.86313988576123,
+          "max_abs_mV": 803.5078921245839,
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 1.0000014305,
+          "v_sim_start_V": 0.0800975099516614,
+          "v_sim_end_V": 0.196493538375416,
+          "v_exp_span_mV": 917.5975397,
+          "v_sim_span_mV": 116.3960284237546,
+          "v_sim_span_ratio": 0.12684867099993447
+        },
+        "frozen_artifact": "PARTIAL"
+      },
+      "delta_rmse_mV": -40.93618436859411,
+      "delta_v_sim_span_mV": 115.2482116758178,
+      "residual_by_exp_voltage_region_MAE_mV": {
+        "low_V_le_0p15": {
+          "phase_A_MAE_mV": 45.7137565608701,
+          "phase_A5_MAE_mV": 31.195522786565473
+        },
+        "mid_0p15_0p60": {
+          "phase_A_MAE_mV": 142.75697134936394,
+          "phase_A5_MAE_mV": 79.48909900526812
+        },
+        "high_V_gt_0p60": {
+          "phase_A_MAE_mV": 672.8376700760521,
+          "phase_A5_MAE_mV": 560.0699923973386
+        }
+      }
+    },
+    "pOCV-lith": {
+      "phase_A": {
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 875.752828973872,
+          "mae_mV": 867.9264940979941,
+          "bias_mV": 866.2826238118498,
+          "max_abs_mV": 1643.8702861443949,
+          "v_exp_start_V": 3.0160996914,
+          "v_exp_end_V": 0.0099927252,
+          "v_sim_start_V": 1.3722294052556052,
+          "v_sim_end_V": 0.752265930308581,
+          "v_exp_span_mV": 3006.1069662,
+          "v_sim_span_mV": 619.9634749470242,
+          "v_sim_span_ratio": 0.2062346689315304
+        },
+        "frozen_artifact": "PARTIAL"
+      },
+      "phase_A5": {
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 81.39077327076888,
+          "mae_mV": 67.8056894360799,
+          "bias_mV": 66.16181914993551,
+          "max_abs_mV": 1643.8702861443949,
+          "v_exp_start_V": 3.0160996914,
+          "v_exp_end_V": 0.0099927252,
+          "v_sim_start_V": 1.3722294052556052,
+          "v_sim_end_V": 0.0832463064866601,
+          "v_exp_span_mV": 3006.1069662,
+          "v_sim_span_mV": 1288.983098768945,
+          "v_sim_span_ratio": 0.42878816797339053
+        },
+        "frozen_artifact": "PARTIAL"
+      },
+      "delta_rmse_mV": -794.3620557031031,
+      "delta_v_sim_span_mV": 669.0196238219207,
+      "residual_by_exp_voltage_region_MAE_mV": {
+        "low_V_le_0p15": {
+          "phase_A_MAE_mV": 857.732737943771,
+          "phase_A5_MAE_mV": 61.75463044504666
+        },
+        "mid_0p15_0p60": {
+          "phase_A_MAE_mV": 1000.5284619554537,
+          "phase_A5_MAE_mV": 105.8196211212353
+        },
+        "high_V_gt_0p60": {
+          "phase_A_MAE_mV": 660.6293142843845,
+          "phase_A5_MAE_mV": 306.76171243402524
+        }
+      }
+    }
+  },
+  "wording": "A.5 is a geometry-aware ZERO-FIT reference replay: OCP, diffusivity and kinetics are unchanged from the reference set, nothing is fitted to voltage, and the result is NOT validation."
+}
