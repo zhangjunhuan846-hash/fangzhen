@@ -1,0 +1,306 @@
+{
+  "dataset": "sintef_graphite",
+  "pocv_cell": "4ccc47",
+  "gitt_cell": "063b77",
+  "model": "SPM",
+  "phase": "B1 GITT apparent diffusivity",
+  "segmentation": {
+    "n_pulses": 981,
+    "pulse_protocol": {
+      "pulse_time_s_median": 1799.9800000000105,
+      "relax_time_s_median": 9000.0,
+      "pulses_per_cycle": {
+        "1": 200,
+        "2": 195,
+        "3": 195,
+        "4": 196,
+        "5": 195
+      },
+      "pulses_per_branch": {
+        "delithiation": 479,
+        "lithiation": 502
+      },
+      "n_pulses_total": 981,
+      "current_levels_A": [
+        -4.4155e-05,
+        -4.4154e-05,
+        -4.4153e-05,
+        4.4154e-05,
+        4.4155e-05
+      ],
+      "pulse_steps": [
+        4,
+        10
+      ],
+      "rest_steps": [
+        1,
+        2,
+        3,
+        7,
+        8,
+        9,
+        13
+      ]
+    },
+    "soc_reference_charge_mAh": {
+      "1": 2.2926080188083153,
+      "2": 2.183523628818757,
+      "3": 2.19608247982358,
+      "4": 2.197506143675658,
+      "5": 2.181255594051171
+    }
+  },
+  "ds_extraction": {
+    "n_pulses": 981,
+    "n_defined": 958,
+    "n_accepted": 616,
+    "n_rejected": 365,
+    "equation_reference": "Weppner & Huggins, J. Electrochem. Soc. 124(10) 1569 (1977); forward relation identical to PyBOP 26.3 pybop/models/lithium_ion/weppner_huggins.py (V = U + U'*(2I/(3Q_th))*sqrt(t*tau_d/pi)), inverted here",
+    "cross_check_equation": "D = (4/(9 pi)) (R^2/tau) (dE_tau/dE_s)^2 -- OCP-free, obtained by eliminating U' between the pulse law and the equilibrium composition step",
+    "particle_radius_m": 1.37e-05,
+    "particle_radius_source": "Positive particle radius [m] of Ecker2015_graphite_halfcell (13.7 um) - a REFERENCE-SET value, NOT measured for this cell; D scales with R^2 so this is the largest systematic uncertainty",
+    "Q_th_Ah": 0.0022464319849470867,
+    "Q_th_source": "F * eps_am * c_max * L * A from the SINTEF catalog metadata of THIS GITT cell (mass-based eps_am, measured thickness and disc area) with c_max from the reference set",
+    "uncertainty_definition": "Ds_app_rel_uncertainty = 2 * sigma(m)/|m| from the sqrt(t) regression; it covers ONLY the fit noise.  Q_th, R and U' contribute systematic uncertainty that is NOT included and is reported separately (D scales with R^2 and with Q_th^2/U'^2)"
+  },
+  "ecker_ds": {
+    "values_m2_s": {
+      "0.05": 5.307083861674532e-13,
+      "0.20": 1.0475366217727928e-13,
+      "0.50": 1.219033308713769e-14,
+      "0.80": 9.070145734089316e-15,
+      "0.95": 8.981283402338358e-15
+    },
+    "median_m2_s": 1.219033308713769e-14
+  },
+  "windows": {
+    "lith": {
+      "ecker_ds": {
+        "parameter_set": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+        "metrics": {
+          "n_points": 1978,
+          "rmse_mV": 44.74139818058967,
+          "mae_mV": 3.2103121261757814,
+          "bias_mV": -3.206150861404477,
+          "max_abs_mV": 1939.1811937909824,
+          "residual_std_mV": 44.62637457611795,
+          "residual_quantiles_mV": {
+            "p05": -5.757376664598154,
+            "p25": -1.4218974635593251,
+            "p50": -1.0004062758069,
+            "p75": -0.7583626557865499,
+            "p95": -0.5706948476697999
+          },
+          "v_exp_start_V": 3.0160996914,
+          "v_exp_end_V": 0.0159007926,
+          "v_sim_start_V": 1.0769184976090176,
+          "v_sim_end_V": 0.0060305900650583,
+          "v_exp_span_mV": 3000.1988988,
+          "v_sim_span_mV": 1070.8879075439593,
+          "v_sim_span_ratio": 0.3569389709369889
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1790,
+            "mae_mV": 1.2702134658888486
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 169,
+            "mae_mV": 5.808551443467703
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 18,
+            "mae_mV": 64.19382743875742
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 1,
+            "mae_mV": 1939.1811937909824
+          }
+        }
+      },
+      "gitt_ds": {
+        "parameter_set": "sintef_graphite_dsapp_lith_v1_v2",
+        "metrics": {
+          "n_points": 932,
+          "rmse_mV": 68.56560436690768,
+          "mae_mV": 19.344557108105718,
+          "bias_mV": -19.3409275158085,
+          "max_abs_mV": 1939.1811937909824,
+          "residual_std_mV": 65.78123307621674,
+          "residual_quantiles_mV": {
+            "p05": -38.89006103225046,
+            "p25": -20.93946927117515,
+            "p50": -14.07357919568885,
+            "p75": -7.610860888912001,
+            "p95": -3.8357659433331697
+          },
+          "v_exp_start_V": 3.0160996914,
+          "v_exp_end_V": 0.0661413521,
+          "v_sim_start_V": 1.0769184976090176,
+          "v_sim_end_V": 0.0097924549907098,
+          "v_exp_span_mV": 2949.9583393000003,
+          "v_sim_span_mV": 1067.1260426183078,
+          "v_sim_span_ratio": 0.361742750194746
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 744,
+            "mae_mV": 17.867833605311073
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 169,
+            "mae_mV": 7.773823741334737
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 18,
+            "mae_mV": 82.36120090703008
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 1,
+            "mae_mV": 1939.1811937909824
+          }
+        }
+      },
+      "verdict": {
+        "control": "Ecker2015 diffusivity (reference set)",
+        "intervention": "SINTEF GITT apparent D_s(SOC)",
+        "rmse_before_mV": 44.74139818058967,
+        "rmse_after_mV": 68.56560436690768,
+        "rmse_delta_mV": 23.82420618631801,
+        "mae_before_mV": 3.2103121261757814,
+        "mae_after_mV": 19.344557108105718,
+        "max_abs_before_mV": 1939.1811937909824,
+        "max_abs_after_mV": 1939.1811937909824,
+        "region_mae_delta_mV": {
+          "V_exp<=0.15": 16.597620139422226,
+          "0.15<V_exp<=0.60": 1.9652722978670338,
+          "0.60<V_exp<=1.43": 18.167373468272658,
+          "V_exp>1.43_outside_ref_table": 0.0
+        }
+      }
+    },
+    "deli": {
+      "ecker_ds": {
+        "parameter_set": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 6.312674857813415,
+          "mae_mV": 2.6538712748080897,
+          "bias_mV": 2.6538712748080897,
+          "max_abs_mV": 64.6617965291038,
+          "residual_std_mV": 5.727724776664649,
+          "residual_quantiles_mV": {
+            "p05": 0.5876466488681151,
+            "p25": 0.8326323694940749,
+            "p50": 1.33104760296445,
+            "p75": 2.089353962076725,
+            "p95": 9.08924509047912
+          },
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 1.0000014305,
+          "v_sim_start_V": 0.1098488894171469,
+          "v_sim_end_V": 1.064663227029104,
+          "v_exp_span_mV": 917.5975397,
+          "v_sim_span_mV": 954.8143376119572,
+          "v_sim_span_ratio": 1.0405589556442412
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1128,
+            "mae_mV": 1.2959070465974756
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 832,
+            "mae_mV": 2.8920226160869187
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 40,
+            "mae_mV": 35.99491461174778
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        }
+      },
+      "gitt_ds": {
+        "parameter_set": "sintef_graphite_dsapp_deli_v1_v2",
+        "metrics": {
+          "n_points": 434,
+          "rmse_mV": 373.959745869862,
+          "mae_mV": 112.80187001080522,
+          "bias_mV": 112.42096483464215,
+          "max_abs_mV": 2993.2914046481587,
+          "residual_std_mV": 356.66148964627496,
+          "residual_quantiles_mV": {
+            "p05": -2.10212104237654,
+            "p25": 8.73017139154615,
+            "p50": 40.31571681642265,
+            "p75": 61.24458965636005,
+            "p95": 347.52515287453946
+          },
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 0.1136013865,
+          "v_sim_start_V": 0.1098488894171469,
+          "v_sim_end_V": 3.1068927911481588,
+          "v_exp_span_mV": 33.01119059999999,
+          "v_sim_span_mV": 2997.043901731012,
+          "v_sim_span_ratio": 90.78872489170422
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 434,
+            "mae_mV": 112.80187001080522
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 0,
+            "mae_mV": NaN
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 0,
+            "mae_mV": NaN
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        }
+      },
+      "verdict": {
+        "control": "Ecker2015 diffusivity (reference set)",
+        "intervention": "SINTEF GITT apparent D_s(SOC)",
+        "rmse_before_mV": 6.312674857813415,
+        "rmse_after_mV": 373.959745869862,
+        "rmse_delta_mV": 367.64707101204857,
+        "mae_before_mV": 2.6538712748080897,
+        "mae_after_mV": 112.80187001080522,
+        "max_abs_before_mV": 64.6617965291038,
+        "max_abs_after_mV": 2993.2914046481587,
+        "region_mae_delta_mV": {
+          "V_exp<=0.15": 111.50596296420774,
+          "0.15<V_exp<=0.60": NaN,
+          "0.60<V_exp<=1.43": NaN,
+          "V_exp>1.43_outside_ref_table": NaN
+        }
+      }
+    }
+  },
+  "sensitivity": {
+    "lith": {
+      "Ds_median_m2_s": 1.4379833412344438e-16,
+      "u_prime_median_V_per_soc": -0.10703162865037381,
+      "diffusion_overpotential_ecker_mV": 10.74622905916756,
+      "diffusion_overpotential_gitt_mV": 98.94342784866801,
+      "window_s": 161589.0,
+      "note": "Weppner-Huggins surface excursion converted to volts over the whole p-OCV window; both values are far below the replay residual, which is why the comparison is flat"
+    },
+    "deli": {
+      "Ds_median_m2_s": 8.354702914909346e-16,
+      "u_prime_median_V_per_soc": -0.21139338552449752,
+      "diffusion_overpotential_ecker_mV": 20.348077795287132,
+      "diffusion_overpotential_gitt_mV": 77.7258839550449,
+      "window_s": 148521.0,
+      "note": "Weppner-Huggins surface excursion converted to volts over the whole p-OCV window; both values are far below the replay residual, which is why the comparison is flat"
+    }
+  }
+}

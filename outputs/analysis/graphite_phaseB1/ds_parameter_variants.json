@@ -1,0 +1,54 @@
+{
+  "cell": "4ccc47",
+  "variants": [
+    {
+      "parameter_set_id": "sintef_graphite_dsapp_lith_v1",
+      "branch": "lithiation",
+      "base_parameter_set": "sintef_graphite_ocp_lith_capmatch_v1",
+      "grade": "apparent_ds_from_GITT_weppner_huggins",
+      "quantity": "APPARENT/effective solid-state diffusivity from GITT under the Weppner-Huggins single-particle model - NOT an intrinsic material coefficient",
+      "equation_reference": "Weppner & Huggins, J. Electrochem. Soc. 124(10) 1569 (1977); forward relation identical to PyBOP 26.3 pybop/models/lithium_ion/weppner_huggins.py (V = U + U'*(2I/(3Q_th))*sqrt(t*tau_d/pi)), inverted here",
+      "particle_radius_source": "Positive particle radius [m] of Ecker2015_graphite_halfcell (13.7 um) - a REFERENCE-SET value, NOT measured for this cell; D scales with R^2 so this is the largest systematic uncertainty",
+      "particle_radius_m": 1.37e-05,
+      "Q_th_source": "F * eps_am * c_max * L * A from the SINTEF catalog metadata of THIS GITT cell (mass-based eps_am, measured thickness and disc area) with c_max from the reference set",
+      "active_mass_source": "SINTEF catalog metadata.csv, cell 063b77 (Mass of Active Material / mg)",
+      "U_prime_source": "local slope of the frozen Phase B0.6 high-fidelity OCP table, branch-matched, fitted over ~1.5 pulse composition steps",
+      "ds_soc_points": 38,
+      "ds_cm2_s_range": [
+        3.4210749580724005e-14,
+        2.7694091096163613e-09
+      ],
+      "ds_cm2_s_median": 2.225652195273766e-12,
+      "n_accepted_pulses": 616,
+      "uncertainty_definition": "Ds_app_rel_uncertainty = 2 * sigma(m)/|m| from the sqrt(t) regression; it covers ONLY the fit noise.  Q_th, R and U' contribute systematic uncertainty that is NOT included and is reported separately (D scales with R^2 and with Q_th^2/U'^2)",
+      "soc_definition": "same charge-based SOC axis as the frozen OCP, so the diffusivity and the OCP share one coordinate",
+      "temperature_dependence": "NONE - the GITT was measured at the declared room temperature, so the function accepts PyBaMM's temperature argument and ignores it.  Using this set at another temperature would be an extrapolation.",
+      "wording": "apparent D_s from GITT; the calibration is model- and radius-dependent and the estimate carries a large method uncertainty - not a material constant, not validation"
+    },
+    {
+      "parameter_set_id": "sintef_graphite_dsapp_deli_v1",
+      "branch": "delithiation",
+      "base_parameter_set": "sintef_graphite_ocp_deli_capmatch_v1",
+      "grade": "apparent_ds_from_GITT_weppner_huggins",
+      "quantity": "APPARENT/effective solid-state diffusivity from GITT under the Weppner-Huggins single-particle model - NOT an intrinsic material coefficient",
+      "equation_reference": "Weppner & Huggins, J. Electrochem. Soc. 124(10) 1569 (1977); forward relation identical to PyBOP 26.3 pybop/models/lithium_ion/weppner_huggins.py (V = U + U'*(2I/(3Q_th))*sqrt(t*tau_d/pi)), inverted here",
+      "particle_radius_source": "Positive particle radius [m] of Ecker2015_graphite_halfcell (13.7 um) - a REFERENCE-SET value, NOT measured for this cell; D scales with R^2 so this is the largest systematic uncertainty",
+      "particle_radius_m": 1.37e-05,
+      "Q_th_source": "F * eps_am * c_max * L * A from the SINTEF catalog metadata of THIS GITT cell (mass-based eps_am, measured thickness and disc area) with c_max from the reference set",
+      "active_mass_source": "SINTEF catalog metadata.csv, cell 063b77 (Mass of Active Material / mg)",
+      "U_prime_source": "local slope of the frozen Phase B0.6 high-fidelity OCP table, branch-matched, fitted over ~1.5 pulse composition steps",
+      "ds_soc_points": 36,
+      "ds_cm2_s_range": [
+        4.4451185919366517e-14,
+        2.2601042064744347e-09
+      ],
+      "ds_cm2_s_median": 7.532346381544831e-12,
+      "n_accepted_pulses": 616,
+      "uncertainty_definition": "Ds_app_rel_uncertainty = 2 * sigma(m)/|m| from the sqrt(t) regression; it covers ONLY the fit noise.  Q_th, R and U' contribute systematic uncertainty that is NOT included and is reported separately (D scales with R^2 and with Q_th^2/U'^2)",
+      "soc_definition": "same charge-based SOC axis as the frozen OCP, so the diffusivity and the OCP share one coordinate",
+      "temperature_dependence": "NONE - the GITT was measured at the declared room temperature, so the function accepts PyBaMM's temperature argument and ignores it.  Using this set at another temperature would be an extrapolation.",
+      "wording": "apparent D_s from GITT; the calibration is model- and radius-dependent and the estimate carries a large method uncertainty - not a material constant, not validation"
+    }
+  ],
+  "ecker_ds_function": "Positive particle diffusivity [m2.s-1] of Ecker2015_graphite_halfcell - the CONTROL for the replay comparison"
+}

@@ -17,6 +17,10 @@ from extraction.ocp_extractor_v2 import (  # noqa: F401
     resample_branch,
     write_ocp_v2,
 )
+from extraction.gitt_extractor import (  # noqa: F401
+    extract_gitt_segments,
+    write_gitt_segments,
+)
 from extraction.hires_trace import (  # noqa: F401
     load_hires_trace,
     resolve_raw_file,
@@ -31,4 +35,6 @@ __all__ = [
     "write_ocp_v2",
     "load_hires_trace",
     "resolve_raw_file",
+    "extract_gitt_segments",
+    "write_gitt_segments",
 ]
