@@ -11,10 +11,13 @@
 #                   cell_temperature_C
 #
 # 禁止自动猜：chemistry / current sign / units / full-cell/half-cell /
-#             parameter set。必须由用户在 dataset_info.xlsx 中显式声明。
+#             parameter set / dataset_role。
+#             必须由用户在 dataset_info.xlsx 中显式声明。
 # ============================================================
 
 from __future__ import annotations
+
+from governance.dataset_roles import ALLOWED_DECLARED_ROLES
 
 # ------------------------------------------------------------------
 # canonical 字段（用户在 column_mapping 里填的就是这些）
@@ -95,12 +98,18 @@ ALLOWED_CELL_CONFIGURATION = ["full_cell", "half_cell"]
 ALLOWED_WORKING_ELECTRODE = ["positive", "negative", ""]
 ALLOWED_COUNTER_ELECTRODE = ["lithium_metal", "graphite", "other", ""]
 ALLOWED_CURRENT_SIGN = ["discharge_positive", "discharge_negative"]
+# 用途声明：identification / validation / benchmark / prediction
+# （词表与规则在 governance/dataset_roles.py，这里只引用，不复制）
+ALLOWED_DATASET_ROLE = list(ALLOWED_DECLARED_ROLES)
 
 EXPERIMENT_FIELDS = [
     # (字段名, 中文标签, 必填, 允许值 or None)
     ("dataset_name", "数据集名称", True, None),
     ("sample_id", "样品编号", True, None),
     ("chemistry", "正极化学体系", True, ALLOWED_CHEMISTRY),
+    # 必填与否：留空按 identification 处理，但每次调用都会返回警告
+    # 并要求写进 provenance（不静默）——见 governance/dataset_roles.py
+    ("dataset_role", "数据用途", False, ALLOWED_DATASET_ROLE),
     ("cell_configuration", "电池构型", True, ALLOWED_CELL_CONFIGURATION),
     ("working_electrode", "工作电极", False, ALLOWED_WORKING_ELECTRODE),
     ("counter_electrode", "对电极", False, ALLOWED_COUNTER_ELECTRODE),

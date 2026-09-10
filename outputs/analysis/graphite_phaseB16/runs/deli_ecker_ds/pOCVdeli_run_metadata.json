@@ -38,6 +38,6 @@
   "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
   "reused_reference": "scripts/run_baseline.py",
   "pybamm_version": "26.8.0.0",
-  "timestamp": "2026-09-10T18:16:35+00:00",
-  "runtime_s": 0.49398210299841594
+  "timestamp": "2026-09-10T18:37:18+00:00",
+  "runtime_s": 0.5176253099998576
 }

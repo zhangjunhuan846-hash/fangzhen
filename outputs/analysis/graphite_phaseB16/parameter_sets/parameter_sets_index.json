@@ -1,0 +1,109 @@
+{
+  "sets": [
+    {
+      "set_id": "sintef_graphite_dsapp_lith_v1_b16v1",
+      "file": "sintef_graphite_dsapp_lith_v1_b16v1.json",
+      "n_scalars": 79,
+      "n_non_scalars": 10,
+      "n_inputs": 6,
+      "inputs": [
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/graphite_ocp_lithiation.csv",
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/graphite_ocp_delithiation.csv",
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/ocp_extraction_provenance.json",
+        "outputs/analysis/graphite_phaseB16/v1/graphite_Ds_app.csv",
+        "outputs/analysis/graphite_phaseB16/v1/gitt_ds_app_provenance.json",
+        "data/metadata.csv"
+      ],
+      "recipe": {
+        "module": "parameters.sintef_graphite_ds",
+        "function": "build_ds_variant",
+        "kwargs": {
+          "branch": "lithiation",
+          "cell": "4ccc47",
+          "ocp_dir": "outputs/analysis/graphite_phaseB06/graphite_ocp_v2",
+          "ds_dir": "outputs/analysis/graphite_phaseB16/v1"
+        },
+        "note": "函数条目（实测 OCP、D_s 插值器）由这个 recipe 重建；inputs 的 sha256 保证重建用的是同一批输入。"
+      }
+    },
+    {
+      "set_id": "sintef_graphite_dsapp_deli_v1_b16v1",
+      "file": "sintef_graphite_dsapp_deli_v1_b16v1.json",
+      "n_scalars": 79,
+      "n_non_scalars": 10,
+      "n_inputs": 6,
+      "inputs": [
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/graphite_ocp_lithiation.csv",
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/graphite_ocp_delithiation.csv",
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/ocp_extraction_provenance.json",
+        "outputs/analysis/graphite_phaseB16/v1/graphite_Ds_app.csv",
+        "outputs/analysis/graphite_phaseB16/v1/gitt_ds_app_provenance.json",
+        "data/metadata.csv"
+      ],
+      "recipe": {
+        "module": "parameters.sintef_graphite_ds",
+        "function": "build_ds_variant",
+        "kwargs": {
+          "branch": "delithiation",
+          "cell": "4ccc47",
+          "ocp_dir": "outputs/analysis/graphite_phaseB06/graphite_ocp_v2",
+          "ds_dir": "outputs/analysis/graphite_phaseB16/v1"
+        },
+        "note": "函数条目（实测 OCP、D_s 插值器）由这个 recipe 重建；inputs 的 sha256 保证重建用的是同一批输入。"
+      }
+    },
+    {
+      "set_id": "sintef_graphite_dsapp_lith_v1_b16v2",
+      "file": "sintef_graphite_dsapp_lith_v1_b16v2.json",
+      "n_scalars": 79,
+      "n_non_scalars": 10,
+      "n_inputs": 6,
+      "inputs": [
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/graphite_ocp_lithiation.csv",
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/graphite_ocp_delithiation.csv",
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/ocp_extraction_provenance.json",
+        "outputs/analysis/graphite_phaseB16/v2/graphite_Ds_app.csv",
+        "outputs/analysis/graphite_phaseB16/v2/gitt_ds_app_provenance.json",
+        "data/metadata.csv"
+      ],
+      "recipe": {
+        "module": "parameters.sintef_graphite_ds",
+        "function": "build_ds_variant",
+        "kwargs": {
+          "branch": "lithiation",
+          "cell": "4ccc47",
+          "ocp_dir": "outputs/analysis/graphite_phaseB06/graphite_ocp_v2",
+          "ds_dir": "outputs/analysis/graphite_phaseB16/v2"
+        },
+        "note": "函数条目（实测 OCP、D_s 插值器）由这个 recipe 重建；inputs 的 sha256 保证重建用的是同一批输入。"
+      }
+    },
+    {
+      "set_id": "sintef_graphite_dsapp_deli_v1_b16v2",
+      "file": "sintef_graphite_dsapp_deli_v1_b16v2.json",
+      "n_scalars": 79,
+      "n_non_scalars": 10,
+      "n_inputs": 6,
+      "inputs": [
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/graphite_ocp_lithiation.csv",
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/graphite_ocp_delithiation.csv",
+        "outputs/analysis/graphite_phaseB06/graphite_ocp_v2/ocp_extraction_provenance.json",
+        "outputs/analysis/graphite_phaseB16/v2/graphite_Ds_app.csv",
+        "outputs/analysis/graphite_phaseB16/v2/gitt_ds_app_provenance.json",
+        "data/metadata.csv"
+      ],
+      "recipe": {
+        "module": "parameters.sintef_graphite_ds",
+        "function": "build_ds_variant",
+        "kwargs": {
+          "branch": "delithiation",
+          "cell": "4ccc47",
+          "ocp_dir": "outputs/analysis/graphite_phaseB06/graphite_ocp_v2",
+          "ds_dir": "outputs/analysis/graphite_phaseB16/v2"
+        },
+        "note": "函数条目（实测 OCP、D_s 插值器）由这个 recipe 重建；inputs 的 sha256 保证重建用的是同一批输入。"
+      }
+    }
+  ],
+  "note": "每套派生集的 JSON 清单；inputs 里带 sha256，recipe 说明重建方式。函数条目不入文件。"
+}

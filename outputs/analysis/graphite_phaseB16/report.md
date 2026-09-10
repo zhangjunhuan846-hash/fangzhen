@@ -3,6 +3,7 @@
 - GITT cell `063b77`, p-OCV cell `4ccc47`, model SPM
 - pulses: **981**, 1800 s pulse / 9000 s rest
 - accepted pulses: v1 **616**, v2 **851**
+- `dataset_role` of `sintef_graphite` for this calibration: **identification** (declared in configs/datasets.yaml, enforced by governance/dataset_roles.py)
 
 ## What changed
 
@@ -169,6 +170,17 @@ The drift diagnostic explains why the SIZE differs so much from Phase B1.5's ~9x
 | deli | Ecker2015 D | **2.849** | 1.726 | 26.232 |
 | deli | SINTEF D_s (first order) | **370.837** | 112.053 | 2968.789 |
 | deli | SINTEF D_s (drift-corrected) | **466.165** | 147.892 | 3072.380 |
+
+### Same comparison on a COMMON time grid
+
+The variants can end at different times (changing the diffusivity moves the voltage event that terminates the run), so the table above scores them on **different point sets** — and a truncated run is only judged where it survived, which understates its error.  Interpolating every variant onto the reference run's grid, restricted to the range all three cover:
+
+| window | common points | Ecker2015 D | D_s (first order) | D_s (drift-corrected) |
+|---|---|---|---|---|
+| lith | 631 | **1.387** | 10.829 | 29.711 |
+| deli | 260 | **1.138** | 35.263 | 466.165 |
+
+**The numbers move a lot, and they move most for the runs that were truncated** (lith: first-order 19.09 → 10.83 mV; deli: first-order 370.84 → 35.26 mV).  The ordering is unchanged — Ecker < first-order < drift-corrected in both windows — so the conclusion is not an artefact of unequal coverage.  But any single RMSE quoted from the table above overstates the first-order curve's error, because that run was only scored where it survived.
 
 ## First-order Weppner-Huggins excursion over the p-OCV window
 

@@ -11,6 +11,12 @@ chen2020:
   ion: "Li"
   chemistry: "NMC_Graphite"
 
+  # 用途治理（见 governance/dataset_roles.py）。
+  # chen2020 的 A-exact 参数集就是为这颗电芯标定的，zero-fit 基线直接用它，
+  # 所以它是**参数来源**：可用于标定与评估。
+  dataset_role: "identification"
+  dataset_role_note: "A-exact：Chen2020 参数集即为此电芯标定，是本平台的参数来源。"
+
   raw_dir: "data/raw/LIB/NMC_Graphite/Chen2020_LGM50/raw"
   processed_dir: "data/processed/LIB/NMC_Graphite/Chen2020_LGM50"
 
@@ -62,6 +68,14 @@ calce_cs2:
   name: "CALCE CS2 (LCO/Graphite)"
   ion: "Li"
   chemistry: "LCO_Graphite"
+
+  # 用途治理（见 governance/dataset_roles.py）。
+  # 参数集与化学体系兼容，但**不是**为这颗电芯标定的（surrogate 等级）。
+  # 因此是 benchmark：可用于评估，**不得**用于标定；
+  # 它与 validation 的区别正是"参数集不是为它标定的"——所以这个比较
+  # 不构成验证，措辞上也不许写成验证。
+  dataset_role: "benchmark"
+  dataset_role_note: "surrogate：参数集非为该电芯标定，只作 benchmark 比较，不构成验证。"
 
   raw_dir: "data/raw/LIB/LCO_Graphite/CALCE_CS2/raw"
 
@@ -141,6 +155,10 @@ calce_20r:
   name: "CALCE INR18650-20R (NMC/Graphite, dynamic)"
   ion: "Li"
   chemistry: "NMC_Graphite"
+
+  # 用途治理（见 governance/dataset_roles.py）。surrogate：只作 benchmark。
+  dataset_role: "benchmark"
+  dataset_role_note: "surrogate：参数集非为该电芯标定，只作 benchmark 比较，不构成验证。"
 
   raw_dir: "data/raw/LIB/NMC_Graphite/CALCE_INR18650_20R/raw"
 
@@ -236,6 +254,12 @@ birmingham_ncm920305:
   name: "Birmingham NCM920305 (NCM||Li half cell, 2 mAh/cm2)"
   ion: "Li"
   chemistry: "NCM_LiMetal"
+
+  # 用途治理（见 governance/dataset_roles.py）。
+  # 这颗电芯正是 Jackowska2025 参数集作者研究的同一电极体系（matched_study），
+  # 因此它是参数来源：可用于标定与评估。
+  dataset_role: "identification"
+  dataset_role_note: "matched_study：Jackowska2025 参数集即出自该电极体系。"
 
   raw_dir: "data/raw/LIB/NMC_LiMetal/Birmingham_NCM920305/raw"
 
@@ -348,6 +372,10 @@ calce_a123:
   ion: "Li"
   chemistry: "LFP_Graphite"
 
+  # 用途治理（见 governance/dataset_roles.py）。surrogate：只作 benchmark。
+  dataset_role: "benchmark"
+  dataset_role_note: "surrogate：参数集非为该电芯标定，只作 benchmark 比较，不构成验证。"
+
   raw_dir: "data/raw/LIB/LFP_Graphite/CALCE_A123/raw/DST-US06-FUDS-25"
 
   adapter: "calce_a123"
@@ -459,6 +487,15 @@ sintef_graphite:
   name: "SINTEF graphite R2032 (Graphite||Li half cell, p-OCV)"
   ion: "Li"
   chemistry: "Graphite_LiMetal"
+
+  # 用途治理（见 governance/dataset_roles.py）。
+  # p-OCV 用于派生 OCP、GITT 用于派生 apparent D_s —— 两者都是**参数来源**，
+  # 所以本数据集是识别集，可用于标定与评估。
+  # 跨电芯注意：GITT 电芯 063b77 与 p-OCV 电芯 4ccc47 不是同一颗，
+  # 因此把 D_s 套到 p-OCV 回放上属于跨电芯检验，B1/B1.6 报告里
+  # 一律写作 consistency check，**不是 validation**。
+  dataset_role: "identification"
+  dataset_role_note: "OCP 与 D_s 的参数来源；但 GITT/p-OCV 跨电芯，回放只作 consistency check。"
 
   raw_dir: "data"
 

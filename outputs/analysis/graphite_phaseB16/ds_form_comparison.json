@@ -4,6 +4,12 @@
   "gitt_cell": "063b77",
   "model": "SPM",
   "phase": "B1.6 fit form (equilibrium drift separated)",
+  "dataset_role": {
+    "role": "identification",
+    "use": "calibrate",
+    "source": "configs/datasets.yaml (governance/dataset_roles.py)",
+    "warnings": []
+  },
   "n_pulses_segmented": 981,
   "b1_reproduced": {
     "checked": true,
@@ -265,6 +271,29 @@
             "mae_mV": NaN
           }
         }
+      },
+      "coverage_matched": {
+        "t_common_s": 50870.0,
+        "n_points": 631,
+        "reference": "ecker_ds",
+        "ecker_ds": {
+          "rmse_mV": 1.386671051497177,
+          "mae_mV": 1.0389109729745898,
+          "bias_mV": 0.996305633368648,
+          "max_abs_mV": 13.307377220501682
+        },
+        "v1": {
+          "rmse_mV": 10.828867389540564,
+          "mae_mV": 9.04535690242167,
+          "bias_mV": 8.998350566237013,
+          "max_abs_mV": 67.82634595180181
+        },
+        "v2": {
+          "rmse_mV": 29.711172984192313,
+          "mae_mV": 25.082230502112935,
+          "bias_mV": 25.04005181044732,
+          "max_abs_mV": 194.00159187265652
+        }
       }
     },
     "deli": {
@@ -395,6 +424,29 @@
             "n_points": 0,
             "mae_mV": NaN
           }
+        }
+      },
+      "coverage_matched": {
+        "t_common_s": 19220.002000000008,
+        "n_points": 260,
+        "reference": "ecker_ds",
+        "ecker_ds": {
+          "rmse_mV": 1.13835927354182,
+          "mae_mV": 0.7804973440546832,
+          "bias_mV": -0.7804973440546832,
+          "max_abs_mV": 6.653262214631598
+        },
+        "v1": {
+          "rmse_mV": 35.26349141498076,
+          "mae_mV": 25.839584619627882,
+          "bias_mV": -25.21190802656451,
+          "max_abs_mV": 78.5718871479825
+        },
+        "v2": {
+          "rmse_mV": 466.16496067372213,
+          "mae_mV": 147.89159195671834,
+          "bias_mV": -147.3049033827947,
+          "max_abs_mV": 3072.3795721481533
         }
       }
     }

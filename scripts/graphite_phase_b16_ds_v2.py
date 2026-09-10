@@ -60,6 +60,11 @@ from extraction.gitt_extractor import (  # noqa: E402
     extract_gitt_segments,
     write_gitt_segments,
 )
+from governance.dataset_roles import (  # noqa: E402
+    USE_CALIBRATE,
+    check,
+    resolve_role,
+)
 from parameters.sintef_graphite_capacity import (  # noqa: E402
     register_capacity_variants,
 )
@@ -94,6 +99,7 @@ OCP_DIR = ROOT / "outputs" / "analysis" / "graphite_phaseB06" / "graphite_ocp_v2
 DATASET = "sintef_graphite"
 POCV_CELL = "4ccc47"        # the p-OCV cell (replay target)
 GITT_CELL = "063b77"        # the GITT cell (parameter source)
+GITT_PROGRAMME = "gitt"     # the programme whose data this phase calibrates on
 
 SUFFIX_V1 = "_b16v1"
 SUFFIX_V2 = "_b16v2"
@@ -105,6 +111,45 @@ WINDOWS = {
 
 POCV_WINDOW_S = {"deli": 148521.0, "lith": 161589.0}
 POCV_CURRENT_A = 43.28e-6
+
+
+def _coverage_matched(csv_paths: dict, reference: str = "ecker_ds") -> dict:
+    """
+    Metrics on a COMMON time grid.
+
+    The variants can terminate at different times (changing the
+    diffusivity moves the voltage event that ends the run), so their
+    time-aligned tables have different lengths.  The plain RMSEs are then
+    computed on DIFFERENT point sets, and a truncated run is only scored
+    where it survived -- which UNDERSTATES its error in exactly the
+    direction that flatters it.
+
+    Here every variant's simulated voltage is interpolated onto the
+    reference run's grid, restricted to the time range all of them cover,
+    and compared against the same experimental trace.
+    """
+    frames = {k: pd.read_csv(p) for k, p in csv_paths.items()}
+    ref = frames[reference]
+    t_common = min(float(f["time_s"].max()) for f in frames.values())
+    grid = ref["time_s"].to_numpy(float)
+    grid = grid[grid <= t_common]
+    if len(grid) < 2:
+        return {"n_points": int(len(grid)), "t_common_s": t_common}
+    t_ref = ref["time_s"].to_numpy(float)
+    v_exp = np.interp(grid, t_ref, ref["voltage_exp_V"].to_numpy(float))
+    out = {"t_common_s": float(t_common), "n_points": int(len(grid)),
+           "reference": reference}
+    for tag, f in frames.items():
+        t_f = f["time_s"].to_numpy(float)
+        v_sim = np.interp(grid, t_f, f["voltage_sim_V"].to_numpy(float))
+        r = (v_exp - v_sim) * 1e3
+        out[tag] = {
+            "rmse_mV": float(np.sqrt(np.mean(r ** 2))),
+            "mae_mV": float(np.mean(np.abs(r))),
+            "bias_mV": float(np.mean(r)),
+            "max_abs_mV": float(np.max(np.abs(r))),
+        }
+    return out
 
 
 def _pct(v: pd.Series) -> dict:
@@ -153,9 +198,36 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
+    # 本阶段的回放运行**不应污染被跟踪的 outputs/platform/**。
+    # 平台按 battery_sim.paths.PLATFORM_OUTPUT_ROOT 解析运行目录，所以把它
+    # 重定向到本阶段的产物目录即可（与 tests/conftest.py 同一手法：
+    # 只换模块属性的值，不改冻结代码）。
+    # benchmark.py 是按值 import 的，需要单独改一份。
+    import battery_sim.paths as _paths
+
+    _platform_root = OUT_DIR / "platform_runs"
+    _paths.PLATFORM_OUTPUT_ROOT = _platform_root
+    try:
+        from battery_sim.simulation import benchmark as _bench
+        _bench.PLATFORM_OUTPUT_ROOT = _platform_root
+    except Exception:                       # pragma: no cover - import guard
+        pass
+
     from battery_sim.registry import get_dataset
 
     adapter = get_dataset(DATASET)
+
+    # ---------------- 用途治理门（标定路径入口） ------------------
+    # 这一段是"参数来源"，所以必须在动数据之前过门：
+    # 若有人把这份 GITT 声明成 validation/benchmark，这里直接报错，
+    # 而不是等到结论写完才发现"验证集被拿去标定了"。
+    role = resolve_role(DATASET, GITT_PROGRAMME)
+    role_warnings = check(role, USE_CALIBRATE, dataset=DATASET,
+                          rate=GITT_PROGRAMME,
+                          what="GITT segmentation and D_s inversion")
+    print(f"[B1.6] dataset_role({DATASET}/{GITT_PROGRAMME}) = {role}")
+    for w in role_warnings:
+        print(f"[B1.6] ROLE WARNING: {w}")
 
     # ---------------- B1.6.0: segmentation, both fits --------------
     seg_res = extract_gitt_segments(adapter, GITT_CELL)
@@ -222,6 +294,12 @@ def main(argv=None) -> int:
         "gitt_cell": GITT_CELL,
         "model": args.model,
         "phase": "B1.6 fit form (equilibrium drift separated)",
+        "dataset_role": {
+            "role": role,
+            "use": USE_CALIBRATE,
+            "source": "configs/datasets.yaml (governance/dataset_roles.py)",
+            "warnings": role_warnings,
+        },
         "n_pulses_segmented": int(len(seg)),
         "b1_reproduced": repro,
         "ecker_reference": ecker,
@@ -315,6 +393,7 @@ def main(argv=None) -> int:
         comparison["windows"] = {}
         for win, (rate, branch) in WINDOWS.items():
             block = {}
+            csvs = {}
             control_id = controls["v1"][branch]
             for tag, set_id in (
                 ("ecker_ds", control_id),
@@ -324,6 +403,7 @@ def main(argv=None) -> int:
                 proxy = OCPConsistentAdapter(adapter, branch, ocp_tables)
                 csv = _run_case(proxy, args.model, rate, set_id,
                                 OUT_DIR / "runs" / f"{win}_{tag}")
+                csvs[tag] = csv
                 m = _metrics(csv)
                 block[tag] = {
                     "parameter_set": set_id,
@@ -332,6 +412,13 @@ def main(argv=None) -> int:
                 }
                 print(f"[B1.6] {win} {tag}: RMSE {m['rmse_mV']:.3f} mV | "
                       f"MAE {m['mae_mV']:.3f}")
+            cm = _coverage_matched(csvs)
+            block["coverage_matched"] = cm
+            if "v1" in cm:
+                print(f"[B1.6] {win} coverage-matched on {cm['n_points']} "
+                      f"common points: "
+                      + " | ".join(f"{t} {cm[t]['rmse_mV']:.3f} mV"
+                                   for t in ("ecker_ds", "v1", "v2")))
             comparison["windows"][win] = block
 
     # ---------------- sensitivity of a C/50 window ----------------
@@ -424,6 +511,10 @@ def main(argv=None) -> int:
         f"pulse / {proto['relax_time_s_median']:.0f} s rest",
         f"- accepted pulses: v1 **{v1_res['provenance']['n_accepted']}**, "
         f"v2 **{v2_res['provenance']['n_accepted']}**",
+        f"- `dataset_role` of `{DATASET}` for this calibration: **{role}** "
+        f"(declared in configs/datasets.yaml, enforced by "
+        f"governance/dataset_roles.py)"
+        + (f" — WARNING: {role_warnings[0]}" if role_warnings else ""),
         "",
         "## What changed",
         "",
@@ -592,6 +683,49 @@ def main(argv=None) -> int:
                     f"| {win} | {label} | **{m['rmse_mV']:.3f}** | "
                     f"{m['mae_mV']:.3f} | {m['max_abs_mV']:.3f} |"
                 )
+        lines += [
+            "",
+            "### Same comparison on a COMMON time grid",
+            "",
+            "The variants can end at different times (changing the "
+            "diffusivity moves the voltage event that terminates the run), so "
+            "the table above scores them on **different point sets** — and a "
+            "truncated run is only judged where it survived, which understates "
+            "its error.  Interpolating every variant onto the reference run's "
+            "grid, restricted to the range all three cover:",
+            "",
+            "| window | common points | Ecker2015 D | D_s (first order) | "
+            "D_s (drift-corrected) |",
+            "|---|---|---|---|---|",
+        ]
+        for win, blk in comparison["windows"].items():
+            cm = blk.get("coverage_matched", {})
+            if "v1" not in cm:
+                continue
+            lines.append(
+                f"| {win} | {cm['n_points']} | "
+                f"**{cm['ecker_ds']['rmse_mV']:.3f}** | "
+                f"{cm['v1']['rmse_mV']:.3f} | {cm['v2']['rmse_mV']:.3f} |"
+            )
+        changed = []
+        for win, blk in comparison["windows"].items():
+            cm = blk.get("coverage_matched", {})
+            if "v1" not in cm:
+                continue
+            changed.append(
+                f"{win}: first-order {blk['v1']['metrics']['rmse_mV']:.2f} "
+                f"→ {cm['v1']['rmse_mV']:.2f} mV"
+            )
+        lines += [
+            "",
+            "**The numbers move a lot, and they move most for the runs that "
+            "were truncated** (" + "; ".join(changed) + ").  The ordering is "
+            "unchanged — Ecker < first-order < drift-corrected in both windows "
+            "— so the conclusion is not an artefact of unequal coverage.  But "
+            "any single RMSE quoted from the table above overstates the "
+            "first-order curve's error, because that run was only scored "
+            "where it survived.",
+        ]
     lines += [
         "",
         "## First-order Weppner-Huggins excursion over the p-OCV window",
