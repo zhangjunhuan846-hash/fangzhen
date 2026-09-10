@@ -1,0 +1,187 @@
+{
+  "segmentation": "extraction/gitt_extractor.py::extract_gitt_segments",
+  "source_file": "sintef__sintef-graphite-R2032-intelligent-063b77__20250514__gitt__RT.bdf.parquet",
+  "source_sha256": "5828f56489f1f48a1ad928acd8c0fb86fd4e0799a4bb37c91974c8ffb8fdf72a",
+  "row_groups": 741,
+  "total_rows": 90957884,
+  "programme": "gitt",
+  "decimation": "NONE - full resolution on pulses and rest endpoints",
+  "file_structure": "multi-rate log: several (cycle, step) channels are interleaved in time and a step's rows do NOT cover [t_min, t_max]",
+  "channels": [
+    {
+      "step": 1,
+      "n_rows": 49,
+      "median_current_A": 0.0,
+      "kind": "rest",
+      "t_min_s": 0.02,
+      "t_max_s": 14400.0,
+      "span_h": 3.9999944444444444,
+      "mean_dt_s": 299.9995833333333,
+      "gap_threshold_s": 1499.9979166666665
+    },
+    {
+      "step": 2,
+      "n_rows": 45180000,
+      "median_current_A": 0.0,
+      "kind": "rest",
+      "t_min_s": 14400.01,
+      "t_max_s": 9726095.822,
+      "span_h": 2697.6932811111114,
+      "mean_dt_s": 0.2149556446869333,
+      "gap_threshold_s": 1.5
+    },
+    {
+      "step": 3,
+      "n_rows": 407122,
+      "median_current_A": 0.0,
+      "kind": "rest",
+      "t_min_s": 15300.02,
+      "t_max_s": 9734195.822,
+      "span_h": 2699.6932783333336,
+      "mean_dt_s": 23.87225370835698,
+      "gap_threshold_s": 119.3612685417849
+    },
+    {
+      "step": 4,
+      "n_rows": 901519,
+      "median_current_A": -4.41545832721218e-05,
+      "kind": "pulse",
+      "t_min_s": 23400.02,
+      "t_max_s": 9735638.669,
+      "span_h": 2697.844069166667,
+      "mean_dt_s": 10.773205470107087,
+      "gap_threshold_s": 53.86602735053543
+    },
+    {
+      "step": 7,
+      "n_rows": 9905,
+      "median_current_A": 0.0,
+      "kind": "rest",
+      "t_min_s": 1137322.46,
+      "t_max_s": 9755438.669,
+      "span_h": 2393.9211691666665,
+      "mean_dt_s": 870.1652068861065,
+      "gap_threshold_s": 4350.826034430533
+    },
+    {
+      "step": 8,
+      "n_rows": 43200000,
+      "median_current_A": 0.0,
+      "kind": "rest",
+      "t_min_s": 1157122.45,
+      "t_max_s": 10782338.67,
+      "span_h": 2673.6711722222226,
+      "mean_dt_s": 0.22280593617606334,
+      "gap_threshold_s": 1.5
+    },
+    {
+      "step": 9,
+      "n_rows": 389280,
+      "median_current_A": 0.0,
+      "kind": "rest",
+      "t_min_s": 1158022.46,
+      "t_max_s": 10790438.67,
+      "span_h": 2675.671169444445,
+      "mean_dt_s": 24.744248238409988,
+      "gap_threshold_s": 123.72124119204994
+    },
+    {
+      "step": 10,
+      "n_rows": 860104,
+      "median_current_A": 4.415445446329747e-05,
+      "kind": "pulse",
+      "t_min_s": 1166122.46,
+      "t_max_s": 10791235.962,
+      "span_h": 2673.6426394444447,
+      "mean_dt_s": 11.190652168403087,
+      "gap_threshold_s": 55.95326084201544
+    },
+    {
+      "step": 13,
+      "n_rows": 9905,
+      "median_current_A": 0.0,
+      "kind": "rest",
+      "t_min_s": 2193437.651,
+      "t_max_s": 10811035.962,
+      "span_h": 2393.7773086111106,
+      "mean_dt_s": 870.1129150848141,
+      "gap_threshold_s": 4350.56457542407
+    }
+  ],
+  "pulse_protocol": {
+    "pulse_time_s_median": 1799.9800000000105,
+    "relax_time_s_median": 9000.0,
+    "pulses_per_cycle": {
+      "1": 200,
+      "2": 195,
+      "3": 195,
+      "4": 196,
+      "5": 195
+    },
+    "pulses_per_branch": {
+      "delithiation": 479,
+      "lithiation": 502
+    },
+    "n_pulses_total": 981,
+    "current_levels_A": [
+      -4.4155e-05,
+      -4.4154e-05,
+      -4.4153e-05,
+      4.4154e-05,
+      4.4155e-05
+    ],
+    "pulse_steps": [
+      4,
+      10
+    ],
+    "rest_steps": [
+      1,
+      2,
+      3,
+      7,
+      8,
+      9,
+      13
+    ]
+  },
+  "soc_definition": "Q_ref = total charge of the cycle's LITHIATION pulse train (canonical current > 0) from the fresh state to the fully lithiated state; lithiation SOC = Q/Q_ref, delithiation SOC = 1 - Q/Q_ref.  Deliberately the SAME definition as the p-OCV OCP extraction so that D_s(SOC) and the frozen OCP share one axis.",
+  "soc_reference_charge_mAh": {
+    "1": 2.2926080188083153,
+    "2": 2.183523628818757,
+    "3": 2.19608247982358,
+    "4": 2.197506143675658,
+    "5": 2.181255594051171
+  },
+  "segmentation_rules": {
+    "gap_rule": "burst break where dt > max(5 x channel mean dt, 1.5 s)",
+    "gap_threshold_s": {
+      "1": 1499.9979166666665,
+      "2": 1.5,
+      "3": 119.3612685417849,
+      "4": 53.86602735053543,
+      "7": 4350.826034430533,
+      "8": 1.5,
+      "9": 123.72124119204994,
+      "10": 55.95326084201544,
+      "13": 4350.56457542407
+    },
+    "min_burst_s": 600.0,
+    "ir_skip_s": 60.0,
+    "rest_pairing": "rest bursts inside the repose window [pulse end, next pulse start on ANY channel]; V_end is the latest rest sample, coverage records the channels' span",
+    "why_the_gaps_matter": "the 9000 s rests between pulses are logged by other channels, so integrating the pulse channel alone would charge them as well: that mis-integration gives 9.8 mAh, 4.5x the cell capacity, instead of the correct 2.29 mAh"
+  },
+  "fits": {
+    "first_order": "V = a + m*sqrt(t) -- the PyBOP Weppner-Huggins form; the Phase B1 apparent D_s is built from this slope",
+    "second_order": "V = a + b*t + m*sqrt(t) -- the same pulse law PLUS the linear equilibrium drift caused by the bulk composition advancing during the pulse.  Phase B1.5 measured that the first-order slope inflates the diffusion term by a median 2.9x on model-generated pulses of this protocol, which biases the first-order D_s low by about 9x",
+    "columns": "both fits are stored per pulse: sqrt_t_* (first order, unchanged from Phase B1) and quad_* (second order); sqrt_t_slope_excess_over_quad is their difference",
+    "why_one_pass": "the two regressions are computed from the SAME pulse samples in the same pass, so the comparison cannot be affected by decimation or by a differing segmentation"
+  },
+  "sign_convention": {
+    "raw": "negative current = discharge (cycler convention)",
+    "platform_canonical": "discharge = +, charge = -",
+    "action": "raw sign FLIPPED (same as the p-OCV adapter)",
+    "physics": "for a graphite||Li half cell the spontaneous discharge LITHIATES the graphite, so canonical + = lithiation and the sign of I_A is directly usable in the PyBOP Weppner-Huggins form where current is positive on discharge"
+  },
+  "temperature_source": "declared_room_temperature_not_measured",
+  "wording": "GITT segmentation only: pulse/rest identification and charge accounting.  No diffusivity is computed in this step."
+}

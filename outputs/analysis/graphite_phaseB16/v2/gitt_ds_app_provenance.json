@@ -1,0 +1,56 @@
+{
+  "calculation": "extraction/gitt_diffusivity_v2.py::compute_ds_app_v2",
+  "quantity": "APPARENT / EFFECTIVE solid-state diffusivity, NOT an intrinsic material coefficient: it is R^2 divided by a diffusion time constant fitted to a one-dimensional single-particle model of ONE particle size",
+  "fit_form": "V(t) = a + b*t + m*sqrt(t), fitted over the pulse with the first IR_SKIP seconds removed; the linear term carries the equilibrium drift caused by the bulk composition advancing during the pulse, so `m` is the diffusional part alone.  Phase B1 instead used V(t) = a + m*sqrt(t).",
+  "fit_form_correction_vs_phase_B1": "Phase B1 inverted the same law from a first-order V = a + m*sqrt(t) fit, which cannot represent the linear drift of the equilibrium voltage during the pulse.  Phase B1.5 measured that inflation as a median 2.9x on model pulses, while BOTH fits kept R^2 >= 0.95 -- so the Phase B1 R^2 gate cannot detect the wrong form, which is why the fit form had to be changed here rather than filtered on.",
+  "equation_reference": "Weppner & Huggins, J. Electrochem. Soc. 124(10) 1569 (1977); forward relation identical to PyBOP 26.3 pybop/models/lithium_ion/weppner_huggins.py (V = U + U'*(2I/(3Q_th))*sqrt(t*tau_d/pi)), inverted here.  Phase B1.6 keeps the same Weppner-Huggins inversion but takes `m` from the drift-corrected fit V = a + b*t + m*sqrt(t)",
+  "equation_solved": "tau_d = pi*(3 Q_th m / (2 I U'))**2 ; D = R^2/tau_d ; m from a least-squares fit of V = a + b*t + m*sqrt(t) over the pulse with the first samples removed",
+  "shared_with_phase_B1": "the inversion, the local OCP slope, the gates (R^2 >= 0.9, |U'| >= 0.001, window curvature <= 100.0 mV, sign of I*U') and the 0.02 SOC binning are IMPORTED from extraction/gitt_diffusivity.py, so the B1 and B1.6 tables differ in exactly one thing: the fitted slope",
+  "cross_check_equation": "D = (4/(9 pi)) (R^2/tau) (dE_tau/dE_s)^2 -- OCP-free, obtained by eliminating U' between the pulse law and the equilibrium composition step",
+  "particle_radius_m": 1.37e-05,
+  "particle_radius_source": "Positive particle radius [m] of Ecker2015_graphite_halfcell (13.7 um) - a REFERENCE-SET value, NOT measured for this cell; D scales with R^2 so this is the largest systematic uncertainty",
+  "Q_th_Ah": 0.0022464319849470867,
+  "Q_th_units": "used in AMPERE-SECONDS in the Weppner-Huggins relation (Q_th = F eps_am c_max L A, as PyBOP builds it); the Ah value is converted by x3600",
+  "Q_th_source": "F * eps_am * c_max * L * A from the SINTEF catalog metadata of THIS GITT cell (mass-based eps_am, measured thickness and disc area) with c_max from the reference set",
+  "active_mass_source": "SINTEF catalog metadata.csv, cell 063b77 (Mass of Active Material / mg)",
+  "I_source": "GITT pulse current (canonical sign, discharge = +)",
+  "U_prime_source": "local slope of the frozen Phase B0.6 high-fidelity OCP table, branch-matched, fitted over ~1.5 pulse composition steps",
+  "uncertainty_definition": "Ds_app_rel_uncertainty = 2 * sigma(m)/|m| from the quadratic regression; it covers ONLY the fit noise.  Q_th, R, U' and the unmodelled porous-electrode contributions are systematic and are NOT included",
+  "fit_effect_on_these_pulses": {
+    "n_pulses": 851,
+    "slope_ratio_linear_over_quad": {
+      "p5": 0.25917893475749487,
+      "p25": 0.3323033438707509,
+      "p50": 0.4739955416264099,
+      "p75": 0.8410221773395599,
+      "p95": 1.9411988691310804
+    },
+    "Ds_ratio_v2_over_v1": {
+      "p5": 0.06717410114409487,
+      "p25": 0.11042552254299712,
+      "p50": 0.22467177348171366,
+      "p75": 0.7073224288444162,
+      "p95": 3.7701368367757286
+    },
+    "drift_term_over_expected_equilibrium_drift": {
+      "p5": -47.843897323695096,
+      "p25": -15.190994107062316,
+      "p50": -4.590862093514057,
+      "p75": -0.3245686624228359,
+      "p95": 3.3126129789831156
+    },
+    "drift_term_sign_matches_expected_fraction": 0.18566392479435959,
+    "note": "ratios of the first-order slope to the drift-corrected one on the SAME pulse samples.  D = R^2/tau_d with tau_d ~ m^2, so Ds_ratio = (slope ratio)^2 is exactly the factor by which the fit form alone moves the diffusivity -- and a ratio BELOW 1 means the correction makes D SMALLER.  The last two rows ask whether the fitted linear term is actually the EQUILIBRIUM drift the correction assumes: pure drift would be dU/dt = U'*I/Q_th, so a ratio far from 1 (or a sign that disagrees with it) means the term is carrying a slow NON-equilibrium transient instead."
+  },
+  "n_pulses": 981,
+  "n_defined": 958,
+  "n_accepted": 851,
+  "n_rejected": 130,
+  "flags": {
+    "min_r2": 0.9,
+    "min_abs_u_prime": 0.001,
+    "min_slope_knots": 5
+  },
+  "branch_note": "lithiation pulses use the lithiation OCP branch and delithiation pulses the delithiation branch, so each D is paired with the same hysteresis branch the model uses",
+  "wording": "apparent/effective D_s(SOC) from GITT under the Weppner-Huggins single-particle model with the equilibrium drift separated from the diffusion signal; not a material constant, not validation"
+}

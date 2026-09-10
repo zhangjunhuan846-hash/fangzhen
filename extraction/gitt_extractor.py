@@ -31,8 +31,10 @@
 #           channel's own sampling interval and gap threshold.
 #   Pass 2: vectorised run-length encoding of every channel into
 #           bursts on dt > max(5 x channel dt, 1.5 s):
-#             * pulse bursts -> one GITT pulse each, keeping only the
-#               sufficient statistics of a V-vs-sqrt(t) regression;
+#             * pulse bursts -> one GITT pulse each, keeping the
+#               sufficient statistics of TWO regressions of the pulse:
+#               the Weppner-Huggins V = a + m*sqrt(t) (Phase B1) and the
+#               drift-corrected V = a + b*t + m*sqrt(t) (Phase B1.6);
 #             * rest bursts  -> start/end voltage of one relaxation.
 #           Each pulse is paired with the longest rest burst that
 #           starts at its end.
@@ -197,6 +199,79 @@ def _fit_sqrt_t(t_rel: np.ndarray, v: np.ndarray, ir_skip: float) -> dict:
             "r2": (1.0 - sse / sst) if sst > 0 else nan, "n_fit": n}
 
 
+def _fit_quadratic_sqrt_t(t_rel: np.ndarray, v: np.ndarray,
+                          ir_skip: float) -> dict:
+    """
+    Least squares fit of V = a + b*t + m*sqrt(t) over t >= ir_skip.
+
+    WHY THIS EXISTS (Phase B1.5)
+      The Weppner-Huggins pulse law assumes the EQUILIBRIUM voltage is
+      constant across the pulse, so the whole measured rise is
+      diffusional.  It is not constant: the bulk-average lithium content
+      advances roughly linearly with time, so the equilibrium voltage
+      drifts linearly and the fitted sqrt(t) slope absorbs part of that
+      drift.  On model-generated pulses of this very protocol the
+      first-order fit inflated the diffusion slope by a median 2.9x
+      (Phase B1.5, `extraction/gitt_pulse_budget.py`).  Adding the
+      linear term lets the drift be carried by `b` and the diffusion
+      signal by `m`.
+
+      Numerically the fit is done with t centred and divided by the
+      pulse duration: the column space of {1, t, sqrt(t)} is unchanged
+      by shifting t, so the returned sqrt(t) coefficient `m` is exactly
+      the coefficient of the raw sqrt(t) column, while the conditioning
+      improves by orders of magnitude (t ~ 1.8e3 against t ~ 9e2 offsets).
+
+    Returns the sqrt(t) coefficient and its standard error, the linear
+    drift coefficient in V/s, the intercept, R^2 and the sample count --
+    the same shape as :func:`_fit_sqrt_t`.
+    """
+    sel = t_rel >= ir_skip
+    if sel.sum() < 10:
+        sel = np.ones(len(t_rel), dtype=bool)
+    t = np.asarray(t_rel[sel], dtype=float)
+    y = np.asarray(v[sel], dtype=float)
+    n = int(len(t))
+    nan = float("nan")
+    empty = {"sqrt_slope": nan, "sqrt_stderr": nan, "t_slope": nan,
+             "intercept": nan, "r2": nan, "n_fit": n}
+    # 3 coefficients + at least 2 residual degrees of freedom
+    if n < 5:
+        return empty
+    tau = float(np.ptp(t))
+    if tau <= 0:
+        return empty
+    x_t = (t - float(np.mean(t))) / tau
+    x_s = np.sqrt(t)
+    X = np.column_stack((np.ones(n), x_t, x_s))
+    XtX = X.T @ X
+    try:
+        XtX_inv = np.linalg.inv(XtX)
+    except np.linalg.LinAlgError:
+        return empty
+    beta = XtX_inv @ (X.T @ y)
+    resid = y - X @ beta
+    sse = float(resid @ resid)
+    dof = n - 3
+    s2 = sse / dof if dof > 0 else nan
+    diag = np.diag(XtX_inv)
+    se_sqrt = float(np.sqrt(s2 * diag[2])) if np.isfinite(s2) \
+        and diag[2] > 0 else nan
+    sst = float(np.sum((y - np.mean(y)) ** 2))
+    # the intercept is reported as V at t = 0 (i.e. a, the value the
+    # first-order fit also reports) rather than as the coefficient of
+    # the centred regressor, so the two fits stay comparable
+    t_mean = float(np.mean(t))
+    return {
+        "sqrt_slope": float(beta[2]),
+        "sqrt_stderr": se_sqrt,
+        "t_slope": float(beta[1]) / tau,      # back to V/s
+        "intercept": float(beta[0] - beta[1] * t_mean / tau),
+        "r2": (1.0 - sse / sst) if sst > 0 else nan,
+        "n_fit": n,
+    }
+
+
 def _runs_with_gaps(t: np.ndarray, gt: float) -> List[Tuple[int, int]]:
     """Index ranges of contiguous logging runs (gaps larger than gt split)."""
     if len(t) == 0:
@@ -295,6 +370,10 @@ def extract_gitt_segments(
             if abs(i_med) < thr_abs:
                 continue
             fit = _fit_sqrt_t(t[a:b] - t[a], v[a:b], ir_skip_s)
+            # the same pulse is ALSO fitted with the equilibrium-drift
+            # term, V = a + b*t + m*sqrt(t); both live side by side so
+            # the two diffusivity routes can be compared pulse by pulse
+            fit2 = _fit_quadratic_sqrt_t(t[a:b] - t[a], v[a:b], ir_skip_s)
             seg_rows.append({
                 "cycle": cyc, "step": step,
                 "branch": "lithiation" if i_med > 0 else "delithiation",
@@ -312,12 +391,22 @@ def extract_gitt_segments(
                 "relax_coverage_s": float("nan"),
                 "V_relax_end_V": float("nan"),
                 "delta_V_relax_V": float("nan"),
+                # ---- first order: V = a + m*sqrt(t) ------------------
                 "sqrt_t_slope_V_per_sqrt_s": fit["slope"],
                 "sqrt_t_slope_stderr": fit["stderr"],
                 "sqrt_t_intercept_V": fit["intercept"],
                 "sqrt_t_r2": fit["r2"],
-                "ir_skip_s": float(ir_skip_s),
                 "n_fit_samples": fit["n_fit"],
+                # ---- second order: V = a + b*t + m*sqrt(t) -----------
+                "quad_sqrt_t_slope_V_per_sqrt_s": fit2["sqrt_slope"],
+                "quad_sqrt_t_slope_stderr": fit2["sqrt_stderr"],
+                "quad_t_slope_V_per_s": fit2["t_slope"],
+                "quad_intercept_V": fit2["intercept"],
+                "quad_r2": fit2["r2"],
+                "quad_n_fit_samples": fit2["n_fit"],
+                # how much of the first-order slope was really drift
+                "sqrt_t_slope_excess_over_quad": fit["slope"] - fit2["sqrt_slope"],
+                "ir_skip_s": float(ir_skip_s),
             })
         if verbose:
             n = sum(1 for r in seg_rows
@@ -471,6 +560,30 @@ def extract_gitt_segments(
                 "channels, so integrating the pulse channel alone would "
                 "charge them as well: that mis-integration gives 9.8 mAh, "
                 "4.5x the cell capacity, instead of the correct 2.29 mAh"
+            ),
+        },
+        "fits": {
+            "first_order": (
+                "V = a + m*sqrt(t) -- the PyBOP Weppner-Huggins form; "
+                "the Phase B1 apparent D_s is built from this slope"
+            ),
+            "second_order": (
+                "V = a + b*t + m*sqrt(t) -- the same pulse law PLUS the "
+                "linear equilibrium drift caused by the bulk composition "
+                "advancing during the pulse.  Phase B1.5 measured that "
+                "the first-order slope inflates the diffusion term by a "
+                "median 2.9x on model-generated pulses of this protocol, "
+                "which biases the first-order D_s low by about 9x"
+            ),
+            "columns": (
+                "both fits are stored per pulse: sqrt_t_* (first order, "
+                "unchanged from Phase B1) and quad_* (second order); "
+                "sqrt_t_slope_excess_over_quad is their difference"
+            ),
+            "why_one_pass": (
+                "the two regressions are computed from the SAME pulse "
+                "samples in the same pass, so the comparison cannot be "
+                "affected by decimation or by a differing segmentation"
             ),
         },
         "sign_convention": {

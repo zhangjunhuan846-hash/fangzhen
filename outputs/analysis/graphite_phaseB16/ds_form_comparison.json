@@ -1,0 +1,416 @@
+{
+  "dataset": "sintef_graphite",
+  "pocv_cell": "4ccc47",
+  "gitt_cell": "063b77",
+  "model": "SPM",
+  "phase": "B1.6 fit form (equilibrium drift separated)",
+  "n_pulses_segmented": 981,
+  "b1_reproduced": {
+    "checked": true,
+    "reference": "outputs/analysis/graphite_phaseB1/graphite_Ds_app.csv",
+    "n_rows": 74,
+    "max_rel_diff": 2.220446049250313e-16,
+    "identical": true
+  },
+  "ecker_reference": {
+    "values_m2_s": {
+      "0.05": 5.307083861674532e-13,
+      "0.20": 1.0475366217727928e-13,
+      "0.50": 1.219033308713769e-14,
+      "0.80": 9.070145734089316e-15,
+      "0.95": 8.981283402338358e-15
+    },
+    "median_m2_s": 1.219033308713769e-14
+  },
+  "fit_effect": {
+    "n_pulses": 851,
+    "slope_ratio_linear_over_quad": {
+      "p5": 0.25917893475749487,
+      "p25": 0.3323033438707509,
+      "p50": 0.4739955416264099,
+      "p75": 0.8410221773395599,
+      "p95": 1.9411988691310804
+    },
+    "Ds_ratio_v2_over_v1": {
+      "p5": 0.06717410114409487,
+      "p25": 0.11042552254299712,
+      "p50": 0.22467177348171366,
+      "p75": 0.7073224288444162,
+      "p95": 3.7701368367757286
+    },
+    "drift_term_over_expected_equilibrium_drift": {
+      "p5": -47.843897323695096,
+      "p25": -15.190994107062316,
+      "p50": -4.590862093514057,
+      "p75": -0.3245686624228359,
+      "p95": 3.3126129789831156
+    },
+    "drift_term_sign_matches_expected_fraction": 0.18566392479435959,
+    "note": "ratios of the first-order slope to the drift-corrected one on the SAME pulse samples.  D = R^2/tau_d with tau_d ~ m^2, so Ds_ratio = (slope ratio)^2 is exactly the factor by which the fit form alone moves the diffusivity -- and a ratio BELOW 1 means the correction makes D SMALLER.  The last two rows ask whether the fitted linear term is actually the EQUILIBRIUM drift the correction assumes: pure drift would be dU/dt = U'*I/Q_th, so a ratio far from 1 (or a sign that disagrees with it) means the term is carrying a slow NON-equilibrium transient instead."
+  },
+  "branches": {
+    "lithiation": {
+      "n_accepted_v1": 329,
+      "n_accepted_v2": 470,
+      "v1_m2_s": {
+        "p1": 1.867918304991237e-18,
+        "p25": 3.537598776608572e-17,
+        "p50": 1.4379833412344438e-16,
+        "p75": 5.947080439534323e-16,
+        "p99": 1.9209199247660862e-13
+      },
+      "v2_m2_s": {
+        "p1": 4.407684959934165e-19,
+        "p25": 9.412200564230534e-18,
+        "p50": 3.651159398306925e-17,
+        "p75": 6.72290388906928e-16,
+        "p99": 7.267284852696817e-14
+      },
+      "v2_over_v1_median": 0.25390832380384665,
+      "ecker_over_v2_median": 333.8756750195693
+    },
+    "delithiation": {
+      "n_accepted_v1": 287,
+      "n_accepted_v2": 381,
+      "v1_m2_s": {
+        "p1": 3.488898004593669e-18,
+        "p25": 2.844082167829533e-16,
+        "p50": 8.354702914909346e-16,
+        "p75": 2.5971989865665104e-15,
+        "p99": 3.7729515673965603e-13
+      },
+      "v2_m2_s": {
+        "p1": 4.198172647542813e-19,
+        "p25": 3.067827189997408e-17,
+        "p50": 1.7382291489404198e-16,
+        "p75": 9.26865479115796e-16,
+        "p99": 8.209017230190929e-14
+      },
+      "v2_over_v1_median": 0.2080539747066854,
+      "ecker_over_v2_median": 70.1307597710498
+    }
+  },
+  "fit_form": "V(t) = a + b*t + m*sqrt(t), fitted over the pulse with the first IR_SKIP seconds removed; the linear term carries the equilibrium drift caused by the bulk composition advancing during the pulse, so `m` is the diffusional part alone.  Phase B1 instead used V(t) = a + m*sqrt(t).",
+  "common_accepted_set": {
+    "n_pulses": 614,
+    "note": "pulses accepted by BOTH the first-order and the drift-corrected table; the only population on which the two diffusivities are directly comparable",
+    "v1_m2_s": {
+      "p1": 2.941002629048299e-18,
+      "p25": 5.661548684076902e-17,
+      "p50": 3.802585203198109e-16,
+      "p75": 1.6580424315863016e-15,
+      "p99": 2.7031994722079136e-13
+    },
+    "v2_m2_s": {
+      "p1": 4.2759153887668016e-19,
+      "p25": 1.8514493525960106e-17,
+      "p50": 2.1545501125446196e-16,
+      "p75": 1.247750702246687e-15,
+      "p99": 8.263782868170111e-14
+    },
+    "v2_over_v1_median": 0.5666014033643656,
+    "paired_ratio_median": 0.4274659480418609,
+    "paired_ratio_percentiles": {
+      "p5": 0.12412177305643987,
+      "p25": 0.19533779408083715,
+      "p50": 0.4274659480418609,
+      "p75": 1.0311432082455747,
+      "p95": 6.271358730671386
+    },
+    "fraction_paired_ratio_above_one": 0.25732899022801303,
+    "branches": {
+      "delithiation": {
+        "n_pulses": 287,
+        "v1_median_m2_s": 8.354702914909346e-16,
+        "v2_median_m2_s": 3.2952808418182715e-16,
+        "v2_over_v1_median": 0.39442226436773636,
+        "ecker_over_v2_median": 36.993305494445515
+      },
+      "lithiation": {
+        "n_pulses": 327,
+        "v1_median_m2_s": 1.427328284739797e-16,
+        "v2_median_m2_s": 8.435607728562931e-17,
+        "v2_over_v1_median": 0.5910068355508522,
+        "ecker_over_v2_median": 144.5104310133018
+      }
+    }
+  },
+  "windows": {
+    "lith": {
+      "ecker_ds": {
+        "parameter_set": "sintef_graphite_ocp_lith_capmatch_v1_b16v1",
+        "metrics": {
+          "n_points": 1980,
+          "rmse_mV": 1.627135158827957,
+          "mae_mV": 1.1996379088420523,
+          "bias_mV": -1.1860601465736942,
+          "max_abs_mV": 13.3073772205016,
+          "residual_std_mV": 1.1139255602613973,
+          "residual_quantiles_mV": {
+            "p05": -3.37405683986984,
+            "p25": -1.188627207558275,
+            "p50": -0.80717005784615,
+            "p75": -0.689610215271725,
+            "p95": -0.560610700295115
+          },
+          "v_exp_start_V": 1.0567988157,
+          "v_exp_end_V": 0.0154301329,
+          "v_sim_start_V": 1.0701061929205016,
+          "v_sim_end_V": 0.0056050977060407,
+          "v_exp_span_mV": 1041.3686828,
+          "v_sim_span_mV": 1064.501095214461,
+          "v_sim_span_ratio": 1.0222134704034533
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1794,
+            "mae_mV": 1.1467773433498023
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 170,
+            "mae_mV": 1.3820868330031821
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 16,
+            "mae_mV": 5.188108995448544
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        }
+      },
+      "v1": {
+        "parameter_set": "sintef_graphite_dsapp_lith_v1_b16v1",
+        "metrics": {
+          "n_points": 933,
+          "rmse_mV": 19.091508449059916,
+          "mae_mV": 15.182719346209923,
+          "bias_mV": -15.150928351426948,
+          "max_abs_mV": 67.8263459518018,
+          "residual_std_mV": 11.61615534290297,
+          "residual_quantiles_mV": {
+            "p05": -38.095211139480504,
+            "p25": -20.756690883323998,
+            "p50": -12.572632452945701,
+            "p75": -6.9335243962152004,
+            "p95": -1.93390984675248
+          },
+          "v_exp_start_V": 1.0567988157,
+          "v_exp_end_V": 0.0660427734,
+          "v_sim_start_V": 1.0701061929205016,
+          "v_sim_end_V": 0.008223107592867,
+          "v_exp_span_mV": 990.7560422999999,
+          "v_sim_span_mV": 1061.8830853276347,
+          "v_sim_span_ratio": 1.0717906729718412
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 747,
+            "mae_mV": 17.675470347641703
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 170,
+            "mae_mV": 3.5008641070111537
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 16,
+            "mae_mV": 22.922118883350848
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        }
+      },
+      "v2": {
+        "parameter_set": "sintef_graphite_dsapp_lith_v1_b16v2",
+        "metrics": {
+          "n_points": 631,
+          "rmse_mV": 29.711172984192242,
+          "mae_mV": 25.08223050211285,
+          "bias_mV": -25.040051810447235,
+          "max_abs_mV": 194.0015918726565,
+          "residual_std_mV": 15.99217325527438,
+          "residual_quantiles_mV": {
+            "p05": -52.4357185785353,
+            "p25": -30.5085660446274,
+            "p50": -22.5881005139012,
+            "p75": -15.77242444006615,
+            "p95": -5.99749390152725
+          },
+          "v_exp_start_V": 1.0567988157,
+          "v_exp_end_V": 0.07473851,
+          "v_sim_start_V": 1.0701061929205016,
+          "v_sim_end_V": 0.0058661827010412,
+          "v_exp_span_mV": 982.0603057,
+          "v_sim_span_mV": 1064.2400102194604,
+          "v_sim_span_ratio": 1.0836809145451447
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 445,
+            "mae_mV": 25.271911571535696
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 170,
+            "mae_mV": 19.1685322827373
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 16,
+            "mae_mV": 82.63976933965507
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        }
+      }
+    },
+    "deli": {
+      "ecker_ds": {
+        "parameter_set": "sintef_graphite_ocp_deli_capmatch_v1_b16v1",
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 2.8488388850811117,
+          "mae_mV": 1.726452041489419,
+          "bias_mV": 1.726452041489419,
+          "max_abs_mV": 26.232116013272098,
+          "residual_std_mV": 2.2661081928246958,
+          "residual_quantiles_mV": {
+            "p05": 0.60969380805826,
+            "p25": 0.772035533958875,
+            "p50": 1.2013303684960501,
+            "p75": 1.676616284876725,
+            "p95": 4.437964160219438
+          },
+          "v_exp_start_V": 0.1100081354,
+          "v_exp_end_V": 1.0000014305,
+          "v_sim_start_V": 0.1166613976146316,
+          "v_sim_end_V": 1.026233546513272,
+          "v_exp_span_mV": 889.9932951000001,
+          "v_sim_span_mV": 913.8574138806047,
+          "v_sim_span_ratio": 1.0268138186118843
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1127,
+            "mae_mV": 1.196767036210286
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 833,
+            "mae_mV": 1.8268785809340662
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 40,
+            "mae_mV": 14.558944381294227
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        }
+      },
+      "v1": {
+        "parameter_set": "sintef_graphite_dsapp_deli_v1_b16v1",
+        "metrics": {
+          "n_points": 434,
+          "rmse_mV": 370.8373279470372,
+          "mae_mV": 112.05299477987994,
+          "bias_mV": 111.67696732781435,
+          "max_abs_mV": 2968.7890613178097,
+          "residual_std_mV": 353.62208467141966,
+          "residual_quantiles_mV": {
+            "p05": -2.05218520714988,
+            "p25": 7.970452076565399,
+            "p50": 40.2964359867146,
+            "p75": 61.444059323841074,
+            "p95": 344.0873640223463
+          },
+          "v_exp_start_V": 0.1100081354,
+          "v_exp_end_V": 0.1136095375,
+          "v_sim_start_V": 0.1166613976146316,
+          "v_sim_end_V": 3.082398598817809,
+          "v_exp_span_mV": 5.408421199999999,
+          "v_sim_span_mV": 2970.0227607293905,
+          "v_sim_span_ratio": 549.1478290798415
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 434,
+            "mae_mV": 112.05299477987994
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 0,
+            "mae_mV": NaN
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 0,
+            "mae_mV": NaN
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        }
+      },
+      "v2": {
+        "parameter_set": "sintef_graphite_dsapp_deli_v1_b16v2",
+        "metrics": {
+          "n_points": 260,
+          "rmse_mV": 466.1649606737221,
+          "mae_mV": 147.89159195671837,
+          "bias_mV": 147.30490338279472,
+          "max_abs_mV": 3072.379572148153,
+          "residual_std_mV": 442.27936420244436,
+          "residual_quantiles_mV": {
+            "p05": -2.524405791466905,
+            "p25": 6.24867332540865,
+            "p50": 33.83426077641626,
+            "p75": 71.02232764171605,
+            "p95": 634.3556377262173
+          },
+          "v_exp_start_V": 0.1100081354,
+          "v_exp_end_V": 0.1117565781,
+          "v_sim_start_V": 0.1166613976146316,
+          "v_sim_end_V": 3.1841361502481536,
+          "v_exp_span_mV": 5.408421199999999,
+          "v_sim_span_mV": 3071.7600607518743,
+          "v_sim_span_ratio": 567.9587345659903
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 260,
+            "mae_mV": 147.89159195671837
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 0,
+            "mae_mV": NaN
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 0,
+            "mae_mV": NaN
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        }
+      }
+    }
+  },
+  "sensitivity": {
+    "lith": {
+      "Ds_median_v2_m2_s": 3.651159398306925e-17,
+      "Ds_median_v1_m2_s": 1.4379833412344438e-16,
+      "diffusion_overpotential_ecker_mV": 9.471932859934643,
+      "diffusion_overpotential_v2_mV": 173.07366903865568
+    },
+    "deli": {
+      "Ds_median_v2_m2_s": 1.7382291489404198e-16,
+      "Ds_median_v1_m2_s": 8.354702914909346e-16,
+      "diffusion_overpotential_ecker_mV": 14.558504045357935,
+      "diffusion_overpotential_v2_mV": 121.91889657234718
+    }
+  }
+}

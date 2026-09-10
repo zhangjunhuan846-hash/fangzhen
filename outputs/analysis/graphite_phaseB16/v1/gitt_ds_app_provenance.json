@@ -1,0 +1,28 @@
+{
+  "calculation": "extraction/gitt_diffusivity.py::compute_ds_app",
+  "quantity": "APPARENT / EFFECTIVE solid-state diffusivity, NOT an intrinsic material coefficient: it is R^2 divided by a diffusion time constant fitted to a one-dimensional single-particle model of ONE particle size",
+  "equation_reference": "Weppner & Huggins, J. Electrochem. Soc. 124(10) 1569 (1977); forward relation identical to PyBOP 26.3 pybop/models/lithium_ion/weppner_huggins.py (V = U + U'*(2I/(3Q_th))*sqrt(t*tau_d/pi)), inverted here",
+  "equation_solved": "tau_d = pi*(3 Q_th m / (2 I U'))**2 ; D = R^2/tau_d ; m from a least-squares fit of V = a + m*sqrt(t) over the pulse with the first samples removed",
+  "cross_check_equation": "D = (4/(9 pi)) (R^2/tau) (dE_tau/dE_s)^2 -- OCP-free, obtained by eliminating U' between the pulse law and the equilibrium composition step",
+  "particle_radius_m": 1.37e-05,
+  "particle_radius_source": "Positive particle radius [m] of Ecker2015_graphite_halfcell (13.7 um) - a REFERENCE-SET value, NOT measured for this cell; D scales with R^2 so this is the largest systematic uncertainty",
+  "Q_th_Ah": 0.0022464319849470867,
+  "Q_th_units": "used in AMPERE-SECONDS in the Weppner-Huggins relation (Q_th = F eps_am c_max L A, as PyBOP builds it); the Ah value is converted by x3600",
+  "Q_th_source": "F * eps_am * c_max * L * A from the SINTEF catalog metadata of THIS GITT cell (mass-based eps_am, measured thickness and disc area) with c_max from the reference set",
+  "active_mass_source": "SINTEF catalog metadata.csv, cell 063b77 (Mass of Active Material / mg)",
+  "I_source": "GITT pulse current (canonical sign, discharge = +)",
+  "U_prime_source": "local slope of the frozen Phase B0.6 high-fidelity OCP table, branch-matched, fitted over ~1.5 pulse composition steps",
+  "uncertainty_definition": "Ds_app_rel_uncertainty = 2 * sigma(m)/|m| from the sqrt(t) regression; it covers ONLY the fit noise.  Q_th, R and U' contribute systematic uncertainty that is NOT included and is reported separately (D scales with R^2 and with Q_th^2/U'^2)",
+  "n_pulses": 981,
+  "n_defined": 958,
+  "n_accepted": 616,
+  "n_rejected": 365,
+  "flags": {
+    "min_r2": 0.9,
+    "min_abs_u_prime": 0.001
+  },
+  "branch_note": "lithiation pulses use the lithiation OCP branch and delithiation pulses the delithiation branch, so each D is paired with the same hysteresis branch the model uses",
+  "wording": "apparent/effective D_s(SOC) from GITT under the Weppner-Huggins single-particle model; not a material constant, not validation",
+  "phase": "B1.6 (recomputed for the regression self-check)",
+  "note": "identical inputs and gates to Phase B1; the value must match outputs/analysis/graphite_phaseB1/graphite_Ds_app.csv"
+}
