@@ -87,12 +87,46 @@ WINDOWS = {
 
 REFERENCE_OCP_TABLE_TOP_V = 1.4325   # Ecker2015 graphite OCP table top
 
-# a zero (or full) Li fraction makes the surface kinetics degenerate at
-# t = 0 (j0 ~ sqrt(c) -> 0) and the initial voltage blows past the
-# voltage window -> the solver raises 'Events [Maximum voltage [V]] are
-# non-positive at initial conditions'.  The initial fraction is therefore
-# kept a hair inside the table edge and the margin is recorded.
+# The initial Li fraction is kept a hair inside the table edge because a
+# zero (or full) concentration makes the surface kinetics degenerate at
+# t = 0 (j0 ~ sqrt(c) -> 0) and the solver raises
+# 'Events [Maximum voltage [V]] are non-positive at initial conditions'.
+#
+# Phase B0.7 quantified WHY that floor is load-bearing, and why it must
+# not simply be made smaller: PyBaMM's initial-state initialisation solves
+# for the surface state under the APPLIED current, so its overpotential
+# grows without bound as c_s -> 0.  Measured on the p-OCV lithiation
+# window (frozen v2 table):
+#
+#     x0 = 1e-3  -> V(0) = 1.077 V, initial overpotential  ~ -6 mV
+#     x0 = 3e-4  -> V(0) = 1.524 V, initial overpotential +126 mV
+#     x0 = 1e-4  -> V(0) = 2.186 V, initial overpotential +453 mV
+#     x0 = 1e-5  -> initial terminal voltage overshoots the 3.2 V cut-off
+#                   and the solve FAILS
+#
+# So 1e-3 is the smallest floor at which the initial state is clean; a
+# smaller one buys a higher V(0) at the price of a spurious, slowly
+# decaying initial overpotential.  The residual defect is therefore NOT
+# fixed by moving x0 - it is fixed by declaring which part of the window
+# the model can represent at all (see WINDOW_START_TOL_V below).
 X0_MARGIN = 1e-3
+
+# Phase B0.7 window-start rule: the model's terminal voltage at the
+# declared initial state is OCP(x0); measured samples on the FAR side of
+# that value (relative to the direction the window traverses) lie outside
+# the model's admissible state space and must be reported, not compared.
+# 1 mV is the tolerance for "at the start value".
+#
+# The rule matters because the frozen OCP table's endpoint entries carry
+# the current-switch-on polarisation: the measured PRE-branch rest OCP is
+# 3.0161 V while the lithiation table's top is 3.0003 V (+15.8 mV), and
+# the delithiation window's rest OCP is 0.0824 V while that branch's
+# bottom is 0.0967 V (-14.3 mV).  Both ends are outside the table by
+# ~15 mV, and on the lithiation side the near-vertical dilute stage turns
+# that into a 1.94 V initial-state error (V(0) = 1.077 V) that lands on a
+# single comparison point and, by itself, accounted for ~43.6 mV of the
+# 44.74 mV lith replay RMSE.
+WINDOW_START_TOL_V = 1e-3
 
 REGIONS = [
     ("V_exp<=0.15", 0.0, 0.15),
@@ -116,18 +150,24 @@ class OCPConsistentAdapter:
     adapter's own (Ecker-inverted) x0.
     """
 
-    def __init__(self, adapter, variant: str, ocp_tables: dict):
+    def __init__(self, adapter, variant: str, ocp_tables: dict,
+                 trim_unrepresentable_prefix: bool = True):
         self._adapter = adapter
         self._variant = variant
         self._tables = ocp_tables
+        self._trim = bool(trim_unrepresentable_prefix)
         self.mapping_log: list = []
+        self.window_trim_log: list = []
 
     def __getattr__(self, name):
         return getattr(self._adapter, name)
 
-    def _x0_for(self, rest_ocv_V: float):
-        tbl = self._tables["lithiation" if self._variant == "lithiation"
-                            else "delithiation"]
+    def _curve(self):
+        """
+        (SOC, V) of the variant's own OCP table, unflipped.
+
+        ``mean`` uses the grid both branches share, as in Phase B0.
+        """
         if self._variant == "mean":
             lo = max(float(self._tables["lithiation"]["SOC"].min()),
                      float(self._tables["delithiation"]["SOC"].min()))
@@ -138,11 +178,19 @@ class OCPConsistentAdapter:
                                     for c in ("SOC", "Voltage")])
             v_d = np.interp(grid, *[self._tables["delithiation"].sort_values("SOC")[c].to_numpy(float)
                                     for c in ("SOC", "Voltage")])
-            soc_tbl, v_tbl = grid, 0.5 * (v_l + v_d)
-        else:
-            srt = tbl.sort_values("SOC")
-            soc_tbl = srt["SOC"].to_numpy(float)
-            v_tbl = srt["Voltage"].to_numpy(float)
+            return grid, 0.5 * (v_l + v_d)
+        srt = self._tables[
+            "lithiation" if self._variant == "lithiation" else "delithiation"
+        ].sort_values("SOC")
+        return (srt["SOC"].to_numpy(float), srt["Voltage"].to_numpy(float))
+
+    def ocp_at(self, soc: float) -> float:
+        """OCP of this variant's own table at a stoichiometry."""
+        s, v = self._curve()
+        return float(np.interp(float(soc), s, v))
+
+    def _x0_for(self, rest_ocv_V: float):
+        soc_tbl, v_tbl = self._curve()
         # tables are monotone decreasing in SOC -> flip to ascending
         order = np.argsort(v_tbl, kind="stable")
         v_asc, soc_asc = v_tbl[order], soc_tbl[order]
@@ -171,6 +219,77 @@ class OCPConsistentAdapter:
         )
         return x0
 
+    def _trim_prefix(self, df, x0: float):
+        """
+        Phase B0.7 window-start rule (see WINDOW_START_TOL_V).
+
+        The model's terminal voltage at the declared initial state is
+        OCP(x0).  Leading measured samples that lie on the FAR side of
+        that value - relative to the direction the window traverses - are
+        outside the model's admissible state space, so they are removed
+        from the comparison window and reported.  Only a contiguous
+        PREFIX is ever removed, and the remaining time/capacity columns
+        are re-zeroed so the frame keeps its canonical semantics.
+        """
+        v_start = self.ocp_at(x0)
+        V = df["voltage_V"].to_numpy(float)
+        t = df["time_s"].to_numpy(float)
+        ascending = float(V[-1]) > float(V[0])
+        outside = (V < v_start - WINDOW_START_TOL_V) if ascending \
+            else (V > v_start + WINDOW_START_TOL_V)
+        k = 0
+        while k < len(V) and bool(outside[k]):
+            k += 1
+        record = {
+            "rule": (
+                "Phase B0.7: leading samples whose measured terminal "
+                "voltage lies on the far side of OCP(x0) (the model's "
+                "voltage at the declared initial state), relative to the "
+                "window's traversal direction, are outside the model's "
+                "admissible state space"
+            ),
+            "applied": bool(k > 0),
+            "variant": self._variant,
+            "x0": float(x0),
+            "model_start_voltage_V": v_start,
+            "traversal_direction": "ascending" if ascending
+            else "descending",
+            "tolerance_V": WINDOW_START_TOL_V,
+            "n_points_removed": int(k),
+            "n_points_kept": int(len(V) - k),
+            "duration_removed_s": float(t[k - 1] - t[0]) if k else 0.0,
+            "duration_total_s": float(t[-1] - t[0]),
+            "fraction_removed": float((t[k - 1] - t[0]) / (t[-1] - t[0]))
+            if k and t[-1] > t[0] else 0.0,
+            "voltage_range_removed_V": (
+                [float(np.min(V[:k])), float(np.max(V[:k]))] if k
+                else None
+            ),
+            "reason": (
+                "the measured PRE-branch rest OCP lies outside the frozen "
+                "OCP table at this end, so no admissible initial Li "
+                "fraction reproduces it; the model starts at the table "
+                "edge instead.  Recorded, not silently compared."
+            ),
+            "not_a_fit": (
+                "the rule is parameter-based (OCP of the declared initial "
+                "state) and pre-registered; nothing is tuned to the "
+                "residual"
+            ),
+        }
+        if k == 0:
+            self.window_trim_log.append(record)
+            return df, record
+        out = df.iloc[k:].reset_index(drop=True).copy()
+        out.attrs.update(df.attrs)
+        t0 = float(out["time_s"].iloc[0])
+        out["time_s"] = out["time_s"] - t0
+        out["capacity_Ah"] = out["capacity_Ah"] - float(
+            out["capacity_Ah"].iloc[0]
+        )
+        self.window_trim_log.append(record)
+        return out, record
+
     def load_processed_discharge(self, cell, rate):
         df = self._adapter.load_processed_discharge(cell, rate)
         rest = float(df.attrs["provenance"]["rest_ocv_V"])
@@ -180,6 +299,23 @@ class OCPConsistentAdapter:
         df.attrs["provenance"]["initial_state_source"] = (
             "inverse_ocp_on_variant_table"
         )
+        if self._trim:
+            df, record = self._trim_prefix(df, x0)
+            record["enabled"] = True
+            df.attrs["provenance"]["window_start_rule"] = record
+            df.attrs["initialisation"]["window_trim"] = record
+        else:
+            # the rule is still evaluated and recorded, merely not applied,
+            # so a rule-off run is auditable on the same terms
+            _trimmed, record = self._trim_prefix(df, x0)
+            record["enabled"] = False
+            record["applied"] = False
+            record["note"] = (
+                "rule DISABLED by flag: the unrepresentable prefix is "
+                "still part of the comparison window"
+            )
+            df.attrs["provenance"]["window_start_rule"] = record
+            df.attrs["initialisation"]["window_trim"] = record
         return df
 
 

@@ -1,0 +1,182 @@
+{
+  "rule": "trim the leading samples whose measured terminal voltage lies on the far side of OCP(x0) - the model's voltage at the declared initial state - relative to the window's traversal direction",
+  "why": "the measured PRE-branch rest OCP is outside the frozen OCP table at both ends (the table's endpoint entries carry the current-switch-on polarisation), so no admissible initial Li fraction reproduces it",
+  "not_a_fit": "parameter-based and pre-registered; the rule never looks at the residual, and only a contiguous prefix is removed",
+  "x0_floor_m2s": 0.001,
+  "x0_floor_reason": "PyBaMM's initial-state initialisation solves the surface state under the applied current, so its overpotential diverges as c_s -> 0 (see initial_state_floor_scan.csv). 1e-3 is the smallest floor with a clean initial state; a smaller one buys a higher V(0) at the price of a spurious decaying overpotential, and below ~1e-5 the solve fails.",
+  "tolerance_V": 0.001,
+  "records": {
+    "pOCV-lith_SPM_off": {
+      "rule": "Phase B0.7: leading samples whose measured terminal voltage lies on the far side of OCP(x0) (the model's voltage at the declared initial state), relative to the window's traversal direction, are outside the model's admissible state space",
+      "applied": false,
+      "variant": "lithiation",
+      "x0": 0.001,
+      "model_start_voltage_V": 1.075918497608994,
+      "traversal_direction": "descending",
+      "tolerance_V": 0.001,
+      "n_points_removed": 18,
+      "n_points_kept": 16143,
+      "duration_removed_s": 160.02000000000044,
+      "duration_total_s": 161589.336,
+      "fraction_removed": 0.0009902881214884157,
+      "voltage_range_removed_V": [
+        1.0795326233,
+        3.0160996914
+      ],
+      "reason": "the measured PRE-branch rest OCP lies outside the frozen OCP table at this end, so no admissible initial Li fraction reproduces it; the model starts at the table edge instead.  Recorded, not silently compared.",
+      "not_a_fit": "the rule is parameter-based (OCP of the declared initial state) and pre-registered; nothing is tuned to the residual",
+      "enabled": false,
+      "note": "rule DISABLED by flag: the unrepresentable prefix is still part of the comparison window"
+    },
+    "pOCV-lith_SPM_on": {
+      "rule": "Phase B0.7: leading samples whose measured terminal voltage lies on the far side of OCP(x0) (the model's voltage at the declared initial state), relative to the window's traversal direction, are outside the model's admissible state space",
+      "applied": true,
+      "variant": "lithiation",
+      "x0": 0.001,
+      "model_start_voltage_V": 1.075918497608994,
+      "traversal_direction": "descending",
+      "tolerance_V": 0.001,
+      "n_points_removed": 18,
+      "n_points_kept": 16143,
+      "duration_removed_s": 160.02000000000044,
+      "duration_total_s": 161589.336,
+      "fraction_removed": 0.0009902881214884157,
+      "voltage_range_removed_V": [
+        1.0795326233,
+        3.0160996914
+      ],
+      "reason": "the measured PRE-branch rest OCP lies outside the frozen OCP table at this end, so no admissible initial Li fraction reproduces it; the model starts at the table edge instead.  Recorded, not silently compared.",
+      "not_a_fit": "the rule is parameter-based (OCP of the declared initial state) and pre-registered; nothing is tuned to the residual",
+      "enabled": true
+    },
+    "pOCV-deli_SPM_off": {
+      "rule": "Phase B0.7: leading samples whose measured terminal voltage lies on the far side of OCP(x0) (the model's voltage at the declared initial state), relative to the window's traversal direction, are outside the model's admissible state space",
+      "applied": false,
+      "variant": "delithiation",
+      "x0": 0.999,
+      "model_start_voltage_V": 0.11084888941717082,
+      "traversal_direction": "ascending",
+      "tolerance_V": 0.001,
+      "n_points_removed": 17,
+      "n_points_kept": 14838,
+      "duration_removed_s": 149.9990000000107,
+      "duration_total_s": 148521.31000000003,
+      "fraction_removed": 0.0010099493466628506,
+      "voltage_range_removed_V": [
+        0.0824038908,
+        0.1098013222
+      ],
+      "reason": "the measured PRE-branch rest OCP lies outside the frozen OCP table at this end, so no admissible initial Li fraction reproduces it; the model starts at the table edge instead.  Recorded, not silently compared.",
+      "not_a_fit": "the rule is parameter-based (OCP of the declared initial state) and pre-registered; nothing is tuned to the residual",
+      "enabled": false,
+      "note": "rule DISABLED by flag: the unrepresentable prefix is still part of the comparison window"
+    },
+    "pOCV-deli_SPM_on": {
+      "rule": "Phase B0.7: leading samples whose measured terminal voltage lies on the far side of OCP(x0) (the model's voltage at the declared initial state), relative to the window's traversal direction, are outside the model's admissible state space",
+      "applied": true,
+      "variant": "delithiation",
+      "x0": 0.999,
+      "model_start_voltage_V": 0.11084888941717082,
+      "traversal_direction": "ascending",
+      "tolerance_V": 0.001,
+      "n_points_removed": 17,
+      "n_points_kept": 14838,
+      "duration_removed_s": 149.9990000000107,
+      "duration_total_s": 148521.31000000003,
+      "fraction_removed": 0.0010099493466628506,
+      "voltage_range_removed_V": [
+        0.0824038908,
+        0.1098013222
+      ],
+      "reason": "the measured PRE-branch rest OCP lies outside the frozen OCP table at this end, so no admissible initial Li fraction reproduces it; the model starts at the table edge instead.  Recorded, not silently compared.",
+      "not_a_fit": "the rule is parameter-based (OCP of the declared initial state) and pre-registered; nothing is tuned to the residual",
+      "enabled": true
+    },
+    "pOCV-lith_SPMe_off": {
+      "rule": "Phase B0.7: leading samples whose measured terminal voltage lies on the far side of OCP(x0) (the model's voltage at the declared initial state), relative to the window's traversal direction, are outside the model's admissible state space",
+      "applied": false,
+      "variant": "lithiation",
+      "x0": 0.001,
+      "model_start_voltage_V": 1.075918497608994,
+      "traversal_direction": "descending",
+      "tolerance_V": 0.001,
+      "n_points_removed": 18,
+      "n_points_kept": 16143,
+      "duration_removed_s": 160.02000000000044,
+      "duration_total_s": 161589.336,
+      "fraction_removed": 0.0009902881214884157,
+      "voltage_range_removed_V": [
+        1.0795326233,
+        3.0160996914
+      ],
+      "reason": "the measured PRE-branch rest OCP lies outside the frozen OCP table at this end, so no admissible initial Li fraction reproduces it; the model starts at the table edge instead.  Recorded, not silently compared.",
+      "not_a_fit": "the rule is parameter-based (OCP of the declared initial state) and pre-registered; nothing is tuned to the residual",
+      "enabled": false,
+      "note": "rule DISABLED by flag: the unrepresentable prefix is still part of the comparison window"
+    },
+    "pOCV-lith_SPMe_on": {
+      "rule": "Phase B0.7: leading samples whose measured terminal voltage lies on the far side of OCP(x0) (the model's voltage at the declared initial state), relative to the window's traversal direction, are outside the model's admissible state space",
+      "applied": true,
+      "variant": "lithiation",
+      "x0": 0.001,
+      "model_start_voltage_V": 1.075918497608994,
+      "traversal_direction": "descending",
+      "tolerance_V": 0.001,
+      "n_points_removed": 18,
+      "n_points_kept": 16143,
+      "duration_removed_s": 160.02000000000044,
+      "duration_total_s": 161589.336,
+      "fraction_removed": 0.0009902881214884157,
+      "voltage_range_removed_V": [
+        1.0795326233,
+        3.0160996914
+      ],
+      "reason": "the measured PRE-branch rest OCP lies outside the frozen OCP table at this end, so no admissible initial Li fraction reproduces it; the model starts at the table edge instead.  Recorded, not silently compared.",
+      "not_a_fit": "the rule is parameter-based (OCP of the declared initial state) and pre-registered; nothing is tuned to the residual",
+      "enabled": true
+    },
+    "pOCV-deli_SPMe_off": {
+      "rule": "Phase B0.7: leading samples whose measured terminal voltage lies on the far side of OCP(x0) (the model's voltage at the declared initial state), relative to the window's traversal direction, are outside the model's admissible state space",
+      "applied": false,
+      "variant": "delithiation",
+      "x0": 0.999,
+      "model_start_voltage_V": 0.11084888941717082,
+      "traversal_direction": "ascending",
+      "tolerance_V": 0.001,
+      "n_points_removed": 17,
+      "n_points_kept": 14838,
+      "duration_removed_s": 149.9990000000107,
+      "duration_total_s": 148521.31000000003,
+      "fraction_removed": 0.0010099493466628506,
+      "voltage_range_removed_V": [
+        0.0824038908,
+        0.1098013222
+      ],
+      "reason": "the measured PRE-branch rest OCP lies outside the frozen OCP table at this end, so no admissible initial Li fraction reproduces it; the model starts at the table edge instead.  Recorded, not silently compared.",
+      "not_a_fit": "the rule is parameter-based (OCP of the declared initial state) and pre-registered; nothing is tuned to the residual",
+      "enabled": false,
+      "note": "rule DISABLED by flag: the unrepresentable prefix is still part of the comparison window"
+    },
+    "pOCV-deli_SPMe_on": {
+      "rule": "Phase B0.7: leading samples whose measured terminal voltage lies on the far side of OCP(x0) (the model's voltage at the declared initial state), relative to the window's traversal direction, are outside the model's admissible state space",
+      "applied": true,
+      "variant": "delithiation",
+      "x0": 0.999,
+      "model_start_voltage_V": 0.11084888941717082,
+      "traversal_direction": "ascending",
+      "tolerance_V": 0.001,
+      "n_points_removed": 17,
+      "n_points_kept": 14838,
+      "duration_removed_s": 149.9990000000107,
+      "duration_total_s": 148521.31000000003,
+      "fraction_removed": 0.0010099493466628506,
+      "voltage_range_removed_V": [
+        0.0824038908,
+        0.1098013222
+      ],
+      "reason": "the measured PRE-branch rest OCP lies outside the frozen OCP table at this end, so no admissible initial Li fraction reproduces it; the model starts at the table edge instead.  Recorded, not silently compared.",
+      "not_a_fit": "the rule is parameter-based (OCP of the declared initial state) and pre-registered; nothing is tuned to the residual",
+      "enabled": true
+    }
+  }
+}

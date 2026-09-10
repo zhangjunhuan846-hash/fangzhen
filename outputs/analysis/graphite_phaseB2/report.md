@@ -179,59 +179,59 @@ RMSE against the measured p-OCV window for every prescribed constant $D$, plus t
 
 | model | rate | case | D_prescribed_m2_s | rmse_mV | mae_mV | n_points | coverage_fraction |
 |---|---|---|---|---|---|---|---|
-| SPM | pOCV-lith | control_native_ecker | n/a | 44.74 | 3.21 | 1978 | 0.989 |
-| SPM | pOCV-lith | gitt_curve | n/a | 68.57 | 19.34 | 932 | 0.466 |
-| SPM | pOCV-lith | const_1e-17 | 1.000e-17 | 271.25 | 219.24 | 239 | 0.119 |
-| SPM | pOCV-lith | const_3e-17 | 3.000e-17 | 217.13 | 161.40 | 377 | 0.188 |
-| SPM | pOCV-lith | const_1e-16 | 1.000e-16 | 140.34 | 84.50 | 856 | 0.428 |
-| SPM | pOCV-lith | const_3e-16 | 3.000e-16 | 98.09 | 45.16 | 1486 | 0.743 |
-| SPM | pOCV-lith | const_1e-15 | 1.000e-15 | 74.72 | 25.67 | 1841 | 0.920 |
-| SPM | pOCV-lith | const_3e-15 | 3.000e-15 | 59.26 | 14.79 | 1944 | 0.972 |
-| SPM | pOCV-lith | const_1e-14 | 1.000e-14 | 49.91 | 7.63 | 1980 | 0.990 |
-| SPM | pOCV-lith | const_3e-14 | 3.000e-14 | 46.74 | 4.61 | 1990 | 0.995 |
-| SPM | pOCV-lith | const_1e-13 | 1.000e-13 | 45.36 | 3.29 | 1994 | 0.997 |
-| SPM | pOCV-deli | control_native_ecker | n/a | 6.31 | 2.65 | 2000 | 1.000 |
-| SPM | pOCV-deli | gitt_curve | n/a | 373.96 | 112.80 | 434 | 0.217 |
-| SPM | pOCV-deli | const_1e-17 | 1.000e-17 | 536.73 | 195.56 | 250 | 0.124 |
-| SPM | pOCV-deli | const_3e-17 | 3.000e-17 | 611.70 | 245.68 | 390 | 0.195 |
-| SPM | pOCV-deli | const_1e-16 | 1.000e-16 | 618.29 | 251.72 | 886 | 0.443 |
-| SPM | pOCV-deli | const_3e-16 | 3.000e-16 | 548.29 | 195.42 | 1554 | 0.777 |
-| SPM | pOCV-deli | const_1e-15 | 1.000e-15 | 443.44 | 131.59 | 1939 | 0.969 |
-| SPM | pOCV-deli | const_3e-15 | 3.000e-15 | 168.42 | 44.23 | 2000 | 1.000 |
-| SPM | pOCV-deli | const_1e-14 | 1.000e-14 | 43.35 | 11.29 | 2000 | 1.000 |
-| SPM | pOCV-deli | const_3e-14 | 3.000e-14 | 16.61 | 4.72 | 2000 | 1.000 |
-| SPM | pOCV-deli | const_1e-13 | 1.000e-13 | 8.53 | 2.72 | 2000 | 1.000 |
-| SPMe | pOCV-lith | control_native_ecker | n/a | 44.74 | 3.33 | 1978 | 0.989 |
-| SPMe | pOCV-lith | gitt_curve | n/a | 68.59 | 19.47 | 932 | 0.466 |
-| SPMe | pOCV-lith | const_1e-17 | 1.000e-17 | 271.40 | 219.40 | 239 | 0.119 |
-| SPMe | pOCV-lith | const_3e-17 | 3.000e-17 | 217.27 | 161.54 | 377 | 0.188 |
-| SPMe | pOCV-lith | const_1e-16 | 1.000e-16 | 140.44 | 84.63 | 856 | 0.428 |
-| SPMe | pOCV-lith | const_3e-16 | 3.000e-16 | 98.17 | 45.29 | 1486 | 0.743 |
-| SPMe | pOCV-lith | const_1e-15 | 1.000e-15 | 74.78 | 25.80 | 1841 | 0.920 |
-| SPMe | pOCV-lith | const_3e-15 | 3.000e-15 | 59.31 | 14.92 | 1944 | 0.972 |
-| SPMe | pOCV-lith | const_1e-14 | 1.000e-14 | 49.94 | 7.76 | 1980 | 0.990 |
-| SPMe | pOCV-lith | const_3e-14 | 3.000e-14 | 46.75 | 4.73 | 1990 | 0.995 |
-| SPMe | pOCV-lith | const_1e-13 | 1.000e-13 | 45.36 | 3.41 | 1994 | 0.997 |
-| SPMe | pOCV-deli | control_native_ecker | n/a | 6.26 | 2.75 | 2000 | 1.000 |
-| SPMe | pOCV-deli | gitt_curve | n/a | 373.21 | 112.71 | 434 | 0.217 |
-| SPMe | pOCV-deli | const_1e-17 | 1.000e-17 | 535.85 | 195.32 | 250 | 0.124 |
-| SPMe | pOCV-deli | const_3e-17 | 3.000e-17 | 611.16 | 245.54 | 390 | 0.195 |
-| SPMe | pOCV-deli | const_1e-16 | 1.000e-16 | 618.09 | 251.73 | 886 | 0.443 |
-| SPMe | pOCV-deli | const_3e-16 | 3.000e-16 | 548.19 | 195.48 | 1554 | 0.777 |
-| SPMe | pOCV-deli | const_1e-15 | 1.000e-15 | 443.34 | 131.66 | 1939 | 0.969 |
-| SPMe | pOCV-deli | const_3e-15 | 3.000e-15 | 168.32 | 44.31 | 2000 | 1.000 |
-| SPMe | pOCV-deli | const_1e-14 | 1.000e-14 | 43.23 | 11.37 | 2000 | 1.000 |
-| SPMe | pOCV-deli | const_3e-14 | 3.000e-14 | 16.48 | 4.80 | 2000 | 1.000 |
-| SPMe | pOCV-deli | const_1e-13 | 1.000e-13 | 8.44 | 2.81 | 2000 | 1.000 |
+| SPM | pOCV-lith | control_native_ecker | n/a | 1.63 | 1.20 | 1980 | 0.989 |
+| SPM | pOCV-lith | gitt_curve | n/a | 19.09 | 15.18 | 933 | 0.466 |
+| SPM | pOCV-lith | const_1e-17 | 1.000e-17 | 229.16 | 203.29 | 239 | 0.119 |
+| SPM | pOCV-lith | const_3e-17 | 3.000e-17 | 184.03 | 151.30 | 376 | 0.187 |
+| SPM | pOCV-lith | const_1e-16 | 1.000e-16 | 117.72 | 79.91 | 856 | 0.427 |
+| SPM | pOCV-lith | const_3e-16 | 3.000e-16 | 79.30 | 42.46 | 1487 | 0.743 |
+| SPM | pOCV-lith | const_1e-15 | 1.000e-15 | 54.50 | 23.46 | 1842 | 0.920 |
+| SPM | pOCV-lith | const_3e-15 | 3.000e-15 | 33.91 | 12.71 | 1946 | 0.972 |
+| SPM | pOCV-lith | const_1e-14 | 1.000e-14 | 16.83 | 5.58 | 1982 | 0.990 |
+| SPM | pOCV-lith | const_3e-14 | 3.000e-14 | 8.51 | 2.58 | 1992 | 0.995 |
+| SPM | pOCV-lith | const_1e-13 | 1.000e-13 | 3.94 | 1.28 | 1996 | 0.997 |
+| SPM | pOCV-deli | control_native_ecker | n/a | 2.85 | 1.73 | 2000 | 0.999 |
+| SPM | pOCV-deli | gitt_curve | n/a | 370.84 | 112.05 | 434 | 0.216 |
+| SPM | pOCV-deli | const_1e-17 | 1.000e-17 | 541.33 | 197.09 | 250 | 0.124 |
+| SPM | pOCV-deli | const_3e-17 | 3.000e-17 | 611.14 | 245.49 | 390 | 0.194 |
+| SPM | pOCV-deli | const_1e-16 | 1.000e-16 | 621.50 | 252.93 | 887 | 0.443 |
+| SPM | pOCV-deli | const_3e-16 | 3.000e-16 | 546.28 | 194.65 | 1555 | 0.777 |
+| SPM | pOCV-deli | const_1e-15 | 1.000e-15 | 439.05 | 130.11 | 1940 | 0.969 |
+| SPM | pOCV-deli | const_3e-15 | 3.000e-15 | 161.51 | 42.29 | 2000 | 0.999 |
+| SPM | pOCV-deli | const_1e-14 | 1.000e-14 | 38.41 | 10.05 | 2000 | 0.999 |
+| SPM | pOCV-deli | const_3e-14 | 3.000e-14 | 12.48 | 3.68 | 2000 | 0.999 |
+| SPM | pOCV-deli | const_1e-13 | 1.000e-13 | 4.76 | 1.75 | 2000 | 0.999 |
+| SPMe | pOCV-lith | control_native_ecker | n/a | 1.72 | 1.33 | 1980 | 0.989 |
+| SPMe | pOCV-lith | gitt_curve | n/a | 19.19 | 15.31 | 933 | 0.466 |
+| SPMe | pOCV-lith | const_1e-17 | 1.000e-17 | 229.27 | 203.42 | 239 | 0.119 |
+| SPMe | pOCV-lith | const_3e-17 | 3.000e-17 | 183.96 | 151.28 | 377 | 0.188 |
+| SPMe | pOCV-lith | const_1e-16 | 1.000e-16 | 117.76 | 80.01 | 857 | 0.428 |
+| SPMe | pOCV-lith | const_3e-16 | 3.000e-16 | 79.37 | 42.59 | 1487 | 0.743 |
+| SPMe | pOCV-lith | const_1e-15 | 1.000e-15 | 54.54 | 23.59 | 1843 | 0.920 |
+| SPMe | pOCV-lith | const_3e-15 | 3.000e-15 | 33.96 | 12.84 | 1946 | 0.972 |
+| SPMe | pOCV-lith | const_1e-14 | 1.000e-14 | 16.87 | 5.71 | 1982 | 0.990 |
+| SPMe | pOCV-lith | const_3e-14 | 3.000e-14 | 8.55 | 2.71 | 1992 | 0.995 |
+| SPMe | pOCV-lith | const_1e-13 | 1.000e-13 | 3.98 | 1.41 | 1996 | 0.997 |
+| SPMe | pOCV-deli | control_native_ecker | n/a | 2.93 | 1.85 | 2000 | 0.999 |
+| SPMe | pOCV-deli | gitt_curve | n/a | 370.95 | 112.17 | 434 | 0.216 |
+| SPMe | pOCV-deli | const_1e-17 | 1.000e-17 | 541.21 | 197.11 | 250 | 0.124 |
+| SPMe | pOCV-deli | const_3e-17 | 3.000e-17 | 611.02 | 245.52 | 390 | 0.194 |
+| SPMe | pOCV-deli | const_1e-16 | 1.000e-16 | 621.51 | 253.02 | 887 | 0.443 |
+| SPMe | pOCV-deli | const_3e-16 | 3.000e-16 | 546.32 | 194.76 | 1555 | 0.777 |
+| SPMe | pOCV-deli | const_1e-15 | 1.000e-15 | 439.08 | 130.22 | 1940 | 0.969 |
+| SPMe | pOCV-deli | const_3e-15 | 3.000e-15 | 161.54 | 42.41 | 2000 | 0.999 |
+| SPMe | pOCV-deli | const_1e-14 | 1.000e-14 | 38.44 | 10.18 | 2000 | 0.999 |
+| SPMe | pOCV-deli | const_3e-14 | 3.000e-14 | 12.51 | 3.81 | 2000 | 0.999 |
+| SPMe | pOCV-deli | const_1e-13 | 1.000e-13 | 4.80 | 1.88 | 2000 | 0.999 |
 
 #### What the p-OCV replay can and cannot identify
 
 | model | window | RMSE, control (native $D(SOC)$) | best constant-$D$ RMSE | at $D$ | is that the grid edge? | coverage at the control | weakest-run coverage |
 |---|---|---|---|---|---|---|---|
-| SPM | pOCV-lith | 44.74 mV | 45.36 mV | 1.0e-13 | yes | 0.989 | 0.119 |
-| SPM | pOCV-deli | 6.31 mV | 8.53 mV | 1.0e-13 | yes | 1.000 | 0.124 |
-| SPMe | pOCV-lith | 44.74 mV | 45.36 mV | 1.0e-13 | yes | 0.989 | 0.119 |
-| SPMe | pOCV-deli | 6.26 mV | 8.44 mV | 1.0e-13 | yes | 1.000 | 0.124 |
+| SPM | pOCV-lith | 1.63 mV | 3.94 mV | 1.0e-13 | yes | 0.989 | 0.119 |
+| SPM | pOCV-deli | 2.85 mV | 4.76 mV | 1.0e-13 | yes | 0.999 | 0.124 |
+| SPMe | pOCV-lith | 1.72 mV | 3.98 mV | 1.0e-13 | yes | 0.989 | 0.119 |
+| SPMe | pOCV-deli | 2.93 mV | 4.80 mV | 1.0e-13 | yes | 0.999 | 0.124 |
 
 Two readings, both important:
 
@@ -289,14 +289,14 @@ $V$ at a fixed *delivered capacity* is deliberately **not** the headline: it sat
 
 | axis | protocol | model | t_protocol_s | rmse_control_mV | rmse_gitt_curve_mV | sustained_control | sustained_gitt_curve | V_half_protocol_deviation_control_mV | sensitivity_threshold_D_from_sustained_m2_s | Fo_at_threshold_from_sustained |
 |---|---|---|---|---|---|---|---|---|---|---|
-| pocv_replay | pOCV-lith | SPM | 159810 | 44.74 | 68.6 | n/a | n/a | n/a | n/a | n/a |
-| pocv_replay | pOCV-deli | SPM | 148521 | 6.31 | 374.0 | n/a | n/a | n/a | n/a | n/a |
+| pocv_replay | pOCV-lith | SPM | 159800 | 1.63 | 19.1 | n/a | n/a | n/a | n/a | n/a |
+| pocv_replay | pOCV-deli | SPM | 148361 | 2.85 | 370.8 | n/a | n/a | n/a | n/a | n/a |
 | cc_rate | C/50 | SPM | 180000 | n/a | n/a | 0.990 | 0.474 | 11.8 | 1.32e-15 | 1.2645 |
 | cc_rate | 0.5C | SPM | 7200 | n/a | n/a | 0.780 | 0.195 | 9.7 | 8.36e-15 | 0.3208 |
 | cc_rate | 1C | SPM | 3600 | n/a | n/a | 0.628 | 0.176 | 10.8 | 9.56e-15 | 0.1834 |
 | cc_rate | 2C | SPM | 1800 | n/a | n/a | 0.431 | 0.136 | n/a | n/a | n/a |
-| pocv_replay | pOCV-lith | SPMe | 159810 | 44.74 | 68.6 | n/a | n/a | n/a | n/a | n/a |
-| pocv_replay | pOCV-deli | SPMe | 148521 | 6.26 | 373.2 | n/a | n/a | n/a | n/a | n/a |
+| pocv_replay | pOCV-lith | SPMe | 159800 | 1.72 | 19.2 | n/a | n/a | n/a | n/a | n/a |
+| pocv_replay | pOCV-deli | SPMe | 148361 | 2.93 | 371.0 | n/a | n/a | n/a | n/a | n/a |
 | cc_rate | C/50 | SPMe | 180000 | n/a | n/a | 0.990 | 0.474 | 11.8 | 1.32e-15 | 1.2645 |
 | cc_rate | 0.5C | SPMe | 7200 | n/a | n/a | 0.775 | 0.195 | 9.7 | 8.35e-15 | 0.3202 |
 | cc_rate | 1C | SPMe | 3600 | n/a | n/a | 0.613 | 0.174 | 10.8 | 9.70e-15 | 0.1860 |

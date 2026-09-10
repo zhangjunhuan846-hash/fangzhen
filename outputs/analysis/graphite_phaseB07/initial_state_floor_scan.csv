@@ -1,0 +1,17 @@
+branch,rate,x0,c_s0_mol_m3,ocp_at_x0_V,v0_solved_V,initial_overpotential_mV,solve_ok,note
+lithiation,pOCV-lith,0.01,319.2,0.5815082072445743,0.5796042627989871,-1.903944445587169,True,
+lithiation,pOCV-lith,0.003,95.76,0.7509611296352308,0.7475036465406208,-3.4574830946099144,True,
+lithiation,pOCV-lith,0.001,31.92,1.075918497608994,1.0701060207205986,-5.812476888395368,True,
+lithiation,pOCV-lith,0.0003,9.575999999999999,1.3979313392312684,1.5050570243508667,107.1256851195983,True,
+lithiation,pOCV-lith,0.0001,3.192,1.6844226007404075,2.1370417902343513,452.61918949394374,True,
+lithiation,pOCV-lith,3e-05,0.9576,2.4118078212305245,3.121494284342567,709.6864631120425,True,
+lithiation,pOCV-lith,1e-05,0.31920000000000004,2.8041255626768415,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
+lithiation,pOCV-lith,1e-06,0.03192,2.980668546327684,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
+delithiation,pOCV-deli,0.01,319.2,1.0000014305,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
+delithiation,pOCV-deli,0.003,95.76,1.0000014305,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
+delithiation,pOCV-deli,0.001,31.92,1.0000014305,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
+delithiation,pOCV-deli,0.0003,9.575999999999999,1.0000014305,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
+delithiation,pOCV-deli,0.0001,3.192,1.0000014305,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
+delithiation,pOCV-deli,3e-05,0.9576,1.0000014305,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
+delithiation,pOCV-deli,1e-05,0.31920000000000004,1.0000014305,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
+delithiation,pOCV-deli,1e-06,0.03192,1.0000014305,,,False,SolverError: Events ['Maximum voltage [V]'] are non-positive at initial conditions with input
