@@ -44,3 +44,4 @@ outputs/analysis/lfp_gitt_audit/*.png
 outputs/analysis/graphite_phaseA5/**/*_Vt.png
 outputs/analysis/graphite_phaseB0/runs/**/*_Vt.png
 outputs/analysis/graphite_phaseB05/runs/**/*_Vt.png
+outputs/analysis/graphite_phaseB06/runs/**/*_Vt.png

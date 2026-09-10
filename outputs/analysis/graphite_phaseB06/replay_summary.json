@@ -1,0 +1,416 @@
+{
+  "dataset": "sintef_graphite",
+  "cell": "4ccc47",
+  "model": "SPM",
+  "phase": "B0.6 high-fidelity OCP (only the OCP table changes)",
+  "table_change": {
+    "v1_input": "adapter.decimated trace (global stride 10)",
+    "v2_input": "full-resolution trace (no stride)",
+    "v1_sampling": "every sample of the decimated trace",
+    "v2_sampling": "vertical-RDP fidelity bound + steepness floor + plateau gap cap",
+    "soc_definition_unchanged": true,
+    "q_ref_relative_difference": 2.719958482995415e-07,
+    "capacity_matched": {
+      "v1": {
+        "Q_model_mAh": 1.9424659492079028,
+        "eps_am": 0.2304654404473679
+      },
+      "v2": {
+        "Q_model_mAh": 1.942466477550576,
+        "eps_am": 0.23046550313301087
+      }
+    }
+  },
+  "headline_table": {
+    "lithiation_n_points_v1": 1707,
+    "lithiation_n_points_v2": 933,
+    "lithiation_n_points_above_1p43V_v1": 1,
+    "lithiation_n_points_above_1p43V_v2": 5,
+    "lithiation_max_deviation_v1_minus_v2_mV": 751.1087367400862,
+    "lithiation_max_deviation_v1_minus_v2_soc_0_to_0p1_mV": 1011.1497477869013,
+    "lithiation_fidelity_v1_vs_measured_mV": 751.10873674007,
+    "lithiation_fidelity_v2_vs_measured_mV": 0.16146501361788412
+  },
+  "windows": {
+    "lith": {
+      "v1": {
+        "parameter_set": "sintef_graphite_ocp_lith_capmatch_v1",
+        "q_model_mAh": 1.9424659492079028,
+        "x0_mapping": [
+          {
+            "variant": "lithiation",
+            "rest_ocv_V": 3.0160996914,
+            "x0": 0.001,
+            "x0_before_margin": 0.0,
+            "margin_applied": true,
+            "clamped_to_table_edge": true,
+            "table_soc_range": [
+              0.0,
+              1.0
+            ],
+            "table_voltage_range": [
+              0.0099927252,
+              3.0002844334
+            ]
+          }
+        ],
+        "x_start_surface": 0.001,
+        "x_end_surface": 0.9986921639374012,
+        "metrics": {
+          "n_points": 1978,
+          "rmse_mV": 44.64495290417176,
+          "mae_mV": 3.2048658471439513,
+          "bias_mV": -3.2016846031933746,
+          "max_abs_mV": 1936.4661292024143,
+          "residual_std_mV": 44.53000152164144,
+          "residual_quantiles_mV": {
+            "p05": -5.751135947413093,
+            "p25": -1.431706656189475,
+            "p50": -0.9966488523179,
+            "p75": -0.753472335798625,
+            "p95": -0.5802287700694952
+          },
+          "v_exp_start_V": 3.0160996914,
+          "v_exp_end_V": 0.0159007926,
+          "v_sim_start_V": 1.0796335621975854,
+          "v_sim_end_V": 0.0060048005228346,
+          "v_exp_span_mV": 3000.1988988,
+          "v_sim_span_mV": 1073.6287616747509,
+          "v_sim_span_ratio": 0.3578525284120909
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1790,
+            "mae_mV": 1.2727062736119423
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 169,
+            "mae_mV": 5.827244269066823
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 18,
+            "mae_mV": 63.32277806725835
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 1,
+            "mae_mV": 1936.4661292024143
+          }
+        },
+        "table_error_along_model_trajectory_mV": {
+          "n": 2000,
+          "n_outside_common_range": 0,
+          "mean_mV": 0.0413696991080325,
+          "p95_mV": 0.03967623974508204,
+          "max_mV": 8.161118896700238,
+          "x_at_max": 0.0012974570867872177
+        }
+      },
+      "v2": {
+        "parameter_set": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+        "q_model_mAh": 1.942466477550576,
+        "x0_mapping": [
+          {
+            "variant": "lithiation",
+            "rest_ocv_V": 3.0160996914,
+            "x0": 0.001,
+            "x0_before_margin": 0.0,
+            "margin_applied": true,
+            "clamped_to_table_edge": true,
+            "table_soc_range": [
+              0.0,
+              1.0
+            ],
+            "table_voltage_range": [
+              0.0099927252,
+              3.0002844334
+            ]
+          }
+        ],
+        "x_start_surface": 0.001,
+        "x_end_surface": 0.9986997838557476,
+        "metrics": {
+          "n_points": 1978,
+          "rmse_mV": 44.74139818058967,
+          "mae_mV": 3.2103121261757814,
+          "bias_mV": -3.206150861404477,
+          "max_abs_mV": 1939.1811937909824,
+          "residual_std_mV": 44.62637457611795,
+          "residual_quantiles_mV": {
+            "p05": -5.757376664598154,
+            "p25": -1.4218974635593251,
+            "p50": -1.0004062758069,
+            "p75": -0.7583626557865499,
+            "p95": -0.5706948476697999
+          },
+          "v_exp_start_V": 3.0160996914,
+          "v_exp_end_V": 0.0159007926,
+          "v_sim_start_V": 1.0769184976090176,
+          "v_sim_end_V": 0.0060305900650583,
+          "v_exp_span_mV": 3000.1988988,
+          "v_sim_span_mV": 1070.8879075439593,
+          "v_sim_span_ratio": 0.3569389709369889
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1790,
+            "mae_mV": 1.2702134658888486
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 169,
+            "mae_mV": 5.808551443467703
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 18,
+            "mae_mV": 64.19382743875742
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 1,
+            "mae_mV": 1939.1811937909824
+          }
+        },
+        "table_error_along_model_trajectory_mV": {
+          "n": 2000,
+          "n_outside_common_range": 0,
+          "mean_mV": 0.015932434350393272,
+          "p95_mV": 0.04245281617310213,
+          "max_mV": 0.16006414816752135,
+          "x_at_max": 0.07995458151077373
+        }
+      },
+      "verdict": {
+        "control": "B0.5_v1 (measured OCP v1 + capacity matched)",
+        "intervention": "B0.5_v2 (measured OCP v2 + capacity matched)",
+        "rmse_before_mV": 44.64495290417176,
+        "rmse_after_mV": 44.74139818058967,
+        "rmse_delta_mV": 0.09644527641791001,
+        "mae_before_mV": 3.2048658471439513,
+        "mae_after_mV": 3.2103121261757814,
+        "mae_delta_mV": 0.005446279031830148,
+        "region_mae_before_mV": {
+          "V_exp<=0.15": 1.2727062736119423,
+          "0.15<V_exp<=0.60": 5.827244269066823,
+          "0.60<V_exp<=1.43": 63.32277806725835,
+          "V_exp>1.43_outside_ref_table": 1936.4661292024143
+        },
+        "region_mae_after_mV": {
+          "V_exp<=0.15": 1.2702134658888486,
+          "0.15<V_exp<=0.60": 5.808551443467703,
+          "0.60<V_exp<=1.43": 64.19382743875742,
+          "V_exp>1.43_outside_ref_table": 1939.1811937909824
+        },
+        "region_n_points": {
+          "V_exp<=0.15": 1790,
+          "0.15<V_exp<=0.60": 169,
+          "0.60<V_exp<=1.43": 18,
+          "V_exp>1.43_outside_ref_table": 1
+        },
+        "table_error_before_mV": {
+          "n": 2000,
+          "n_outside_common_range": 0,
+          "mean_mV": 0.0413696991080325,
+          "p95_mV": 0.03967623974508204,
+          "max_mV": 8.161118896700238,
+          "x_at_max": 0.0012974570867872177
+        },
+        "table_error_after_mV": {
+          "n": 2000,
+          "n_outside_common_range": 0,
+          "mean_mV": 0.015932434350393272,
+          "p95_mV": 0.04245281617310213,
+          "max_mV": 0.16006414816752135,
+          "x_at_max": 0.07995458151077373
+        }
+      }
+    },
+    "deli": {
+      "v1": {
+        "parameter_set": "sintef_graphite_ocp_deli_capmatch_v1",
+        "q_model_mAh": 1.9424659492079028,
+        "x0_mapping": [
+          {
+            "variant": "delithiation",
+            "rest_ocv_V": 0.0824216753,
+            "x0": 0.999,
+            "x0_before_margin": 1.0,
+            "margin_applied": true,
+            "clamped_to_table_edge": true,
+            "table_soc_range": [
+              0.0812458303937023,
+              1.0
+            ],
+            "table_voltage_range": [
+              0.0966956839,
+              1.0000014305
+            ]
+          }
+        ],
+        "x_start_surface": 0.9990000000000001,
+        "x_end_surface": 0.07977592899654787,
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 6.269028579306964,
+          "mae_mV": 2.64844903744977,
+          "bias_mV": 2.64844903744977,
+          "max_abs_mV": 60.2574170986626,
+          "residual_std_mV": 5.6821155412574,
+          "residual_quantiles_mV": {
+            "p05": 0.592527789333545,
+            "p25": 0.8341856776746001,
+            "p50": 1.32811894281225,
+            "p75": 2.0800272361837004,
+            "p95": 9.098687954141003
+          },
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 1.0000014305,
+          "v_sim_start_V": 0.1098097265948622,
+          "v_sim_end_V": 1.0601851604751522,
+          "v_exp_span_mV": 917.5975397,
+          "v_sim_span_mV": 950.37543388029,
+          "v_sim_span_ratio": 1.0357214277089348
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1128,
+            "mae_mV": 1.2972809220780932
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 832,
+            "mae_mV": 2.8864704967806474
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 40,
+            "mae_mV": 35.800543536848785
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        },
+        "table_error_along_model_trajectory_mV": {
+          "n": 1996,
+          "n_outside_common_range": 4,
+          "mean_mV": 0.011527459889876586,
+          "p95_mV": 0.030311051003761857,
+          "max_mV": 0.16184400256114007,
+          "x_at_max": 0.08435291763124564
+        }
+      },
+      "v2": {
+        "parameter_set": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+        "q_model_mAh": 1.942466477550576,
+        "x0_mapping": [
+          {
+            "variant": "delithiation",
+            "rest_ocv_V": 0.0824216753,
+            "x0": 0.999,
+            "x0_before_margin": 1.0,
+            "margin_applied": true,
+            "clamped_to_table_edge": true,
+            "table_soc_range": [
+              0.0812458240123724,
+              1.0
+            ],
+            "table_voltage_range": [
+              0.0966956839,
+              1.0000014305
+            ]
+          }
+        ],
+        "x_start_surface": 0.9990000000000001,
+        "x_end_surface": 0.07977617844312071,
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 6.312674857813415,
+          "mae_mV": 2.6538712748080897,
+          "bias_mV": 2.6538712748080897,
+          "max_abs_mV": 64.6617965291038,
+          "residual_std_mV": 5.727724776664649,
+          "residual_quantiles_mV": {
+            "p05": 0.5876466488681151,
+            "p25": 0.8326323694940749,
+            "p50": 1.33104760296445,
+            "p75": 2.089353962076725,
+            "p95": 9.08924509047912
+          },
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 1.0000014305,
+          "v_sim_start_V": 0.1098488894171469,
+          "v_sim_end_V": 1.064663227029104,
+          "v_exp_span_mV": 917.5975397,
+          "v_sim_span_mV": 954.8143376119572,
+          "v_sim_span_ratio": 1.0405589556442412
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1128,
+            "mae_mV": 1.2959070465974756
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 832,
+            "mae_mV": 2.8920226160869187
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 40,
+            "mae_mV": 35.99491461174778
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        },
+        "table_error_along_model_trajectory_mV": {
+          "n": 1996,
+          "n_outside_common_range": 4,
+          "mean_mV": 0.017213539409857457,
+          "p95_mV": 0.04626988864897541,
+          "max_mV": 0.17694029484544016,
+          "x_at_max": 0.12970080003264606
+        }
+      },
+      "verdict": {
+        "control": "B0.5_v1 (measured OCP v1 + capacity matched)",
+        "intervention": "B0.5_v2 (measured OCP v2 + capacity matched)",
+        "rmse_before_mV": 6.269028579306964,
+        "rmse_after_mV": 6.312674857813415,
+        "rmse_delta_mV": 0.04364627850645153,
+        "mae_before_mV": 2.64844903744977,
+        "mae_after_mV": 2.6538712748080897,
+        "mae_delta_mV": 0.005422237358319926,
+        "region_mae_before_mV": {
+          "V_exp<=0.15": 1.2972809220780932,
+          "0.15<V_exp<=0.60": 2.8864704967806474,
+          "0.60<V_exp<=1.43": 35.800543536848785,
+          "V_exp>1.43_outside_ref_table": NaN
+        },
+        "region_mae_after_mV": {
+          "V_exp<=0.15": 1.2959070465974756,
+          "0.15<V_exp<=0.60": 2.8920226160869187,
+          "0.60<V_exp<=1.43": 35.99491461174778,
+          "V_exp>1.43_outside_ref_table": NaN
+        },
+        "region_n_points": {
+          "V_exp<=0.15": 1128,
+          "0.15<V_exp<=0.60": 832,
+          "0.60<V_exp<=1.43": 40,
+          "V_exp>1.43_outside_ref_table": 0
+        },
+        "table_error_before_mV": {
+          "n": 1996,
+          "n_outside_common_range": 4,
+          "mean_mV": 0.011527459889876586,
+          "p95_mV": 0.030311051003761857,
+          "max_mV": 0.16184400256114007,
+          "x_at_max": 0.08435291763124564
+        },
+        "table_error_after_mV": {
+          "n": 1996,
+          "n_outside_common_range": 4,
+          "mean_mV": 0.017213539409857457,
+          "p95_mV": 0.04626988864897541,
+          "max_mV": 0.17694029484544016,
+          "x_at_max": 0.12970080003264606
+        }
+      }
+    }
+  }
+}

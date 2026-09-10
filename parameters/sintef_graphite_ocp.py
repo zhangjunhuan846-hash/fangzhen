@@ -190,8 +190,16 @@ def variant_summary(
     cell: str = "4ccc47",
     ocp_dir: Path | str = DEFAULT_OCP_DIR,
     metadata_csv: Optional[Path | str] = None,
+    set_id_suffix: str = "",
 ) -> dict:
-    """Auditable description of one variant (no pybamm needed)."""
+    """
+    Auditable description of one variant (no pybamm needed).
+
+    ``set_id_suffix`` lets a SECOND table set (e.g. the Phase B0.6
+    high-fidelity extraction written to another directory) coexist in
+    the same process with its own ids.  Empty by default, so every
+    existing id and output is unchanged.
+    """
     tables = load_ocp_tables(ocp_dir)
     if variant == "mean":
         soc_lo = max(float(tables["lithiation"]["SOC"].min()),
@@ -222,7 +230,7 @@ def variant_summary(
             "lithiation": OCP_LITH_ID,
             "delithiation": OCP_DELI_ID,
             "mean": OCP_MEAN_ID,
-        }[variant],
+        }[variant] + set_id_suffix,
         "reference_parameter_set": REFERENCE_SET,
         "geometry_parameter_set_id": GEOMETRY_PARAMETER_SET_ID,
         "ocp_source": source,
@@ -259,10 +267,15 @@ def register_variants(
     ocp_dir: Path | str = DEFAULT_OCP_DIR,
     metadata_csv: Optional[Path | str] = None,
     variants: Optional[List[str]] = None,
+    set_id_suffix: str = "",
 ) -> Dict[str, str]:
     """
     Register the derived variants for name-based lookup in THIS
     process (read-through view over pybamm.parameter_sets).
+
+    ``set_id_suffix`` (default empty) suffixes every id so that a
+    second table set can be registered side by side without
+    overwriting the first.
     """
     import pybamm
 
@@ -272,16 +285,16 @@ def register_variants(
     extra: Dict[str, dict] = {}
     for variant in variants:
         pv = build_ocp_variant(variant, cell, ocp_dir, metadata_csv)
-        extra[variant_summary(variant, cell, ocp_dir,
-                              metadata_csv)["parameter_set_id"]] = dict(pv)
+        extra[variant_summary(variant, cell, ocp_dir, metadata_csv,
+                              set_id_suffix)["parameter_set_id"]] = dict(pv)
 
     current = pybamm.parameter_sets
     if isinstance(current, _ParameterSetsWithExtra):
         current._extra.update(extra)
     else:
         pybamm.parameter_sets = _ParameterSetsWithExtra(current, extra)
-    return {v: variant_summary(v, cell, ocp_dir,
-                               metadata_csv)["parameter_set_id"]
+    return {v: variant_summary(v, cell, ocp_dir, metadata_csv,
+                               set_id_suffix)["parameter_set_id"]
             for v in variants}
 
 
@@ -289,6 +302,7 @@ def write_variant_summaries(
     out_dir: Path | str = DEFAULT_OCP_DIR,
     cell: str = "4ccc47",
     metadata_csv: Optional[Path | str] = None,
+    set_id_suffix: str = "",
 ) -> Path:
     d = Path(out_dir)
     if not d.is_absolute():
@@ -297,7 +311,8 @@ def write_variant_summaries(
     payload = {
         "cell": cell,
         "variants": [
-            variant_summary(v, cell, out_dir, metadata_csv)
+            variant_summary(v, cell, out_dir, metadata_csv,
+                            set_id_suffix)
             for v in ("lithiation", "delithiation", "mean")
         ],
         "reference_baseline": {

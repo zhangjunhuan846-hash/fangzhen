@@ -1,0 +1,213 @@
+{
+  "source_file": "sintef__sintef-graphite-R2032-intelligent-4ccc47__20250514__p-ocv__RT.bdf.parquet",
+  "source_sha256": "72f208de682a205f6053969d3958fa55d889a326218cc963bad5510e3447b369",
+  "temperature_source": "declared_room_temperature_not_measured",
+  "extraction": "extraction/ocp_extractor_v2.py::extract_ocp_v2 (v1 core + branch-aware sampling)",
+  "soc_definition": "Q_ref = charge of the cycle's lithiation branch (canonical current > 0) from the fresh state to the lower cutoff; lithiation SOC = Q/Q_ref; delithiation SOC = 1 - |Q|/Q_ref",
+  "soc_reference_charge_Ah": 0.0019424664775505762,
+  "soc_reference_charge_mAh": 1.9424664775505762,
+  "soc_anchor_cycle": 1,
+  "branch_steps": {
+    "lithiation": 2,
+    "delithiation": 4
+  },
+  "n_points": {
+    "lithiation": 933,
+    "delithiation": 638
+  },
+  "voltage_range_V": {
+    "lithiation": [
+      0.0099927252,
+      3.0002844334
+    ],
+    "delithiation": [
+      0.0966956839,
+      1.0000014305
+    ]
+  },
+  "soc_range": {
+    "lithiation": [
+      0.0,
+      1.0
+    ],
+    "delithiation": [
+      0.08124582401237246,
+      1.0
+    ]
+  },
+  "hysteresis_proxy_mV": 115.26703272641565,
+  "hysteresis_proxy_definition": "mean( V_delithiation(SOC) - V_lithiation(SOC) ) on a common 200-point SOC grid over the overlap; positive = the delithiation branch sits above the lithiation branch",
+  "hysteresis_max_abs_mV": 829.7985544336759,
+  "hysteresis_at_mid_overlap_mV": 88.8126115780922,
+  "hysteresis_at_soc_mV": {
+    "SOC_0.20": 134.77459554301115,
+    "SOC_0.50": 85.86256156872949,
+    "SOC_0.80": 64.72704003834073
+  },
+  "hysteresis_mean_caveat": "the mean is dominated by the steep dilute-stage end (large dV/dSOC); prefer the fixed-SOC values for reporting",
+  "handover_voltage_gap_mV": 86.7029587,
+  "handover_gap_note": "delithiation-branch start minus lithiation-branch end; this is NOT hysteresis (cutoff overshoot + switched-on polarisation)",
+  "rest_ocv_after_lithiation_V": 0.0824394673,
+  "polarization_estimate_at_handover_mV": 14.256216599999997,
+  "polarization_estimate_note": "first-order C/50 polarisation read off the delithiation branch start vs the preceding rest OCV; RECORDED ONLY, never applied to the extracted curve",
+  "branch_direction_check": "lithiation lowers the voltage (3.0 V -> 0.01 V), delithiation raises it (0.01 V -> 1.0 V); both verified from the data",
+  "equilibrium_warning": "pseudo-OCP: extracted from a ~C/50 galvanostatic p-OCV with rests only at the branch endpoints. The curve therefore contains the C/50 polarisation (lithiation branch biased low, delithiation branch biased high) and is NOT a true equilibrium OCP. Using it as the model OCP double-counts that polarisation, so the replay residual is a conservative (pessimistic) estimate. Not a material constant: it is the measured quasi-equilibrium response of this electrode at the declared room temperature.",
+  "flags": [],
+  "wording": "experiment-derived PSEUDO-OCP for this electrode; not a material constant, not validation; sampling re-derived from the full-resolution trace -- the OCP definition is unchanged from v1",
+  "input_trace": {
+    "loader": "extraction/hires_trace.py::load_hires_trace",
+    "purpose": "Phase B0.6 full-resolution trace for OCP extraction; the decimating load_raw path is deliberately NOT used",
+    "source_file": "sintef__sintef-graphite-R2032-intelligent-4ccc47__20250514__p-ocv__RT.bdf.parquet",
+    "source_sha256": "72f208de682a205f6053969d3958fa55d889a326218cc963bad5510e3447b369",
+    "source_path": "data/sintef__sintef-graphite-R2032-intelligent-4ccc47__20250514__p-ocv__RT.bdf.parquet",
+    "programme": "p-ocv",
+    "n_rows": 189340,
+    "row_groups": 1,
+    "sampling_median_s": 10.0,
+    "sampling_min_s": 0.01999999990221113,
+    "sampling_max_s": 300.00000000000045,
+    "decimation": "NONE - every raw sample is kept",
+    "sign_convention": {
+      "raw": "negative current = discharge (cycler convention)",
+      "platform_canonical": "discharge = +, charge = -",
+      "action": "raw sign FLIPPED to platform canonical (discharge = +)",
+      "raw_current_kept_as": "raw_current_A column"
+    },
+    "unit_conversion": {
+      "time_s": "raw 'Test Time / s' made relative to its first sample",
+      "current_A": "raw 'Current / A' negated (canonical)",
+      "voltage_V": "raw 'Voltage / V' used as-is",
+      "capacity_Ah": "raw per-step cumulative column, used as-is"
+    },
+    "ambient_temperature_C": 25.0,
+    "verification_vs_adapter": {
+      "adapter_source_file": "sintef__sintef-graphite-R2032-intelligent-4ccc47__20250514__p-ocv__RT.bdf.parquet",
+      "adapter_source_sha256": "72f208de682a205f6053969d3958fa55d889a326218cc963bad5510e3447b369",
+      "same_file": true,
+      "same_sha256": true,
+      "adapter_rows_in_window": 17729,
+      "adapter_stride": 1
+    }
+  },
+  "n_points_full_resolution": {
+    "lithiation": 16160,
+    "delithiation": 14848
+  },
+  "resampling": {
+    "lithiation": {
+      "method": "vertical-distance RDP in the (SOC, V) plane + steepness floor + no-gap-greater-than-max_gap_soc",
+      "parameters": {
+        "eps_mV_requested": 0.2,
+        "point_cap": 4000,
+        "steep_dv_dsoc_v_per_soc": 5.0,
+        "min_pts_in_steep": 12,
+        "max_gap_soc": 0.005
+      },
+      "eps_ladder": [
+        {
+          "eps_mV": 0.2,
+          "n_kept": 438
+        }
+      ],
+      "eps_mV_used": 0.2,
+      "n_in": 16160,
+      "n_out": 933,
+      "endpoints_kept": true,
+      "soc_span": [
+        0.0,
+        1.0
+      ],
+      "min_soc_step": 6.187672920553283e-05,
+      "median_soc_step": 6.188538086349116e-05,
+      "max_dv_dsoc_v_per_soc": 19615.88707231585,
+      "median_dv_dsoc_v_per_soc": 8.34820963842192,
+      "achieved_vertical_error_mV": {
+        "max": 0.1989601702401811,
+        "mean": 0.016937206229092446,
+        "p95": 0.043588739349282084,
+        "by_soc_band": {
+          "0.000-0.01": {
+            "n": 162,
+            "max_mV": 0.1667730207646212,
+            "mean_mV": 0.004230434073543356
+          },
+          "0.010-0.10": {
+            "n": 1454,
+            "max_mV": 0.1989601702401811,
+            "mean_mV": 0.02422783375459752
+          },
+          "0.100-0.50": {
+            "n": 6464,
+            "max_mV": 0.13289854133577417,
+            "mean_mV": 0.017297783548979113
+          },
+          "0.500-1.00": {
+            "n": 8080,
+            "max_mV": 0.08857385184931482,
+            "mean_mV": 0.01559155683198442
+          }
+        }
+      }
+    },
+    "delithiation": {
+      "method": "vertical-distance RDP in the (SOC, V) plane + steepness floor + no-gap-greater-than-max_gap_soc",
+      "parameters": {
+        "eps_mV_requested": 0.2,
+        "point_cap": 4000,
+        "steep_dv_dsoc_v_per_soc": 5.0,
+        "min_pts_in_steep": 12,
+        "max_gap_soc": 0.005
+      },
+      "eps_ladder": [
+        {
+          "eps_mV": 0.2,
+          "n_kept": 110
+        }
+      ],
+      "eps_mV_used": 0.2,
+      "n_in": 14848,
+      "n_out": 638,
+      "endpoints_kept": true,
+      "soc_span": [
+        0.08124582401237246,
+        1.0
+      ],
+      "min_soc_step": 8.07579026795846e-06,
+      "median_soc_step": 0.0001237699752127952,
+      "max_dv_dsoc_v_per_soc": 144.94683189883085,
+      "median_dv_dsoc_v_per_soc": 8.324612713396272,
+      "achieved_vertical_error_mV": {
+        "max": 0.19242388167917124,
+        "mean": 0.018816667604136805,
+        "p95": 0.05068598545909241,
+        "by_soc_band": {
+          "0.000-0.01": {
+            "n": 0,
+            "max_mV": NaN,
+            "mean_mV": NaN
+          },
+          "0.010-0.10": {
+            "n": 304,
+            "max_mV": 0.03334673820387657,
+            "mean_mV": 0.0021085977117382255
+          },
+          "0.100-0.50": {
+            "n": 6464,
+            "max_mV": 0.19242388167917124,
+            "mean_mV": 0.023274118938852766
+          },
+          "0.500-1.00": {
+            "n": 8080,
+            "max_mV": 0.1252191701209271,
+            "mean_mV": 0.015879326987761216
+          }
+        }
+      }
+    }
+  },
+  "scope": "pOCV-deli cycle 1, both branches, full-resolution input, canonical sign",
+  "phase": "B0.6 high-fidelity OCP extraction",
+  "no_decimation": true,
+  "supersedes": "v1 (outputs/analysis/graphite_phaseB0) - kept untouched",
+  "definition_unchanged_from": "outputs/analysis/graphite_phaseB0 (v1)"
+}

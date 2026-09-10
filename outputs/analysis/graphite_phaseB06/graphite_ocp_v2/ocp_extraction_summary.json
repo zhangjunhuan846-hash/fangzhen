@@ -1,0 +1,14 @@
+{
+  "lithiation_csv": "graphite_ocp_lithiation.csv",
+  "delithiation_csv": "graphite_ocp_delithiation.csv",
+  "fields": [
+    "SOC",
+    "Voltage",
+    "branch",
+    "time_s",
+    "current_A",
+    "capacity_Ah"
+  ],
+  "soc_reference_charge_Ah": 0.0019424664775505762,
+  "equilibrium_warning": "pseudo-OCP: extracted from a ~C/50 galvanostatic p-OCV with rests only at the branch endpoints. The curve therefore contains the C/50 polarisation (lithiation branch biased low, delithiation branch biased high) and is NOT a true equilibrium OCP. Using it as the model OCP double-counts that polarisation, so the replay residual is a conservative (pessimistic) estimate. Not a material constant: it is the measured quasi-equilibrium response of this electrode at the declared room temperature."
+}

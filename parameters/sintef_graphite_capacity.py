@@ -212,6 +212,7 @@ def _ensure_base_registered(
     cell: str,
     ocp_dir: Path | str,
     metadata_csv: Optional[Path | str],
+    set_id_suffix: str = "",
 ) -> None:
     """
     The base sets of Phase B0 must be resolvable by name before a
@@ -223,8 +224,9 @@ def _ensure_base_registered(
 
     from parameters.sintef_graphite_ocp import register_variants
 
-    if BASE_OCP_IDS["delithiation"] not in pybamm.parameter_sets:
-        register_variants(cell, ocp_dir, metadata_csv)
+    if BASE_OCP_IDS["delithiation"] + set_id_suffix not in pybamm.parameter_sets:
+        register_variants(cell, ocp_dir, metadata_csv,
+                          set_id_suffix=set_id_suffix)
 
 
 # ------------------------------------------------------------------
@@ -236,9 +238,15 @@ def capacity_payload(
     ocp_dir: Path | str = DEFAULT_OCP_DIR,
     metadata_csv: Optional[Path | str] = None,
     q_target_Ah: Optional[float] = None,
+    set_id_suffix: str = "",
 ) -> Dict[str, object]:
     """
     Full audit payload for one capacity-matched variant.
+
+    ``set_id_suffix`` lets a second OCP table set (e.g. the Phase B0.6
+    high-fidelity tables) be matched side by side in the same process
+    with its own ids; empty by default so every existing id and output
+    is unchanged.
 
     ``variant`` in {"lithiation", "delithiation"} (the OCP branch the
     set is built on; the mean variant is not used -- Phase B0 showed
@@ -252,8 +260,8 @@ def capacity_payload(
             f"(expected one of {sorted(CAPACITY_MATCHED_IDS)})"
         )
 
-    base_id = BASE_OCP_IDS[variant]
-    _ensure_base_registered(cell, ocp_dir, metadata_csv)
+    base_id = BASE_OCP_IDS[variant] + set_id_suffix
+    _ensure_base_registered(cell, ocp_dir, metadata_csv, set_id_suffix)
     base = pybamm.ParameterValues(base_id)
 
     q_before = electrode_capacity_Ah(base)
@@ -289,7 +297,7 @@ def capacity_payload(
         loading_am_g_cm2_before = float("nan")
 
     return {
-        "parameter_set_id": CAPACITY_MATCHED_IDS[variant],
+        "parameter_set_id": CAPACITY_MATCHED_IDS[variant] + set_id_suffix,
         "base_parameter_set": base_id,
         "reference_parameter_set": REFERENCE_SET,
         "geometry_parameter_set": GEOMETRY_PARAMETER_SET_ID,
@@ -384,6 +392,7 @@ def build_capacity_matched_pair(
     ocp_dir: Path | str = DEFAULT_OCP_DIR,
     metadata_csv: Optional[Path | str] = None,
     q_target_Ah: Optional[float] = None,
+    set_id_suffix: str = "",
 ):
     """
     ``(base, matched)`` pair of ``pybamm.ParameterValues``.
@@ -398,12 +407,13 @@ def build_capacity_matched_pair(
     base = build_ocp_variant(variant, cell, ocp_dir, metadata_csv)
     pv = pybamm.ParameterValues(dict(base))
     payload = capacity_payload(
-        variant, cell, ocp_dir, metadata_csv, q_target_Ah
+        variant, cell, ocp_dir, metadata_csv, q_target_Ah, set_id_suffix
     )
     for key, value in payload["apply"].items():
         if key not in pv:
             raise KeyError(
-                f"parameter set '{BASE_OCP_IDS[variant]}' has no key "
+                f"parameter set '{BASE_OCP_IDS[variant] + set_id_suffix}' "
+                f"has no key "
                 f"'{key}'; refusing to add a parameter the model does not "
                 f"expect"
             )
@@ -417,6 +427,7 @@ def build_capacity_matched_variant(
     ocp_dir: Path | str = DEFAULT_OCP_DIR,
     metadata_csv: Optional[Path | str] = None,
     q_target_Ah: Optional[float] = None,
+    set_id_suffix: str = "",
 ):
     """
     ``pybamm.ParameterValues`` = B0 OCP variant + capacity-matched
@@ -424,7 +435,7 @@ def build_capacity_matched_variant(
     unchanged (identity-checked in tests).
     """
     return build_capacity_matched_pair(
-        variant, cell, ocp_dir, metadata_csv, q_target_Ah
+        variant, cell, ocp_dir, metadata_csv, q_target_Ah, set_id_suffix
     )[1]
 
 
@@ -434,10 +445,11 @@ def variant_summary(
     ocp_dir: Path | str = DEFAULT_OCP_DIR,
     metadata_csv: Optional[Path | str] = None,
     q_target_Ah: Optional[float] = None,
+    set_id_suffix: str = "",
 ) -> Dict[str, object]:
     """Auditable summary (no pybamm solve; pybamm is used for lookups)."""
     return capacity_payload(
-        variant, cell, ocp_dir, metadata_csv, q_target_Ah
+        variant, cell, ocp_dir, metadata_csv, q_target_Ah, set_id_suffix
     )
 
 
@@ -447,6 +459,7 @@ def register_capacity_variants(
     metadata_csv: Optional[Path | str] = None,
     q_target_Ah: Optional[float] = None,
     variants: Optional[List[str]] = None,
+    set_id_suffix: str = "",
 ) -> Dict[str, str]:
     """
     Register the capacity-matched sets for name-based lookup in THIS
@@ -461,16 +474,16 @@ def register_capacity_variants(
     extra: Dict[str, dict] = {}
     for variant in variants:
         pv = build_capacity_matched_variant(
-            variant, cell, ocp_dir, metadata_csv, q_target_Ah
+            variant, cell, ocp_dir, metadata_csv, q_target_Ah, set_id_suffix
         )
-        extra[CAPACITY_MATCHED_IDS[variant]] = dict(pv)
+        extra[CAPACITY_MATCHED_IDS[variant] + set_id_suffix] = dict(pv)
 
     current = pybamm.parameter_sets
     if isinstance(current, _ParameterSetsWithExtra):
         current._extra.update(extra)
     else:
         pybamm.parameter_sets = _ParameterSetsWithExtra(current, extra)
-    return {v: CAPACITY_MATCHED_IDS[v] for v in variants}
+    return {v: CAPACITY_MATCHED_IDS[v] + set_id_suffix for v in variants}
 
 
 def changed_keys_against(base_parameter_values, new_parameter_values) -> List[str]:
@@ -499,6 +512,7 @@ def write_capacity_summary(
     ocp_dir: Path | str = DEFAULT_OCP_DIR,
     metadata_csv: Optional[Path | str] = None,
     q_target_Ah: Optional[float] = None,
+    set_id_suffix: str = "",
 ) -> Path:
     d = Path(out_dir)
     if not d.is_absolute():
@@ -507,7 +521,8 @@ def write_capacity_summary(
     payload = {
         "cell": cell,
         "variants": [
-            capacity_payload(v, cell, ocp_dir, metadata_csv, q_target_Ah)
+            capacity_payload(v, cell, ocp_dir, metadata_csv, q_target_Ah,
+                             set_id_suffix)
             for v in ("lithiation", "delithiation")
         ],
     }

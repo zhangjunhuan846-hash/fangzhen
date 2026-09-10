@@ -1,0 +1,737 @@
+{
+  "definition_unchanged": {
+    "soc_definition": "Q_ref = charge of the cycle's lithiation branch (canonical current > 0) from the fresh state to the lower cutoff; lithiation SOC = Q/Q_ref; delithiation SOC = 1 - |Q|/Q_ref",
+    "soc_reference_charge_Ah": 0.0019424664775505762,
+    "n_points_full_resolution": {
+      "lithiation": 16160,
+      "delithiation": 14848
+    }
+  },
+  "sampling": {
+    "lithiation": {
+      "method": "vertical-distance RDP in the (SOC, V) plane + steepness floor + no-gap-greater-than-max_gap_soc",
+      "parameters": {
+        "eps_mV_requested": 0.2,
+        "point_cap": 4000,
+        "steep_dv_dsoc_v_per_soc": 5.0,
+        "min_pts_in_steep": 12,
+        "max_gap_soc": 0.005
+      },
+      "eps_ladder": [
+        {
+          "eps_mV": 0.2,
+          "n_kept": 438
+        }
+      ],
+      "eps_mV_used": 0.2,
+      "n_in": 16160,
+      "n_out": 933,
+      "endpoints_kept": true,
+      "soc_span": [
+        0.0,
+        1.0
+      ],
+      "min_soc_step": 6.187672920553283e-05,
+      "median_soc_step": 6.188538086349116e-05,
+      "max_dv_dsoc_v_per_soc": 19615.88707231585,
+      "median_dv_dsoc_v_per_soc": 8.34820963842192,
+      "achieved_vertical_error_mV": {
+        "max": 0.1989601702401811,
+        "mean": 0.016937206229092446,
+        "p95": 0.043588739349282084,
+        "by_soc_band": {
+          "0.000-0.01": {
+            "n": 162,
+            "max_mV": 0.1667730207646212,
+            "mean_mV": 0.004230434073543356
+          },
+          "0.010-0.10": {
+            "n": 1454,
+            "max_mV": 0.1989601702401811,
+            "mean_mV": 0.02422783375459752
+          },
+          "0.100-0.50": {
+            "n": 6464,
+            "max_mV": 0.13289854133577417,
+            "mean_mV": 0.017297783548979113
+          },
+          "0.500-1.00": {
+            "n": 8080,
+            "max_mV": 0.08857385184931482,
+            "mean_mV": 0.01559155683198442
+          }
+        }
+      }
+    },
+    "delithiation": {
+      "method": "vertical-distance RDP in the (SOC, V) plane + steepness floor + no-gap-greater-than-max_gap_soc",
+      "parameters": {
+        "eps_mV_requested": 0.2,
+        "point_cap": 4000,
+        "steep_dv_dsoc_v_per_soc": 5.0,
+        "min_pts_in_steep": 12,
+        "max_gap_soc": 0.005
+      },
+      "eps_ladder": [
+        {
+          "eps_mV": 0.2,
+          "n_kept": 110
+        }
+      ],
+      "eps_mV_used": 0.2,
+      "n_in": 14848,
+      "n_out": 638,
+      "endpoints_kept": true,
+      "soc_span": [
+        0.08124582401237246,
+        1.0
+      ],
+      "min_soc_step": 8.07579026795846e-06,
+      "median_soc_step": 0.0001237699752127952,
+      "max_dv_dsoc_v_per_soc": 144.94683189883085,
+      "median_dv_dsoc_v_per_soc": 8.324612713396272,
+      "achieved_vertical_error_mV": {
+        "max": 0.19242388167917124,
+        "mean": 0.018816667604136805,
+        "p95": 0.05068598545909241,
+        "by_soc_band": {
+          "0.000-0.01": {
+            "n": 0,
+            "max_mV": NaN,
+            "mean_mV": NaN
+          },
+          "0.010-0.10": {
+            "n": 304,
+            "max_mV": 0.03334673820387657,
+            "mean_mV": 0.0021085977117382255
+          },
+          "0.100-0.50": {
+            "n": 6464,
+            "max_mV": 0.19242388167917124,
+            "mean_mV": 0.023274118938852766
+          },
+          "0.500-1.00": {
+            "n": 8080,
+            "max_mV": 0.1252191701209271,
+            "mean_mV": 0.015879326987761216
+          }
+        }
+      }
+    }
+  },
+  "branches": {
+    "lithiation": {
+      "v1": {
+        "n_points": 1707,
+        "soc_range": [
+          0.0,
+          1.0
+        ],
+        "voltage_range_V": [
+          0.0099927252,
+          3.0002844334
+        ],
+        "min_soc_step": 0.0005527345384351845,
+        "median_soc_step": 0.0005569795189672433,
+        "max_dv_dsoc_v_per_soc": 3170.031269701166,
+        "median_dv_dsoc_v_per_soc": 0.10420092974897335,
+        "bands": {
+          "0.000-0.01": {
+            "n_points": 18,
+            "points_per_0p01_soc": 18.0,
+            "min_soc_step": 0.0005568894272978,
+            "max_dv_dsoc_v_per_soc": 3170.031269701166
+          },
+          "0.010-0.10": {
+            "n_points": 153,
+            "points_per_0p01_soc": 17.0,
+            "min_soc_step": 0.0005569499174186976,
+            "max_dv_dsoc_v_per_soc": 23.51595089915949
+          },
+          "0.100-0.50": {
+            "n_points": 682,
+            "points_per_0p01_soc": 17.05,
+            "min_soc_step": 0.0005569512044426017,
+            "max_dv_dsoc_v_per_soc": 1.2070323705926975
+          },
+          "0.500-1.00": {
+            "n_points": 854,
+            "points_per_0p01_soc": 17.08,
+            "min_soc_step": 0.0005527345384351845,
+            "max_dv_dsoc_v_per_soc": 0.6409802090584302
+          }
+        }
+      },
+      "v2": {
+        "n_points": 933,
+        "soc_range": [
+          0.0,
+          1.0
+        ],
+        "voltage_range_V": [
+          0.0099927252,
+          3.0002844334
+        ],
+        "min_soc_step": 6.187672920553283e-05,
+        "median_soc_step": 6.18853808635033e-05,
+        "max_dv_dsoc_v_per_soc": 19615.88707231585,
+        "median_dv_dsoc_v_per_soc": 8.348209638416533,
+        "bands": {
+          "0.000-0.01": {
+            "n_points": 152,
+            "points_per_0p01_soc": 152.0,
+            "min_soc_step": 6.187672920553283e-05,
+            "max_dv_dsoc_v_per_soc": 19615.88707231585
+          },
+          "0.010-0.10": {
+            "n_points": 582,
+            "points_per_0p01_soc": 64.66666666666667,
+            "min_soc_step": 6.188330732559422e-05,
+            "max_dv_dsoc_v_per_soc": 65.7327230266927
+          },
+          "0.100-0.50": {
+            "n_points": 88,
+            "points_per_0p01_soc": 2.2,
+            "min_soc_step": 0.00037130570706089827,
+            "max_dv_dsoc_v_per_soc": 0.980180016533604
+          },
+          "0.500-1.00": {
+            "n_points": 111,
+            "points_per_0p01_soc": 2.22,
+            "min_soc_step": 6.188545236474052e-05,
+            "max_dv_dsoc_v_per_soc": 0.9820466309563787
+          }
+        }
+      },
+      "deviation_v1_minus_v2_mV": {
+        "full_overlap": {
+          "soc_range": [
+            0.0,
+            1.0
+          ],
+          "n_grid": 4000,
+          "max_abs_mV": 751.1087367400862,
+          "mean_abs_mV": 0.274253817969702,
+          "p95_abs_mV": 0.06274495955978782,
+          "signed_max_abs_mV": 751.1087367400862,
+          "soc_at_max": 0.00025006251562890725
+        },
+        "by_soc_band": {
+          "0.000-0.01": {
+            "soc_range": [
+              0.0,
+              0.01
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 1017.3014205083352,
+            "mean_abs_mV": 33.698058855927414,
+            "p95_abs_mV": 132.55745806172524,
+            "signed_max_abs_mV": 1017.3014205083352,
+            "soc_at_max": 6.251562890722681e-05
+          },
+          "0.010-0.10": {
+            "soc_range": [
+              0.01,
+              0.1
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 6.308601501193167,
+            "mean_abs_mV": 0.24932375605805404,
+            "p95_abs_mV": 1.2355361759972354,
+            "signed_max_abs_mV": 6.308601501193167,
+            "soc_at_max": 0.02073518379594899
+          },
+          "0.100-0.50": {
+            "soc_range": [
+              0.1,
+              0.5
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 0.09470090044089163,
+            "mean_abs_mV": 0.015270194912668799,
+            "p95_abs_mV": 0.036886579597006364,
+            "signed_max_abs_mV": 0.09470090044089163,
+            "soc_at_max": 0.10600150037509377
+          },
+          "0.500-1.00": {
+            "soc_range": [
+              0.5,
+              1.0
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 0.07580372799476098,
+            "mean_abs_mV": 0.014529702452377022,
+            "p95_abs_mV": 0.03657314473384798,
+            "signed_max_abs_mV": 0.07580372799476098,
+            "soc_at_max": 0.944861215303826
+          }
+        },
+        "at_v1_knots": {
+          "soc_range": [
+            0.0,
+            1.0
+          ],
+          "n_grid": 1707,
+          "max_abs_mV": 0.14802293048826742,
+          "mean_abs_mV": 0.01685899051875316,
+          "p95_abs_mV": 0.043623473667719084,
+          "signed_max_abs_mV": 0.14802293048826742,
+          "soc_at_max": 0.0808833144440622
+        },
+        "soc_0_to_0p1_dense": {
+          "soc_range": [
+            0.0,
+            0.1
+          ],
+          "n_grid": 4000,
+          "max_abs_mV": 1011.1497477869013,
+          "mean_abs_mV": 3.581948620131591,
+          "p95_abs_mV": 1.6882055191690981,
+          "signed_max_abs_mV": 1011.1497477869013,
+          "soc_at_max": 7.501875468867217e-05
+        }
+      },
+      "fidelity_vs_measured_mV": {
+        "v1": {
+          "full_overlap": {
+            "soc_range": [
+              0.0,
+              1.0
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 751.10873674007,
+            "mean_abs_mV": 0.26974977331127187,
+            "p95_abs_mV": 0.03953196957023511,
+            "signed_max_abs_mV": 751.10873674007,
+            "soc_at_max": 0.00025006251562890725
+          },
+          "by_soc_band": {
+            "0.000-0.01": {
+              "soc_range": [
+                0.0,
+                0.01
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 1017.3014205083335,
+              "mean_abs_mV": 33.69800384773136,
+              "p95_abs_mV": 132.5574580617113,
+              "signed_max_abs_mV": 1017.3014205083335,
+              "soc_at_max": 6.251562890722681e-05
+            },
+            "0.010-0.10": {
+              "soc_range": [
+                0.01,
+                0.1
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 6.3086015011943335,
+              "mean_abs_mV": 0.2340338360580434,
+              "p95_abs_mV": 1.2349810599523836,
+              "signed_max_abs_mV": 6.3086015011943335,
+              "soc_at_max": 0.02073518379594899
+            },
+            "0.100-0.50": {
+              "soc_range": [
+                0.1,
+                0.5
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.08661600304205042,
+              "mean_abs_mV": 0.011834992988888658,
+              "p95_abs_mV": 0.031453418466240855,
+              "signed_max_abs_mV": 0.08661600304205042,
+              "soc_at_max": 0.26784196049012254
+            },
+            "0.500-1.00": {
+              "soc_range": [
+                0.5,
+                1.0
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.07480255524636159,
+              "mean_abs_mV": 0.01112282727249501,
+              "p95_abs_mV": 0.03066416164290707,
+              "signed_max_abs_mV": 0.07480255524636159,
+              "soc_at_max": 0.944861215303826
+            }
+          }
+        },
+        "v2": {
+          "full_overlap": {
+            "soc_range": [
+              0.0,
+              1.0
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 0.16146501361788412,
+            "mean_abs_mV": 0.015426338885292634,
+            "p95_abs_mV": 0.03992560177517484,
+            "signed_max_abs_mV": 0.16146501361788412,
+            "soc_at_max": 0.08002000500125032
+          },
+          "by_soc_band": {
+            "0.000-0.01": {
+              "soc_range": [
+                0.0,
+                0.01
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.1665837141154869,
+              "mean_abs_mV": 0.004240488161789763,
+              "p95_abs_mV": 0.026687607922754025,
+              "signed_max_abs_mV": 0.1665837141154869,
+              "soc_at_max": 0.0063740935233808456
+            },
+            "0.010-0.10": {
+              "soc_range": [
+                0.01,
+                0.1
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.19854123895896025,
+              "mean_abs_mV": 0.023796634017833,
+              "p95_abs_mV": 0.08865625024709749,
+              "signed_max_abs_mV": 0.19854123895896025,
+              "soc_at_max": 0.049632408102025516
+            },
+            "0.100-0.50": {
+              "soc_range": [
+                0.1,
+                0.5
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.12396537461595303,
+              "mean_abs_mV": 0.01604243679483204,
+              "p95_abs_mV": 0.03813565887170952,
+              "signed_max_abs_mV": 0.12396537461595303,
+              "soc_at_max": 0.10570142535633908
+            },
+            "0.500-1.00": {
+              "soc_range": [
+                0.5,
+                1.0
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.07808727086030393,
+              "mean_abs_mV": 0.014211256398840369,
+              "p95_abs_mV": 0.03599942250473856,
+              "signed_max_abs_mV": 0.07808727086030393,
+              "soc_at_max": 0.9446111527881971
+            }
+          }
+        }
+      },
+      "point_density_ratio_v2_over_v1": 0.546572934973638
+    },
+    "delithiation": {
+      "v1": {
+        "n_points": 1568,
+        "soc_range": [
+          0.0812458303937023,
+          1.0
+        ],
+        "voltage_range_V": [
+          0.0966956839,
+          1.0000014305
+        ],
+        "min_soc_step": 0.0005031557379186063,
+        "median_soc_step": 0.0005569763014076079,
+        "max_dv_dsoc_v_per_soc": 40.425383767143586,
+        "median_dv_dsoc_v_per_soc": 0.1370620032229046,
+        "bands": {
+          "0.000-0.01": {
+            "n_points": 0,
+            "points_per_0p01_soc": 0.0,
+            "min_soc_step": NaN,
+            "max_dv_dsoc_v_per_soc": NaN
+          },
+          "0.010-0.10": {
+            "n_points": 33,
+            "points_per_0p01_soc": 3.6666666666666665,
+            "min_soc_step": 0.0005031557379186063,
+            "max_dv_dsoc_v_per_soc": 40.425383767143586
+          },
+          "0.100-0.50": {
+            "n_points": 682,
+            "points_per_0p01_soc": 17.05,
+            "min_soc_step": 0.0005569486303947935,
+            "max_dv_dsoc_v_per_soc": 10.236702255498546
+          },
+          "0.500-1.00": {
+            "n_points": 853,
+            "points_per_0p01_soc": 17.06,
+            "min_soc_step": 0.0005568559646778048,
+            "max_dv_dsoc_v_per_soc": 23.535059568919014
+          }
+        }
+      },
+      "v2": {
+        "n_points": 638,
+        "soc_range": [
+          0.0812458240123724,
+          1.0
+        ],
+        "voltage_range_V": [
+          0.0966956839,
+          1.0000014305
+        ],
+        "min_soc_step": 8.075790268000094e-06,
+        "median_soc_step": 0.0001237699752127952,
+        "max_dv_dsoc_v_per_soc": 144.94683189909094,
+        "median_dv_dsoc_v_per_soc": 8.324612713392538,
+        "bands": {
+          "0.000-0.01": {
+            "n_points": 0,
+            "points_per_0p01_soc": 0.0,
+            "min_soc_step": NaN,
+            "max_dv_dsoc_v_per_soc": NaN
+          },
+          "0.010-0.10": {
+            "n_points": 262,
+            "points_per_0p01_soc": 29.11111111111111,
+            "min_soc_step": 8.075790268000094e-06,
+            "max_dv_dsoc_v_per_soc": 43.479460009183086
+          },
+          "0.100-0.50": {
+            "n_points": 256,
+            "points_per_0p01_soc": 6.4,
+            "min_soc_step": 6.188373633349287e-05,
+            "max_dv_dsoc_v_per_soc": 10.575804490157875
+          },
+          "0.500-1.00": {
+            "n_points": 120,
+            "points_per_0p01_soc": 2.4,
+            "min_soc_step": 6.187329714280043e-05,
+            "max_dv_dsoc_v_per_soc": 144.94683189909094
+          }
+        }
+      },
+      "deviation_v1_minus_v2_mV": {
+        "full_overlap": {
+          "soc_range": [
+            0.0812458303937023,
+            1.0
+          ],
+          "n_grid": 4000,
+          "max_abs_mV": 5.829986266005907,
+          "mean_abs_mV": 0.020720675301061448,
+          "p95_abs_mV": 0.05141209933468697,
+          "signed_max_abs_mV": 5.829986266005907,
+          "soc_at_max": 0.9997702540211038
+        },
+        "by_soc_band": {
+          "0.000-0.01": {
+            "soc_range": null,
+            "n_grid": 0,
+            "max_abs_mV": NaN,
+            "mean_abs_mV": NaN,
+            "p95_abs_mV": NaN,
+            "signed_max_abs_mV": NaN,
+            "soc_at_max": NaN,
+            "note": "band lies outside the common SOC range of the two tables"
+          },
+          "0.010-0.10": {
+            "soc_range": [
+              0.0812458303937023,
+              0.1
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 0.16616062235119688,
+            "mean_abs_mV": 0.046751186592404896,
+            "p95_abs_mV": 0.1281763237477196,
+            "signed_max_abs_mV": 0.16616062235119688,
+            "soc_at_max": 0.08503043026173987
+          },
+          "0.100-0.50": {
+            "soc_range": [
+              0.1,
+              0.5
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 0.17817668634684258,
+            "mean_abs_mV": 0.022606688123921997,
+            "p95_abs_mV": 0.0742376325085475,
+            "signed_max_abs_mV": 0.17817668634684258,
+            "soc_at_max": 0.15741435358839712
+          },
+          "0.500-1.00": {
+            "soc_range": [
+              0.5,
+              1.0
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 7.118355851410921,
+            "mean_abs_mV": 0.019063510224164092,
+            "p95_abs_mV": 0.03700042794435585,
+            "signed_max_abs_mV": 7.118355851410921,
+            "soc_at_max": 0.9998749687421856
+          }
+        },
+        "at_v1_knots": {
+          "soc_range": [
+            0.0812458303937023,
+            1.0
+          ],
+          "n_grid": 1568,
+          "max_abs_mV": 0.1785009823858652,
+          "mean_abs_mV": 0.019052192108176682,
+          "p95_abs_mV": 0.049100068514797146,
+          "signed_max_abs_mV": 0.1785009823858652,
+          "soc_at_max": 0.1574343410188831
+        },
+        "soc_0_to_0p1_dense": {
+          "soc_range": [
+            0.0812458303937023,
+            0.1
+          ],
+          "n_grid": 4000,
+          "max_abs_mV": 0.16616062235119688,
+          "mean_abs_mV": 0.046751186592404896,
+          "p95_abs_mV": 0.1281763237477196,
+          "signed_max_abs_mV": 0.16616062235119688,
+          "soc_at_max": 0.08503043026173987
+        }
+      },
+      "fidelity_vs_measured_mV": {
+        "v1": {
+          "full_overlap": {
+            "soc_range": [
+              0.0812458303937023,
+              1.0
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 5.8299862660062125,
+            "mean_abs_mV": 0.013833225352333101,
+            "p95_abs_mV": 0.031195664619786807,
+            "signed_max_abs_mV": 5.8299862660062125,
+            "soc_at_max": 0.9997702540211038
+          },
+          "by_soc_band": {
+            "0.000-0.01": {
+              "soc_range": null,
+              "n_grid": 0,
+              "max_abs_mV": NaN,
+              "mean_abs_mV": NaN,
+              "p95_abs_mV": NaN,
+              "signed_max_abs_mV": NaN,
+              "soc_at_max": NaN,
+              "note": "band lies outside the common SOC range of the two tables"
+            },
+            "0.010-0.10": {
+              "soc_range": [
+                0.0812458303937023,
+                0.1
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.1661606223503087,
+              "mean_abs_mV": 0.04667407035796608,
+              "p95_abs_mV": 0.12817632374647614,
+              "signed_max_abs_mV": 0.1661606223503087,
+              "soc_at_max": 0.08503043026173987
+            },
+            "0.100-0.50": {
+              "soc_range": [
+                0.1,
+                0.5
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.10669217090097938,
+              "mean_abs_mV": 0.011073618538904692,
+              "p95_abs_mV": 0.02955104198735097,
+              "signed_max_abs_mV": 0.10669217090097938,
+              "soc_at_max": 0.12330582645661416
+            },
+            "0.500-1.00": {
+              "soc_range": [
+                0.5,
+                1.0
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 7.118355851410948,
+              "mean_abs_mV": 0.015404810722122523,
+              "p95_abs_mV": 0.02984438623164081,
+              "signed_max_abs_mV": 7.118355851410948,
+              "soc_at_max": 0.9998749687421856
+            }
+          }
+        },
+        "v2": {
+          "full_overlap": {
+            "soc_range": [
+              0.08124582401237246,
+              1.0
+            ],
+            "n_grid": 4000,
+            "max_abs_mV": 0.1805898965321906,
+            "mean_abs_mV": 0.017754286580669316,
+            "p95_abs_mV": 0.047083574048221256,
+            "signed_max_abs_mV": 0.1805898965321906,
+            "soc_at_max": 0.15706199757474232
+          },
+          "by_soc_band": {
+            "0.000-0.01": {
+              "soc_range": null,
+              "n_grid": 0,
+              "max_abs_mV": NaN,
+              "mean_abs_mV": NaN,
+              "p95_abs_mV": NaN,
+              "signed_max_abs_mV": NaN,
+              "soc_at_max": NaN,
+              "note": "band lies outside the common SOC range of the two tables"
+            },
+            "0.010-0.10": {
+              "soc_range": [
+                0.08124582401237246,
+                0.1
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.03286471243668654,
+              "mean_abs_mV": 0.0021144774973363705,
+              "p95_abs_mV": 0.014517483470122272,
+              "signed_max_abs_mV": 0.03286471243668654,
+              "soc_at_max": 0.09814756201172471
+            },
+            "0.100-0.50": {
+              "soc_range": [
+                0.1,
+                0.5
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.18987186132096712,
+              "mean_abs_mV": 0.02229205664481991,
+              "p95_abs_mV": 0.07673758326830757,
+              "signed_max_abs_mV": 0.18987186132096712,
+              "soc_at_max": 0.15701425356339085
+            },
+            "0.500-1.00": {
+              "soc_range": [
+                0.5,
+                1.0
+              ],
+              "n_grid": 4000,
+              "max_abs_mV": 0.12421271743917606,
+              "mean_abs_mV": 0.014718846323463108,
+              "p95_abs_mV": 0.03606385715579292,
+              "signed_max_abs_mV": 0.12421271743917606,
+              "soc_at_max": 0.9993748437109278
+            }
+          }
+        }
+      },
+      "point_density_ratio_v2_over_v1": 0.40688775510204084
+    }
+  },
+  "headline": {
+    "lithiation_n_points_v1": 1707,
+    "lithiation_n_points_v2": 933,
+    "lithiation_n_points_above_1p43V_v1": 1,
+    "lithiation_n_points_above_1p43V_v2": 5,
+    "lithiation_max_deviation_v1_minus_v2_mV": 751.1087367400862,
+    "lithiation_max_deviation_v1_minus_v2_soc_0_to_0p1_mV": 1011.1497477869013,
+    "lithiation_fidelity_v1_vs_measured_mV": 751.10873674007,
+    "lithiation_fidelity_v2_vs_measured_mV": 0.16146501361788412
+  },
+  "q_ref_v1_Ah": 0.0019424659492079026,
+  "q_ref_v2_Ah": 0.0019424664775505762,
+  "q_ref_relative_difference": 2.719958482995415e-07
+}
