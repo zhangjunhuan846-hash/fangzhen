@@ -202,7 +202,7 @@ python run_pipeline.py baseline --dataset chen2020 --model SPMe --cell 02
 ├── user_tools/            # 自助入口：实验 CSV → 校验 → zero-fit baseline
 ├── outputs/               # Simulation results
 ├── external/              # Vendored upstream parameter-set repo (BSD-3)
-├── tests/                 # Regression tests (98 passed gate)
+├── tests/                 # Regression tests (115 passed gate)
 └── README.md
 ```
 
@@ -240,8 +240,10 @@ run_metadata.json
 * [x] Baseline simulation
 * [x] Sensitivity analysis
 * [x] Result tracking
-* [x] Regression testing (98 tests)
+* [x] Regression testing (115 tests)
 * [x] Experimental-CSV self-service entry (`user_tools/` + example case)
+* [x] Graphite half-cell line, Phase A: SINTEF graphite R2032 → zero-fit SPM chain
+* [ ] Graphite Phase B/C: OCP + GITT extraction, geometry-matched parameter set
 
 ---
 
@@ -311,6 +313,11 @@ baseline（RMSE 104.29 mV）→ 预期结果已固化在 `result/`。
 化学体系显式注册表：`configs/chemistry.yaml` —— 化学体系 → 正负极/电解液/
 电池形式/参数集 + 溯源等级（A-exact / B-compatible_surrogate），可直接对接
 文献抽取输出（如 `NMC811||graphite`）。
+
+石墨半电池（Phase A）：`python run_pipeline.py baseline --dataset sintef_graphite --model SPM`
+—— SINTEF graphite R2032 半电池 p-OCV 脱锂支的 zero-fit replay。
+注意其 RMSE 由参考参数集与目标电芯的**尺度失配**主导（面积 55.8×），
+只作通路验证，见 `docs/graphite_platform_integration_plan.md`。
 
 > 措辞约定：surrogate 参数集结果为**代理基线**，不称 validation；
 > baseline 为 **zero-fit**，不称 fitting。

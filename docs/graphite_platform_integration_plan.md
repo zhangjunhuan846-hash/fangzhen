@@ -1,0 +1,319 @@
+# 石墨半电池接入：代码审计与实现计划（Step 1，只审计不编码）
+
+日期：2026-09-10
+范围：`run_pipeline.py`、`battery_sim/`、`configs/`、`tests/`、`outputs/`
+目标链路：`dataset → chemistry → parameter extraction → PyBaMM → evaluation`（石墨负极半电池优先）
+
+---
+
+## 1. 当前架构理解
+
+平台是**三层 + 注册表**结构，扩展方式是"新增文件 + 声明式配置"，不是改代码：
+
+```
+configs/*.yaml（声明）
+      ↓  registry.py 按命名约定解析
+battery_sim/datasets/<adapter>.py     纯数据 I/O（禁止 import pybamm）
+      ↓  返回 canonical DataFrame（time_s/current_A/voltage_V/capacity_Ah/temperature）
+battery_sim/simulation/*.py           开环 replay（zero-fit）
+      ↓  models/pybamm_factory.py（建模 + 参数集加载）
+      ↓  evaluation/{metrics,plotting}.py
+outputs/platform/<dataset>/<task>/<MODEL>/cell<cell>/
+```
+
+### 1.1 已有模块职责
+
+| 模块 | 职责 | 冻结 |
+|---|---|---|
+| `run_pipeline.py` | CLI 入口；`--config` YAML、位置参数 task、`--mode` | 可扩展（已支持 YAML 合并） |
+| `battery_sim/registry.py` | `dataset_id → adapter` 解析（`battery_sim.datasets.<adapter>` + `PascalCase(adapter)+Adapter`） | ✅ 不改 |
+| `battery_sim/config.py` | 读 `configs/*.yaml`（datasets/models/sensitivity） | ✅ 不改 |
+| `battery_sim/schemas.py` | `DatasetConfig` 数据类 + 必填字段校验（`extra` 承载数据集专属块） | ✅ 不改 |
+| `battery_sim/paths.py` | `ROOT` / 输出目录约定 | ✅ 不改 |
+| `battery_sim/rates.py` | rate 归一化：`c_rate`（机器主键）/`rate_label`/`rate_slug`/`source_rate`/`legacy_rate` | ✅ 不改 |
+| `battery_sim/datasets/base.py` | `BatteryDatasetAdapter` 接口（抽象基类） | ✅ 不改 |
+| `battery_sim/datasets/*.py` | 5 个现有 adapter（chen2020 / calce_cs2 / calce_20r / calce_a123 / birmingham_ncm920305） | ✅ 不改（但**可以新增同目录文件**） |
+| `battery_sim/simulation/{baseline,benchmark,reproduction,sensitivity}.py` | 四个 runner | ✅ 不改 |
+| `battery_sim/models/pybamm_factory.py` | `build_model` / `build_model_options` / `load_parameter_values`；半电池走 `{"working electrode": "negative"}` | ✅ 不改 |
+| `battery_sim/models/parameter_sources.py` | **外部参数集注册表**（`EXTERNAL_PARAMETER_SETS`）+ 直接模块导入 | ⚠️ 注册表条目可追加（需批准） |
+| `battery_sim/evaluation/*` | 指标 + 绘图 | ✅ 不改 |
+| `configs/datasets.yaml` | 数据集注册表（含半电池一等配置块） | ⚠️ 可追加条目 |
+| `configs/chemistry.yaml` | 化学体系显式层（化学体系→电极/电解液/参数集/等级） | ⚠️ 可追加条目 |
+| `tests/` | 98 项回归门 | 只新增 |
+
+### 1.2 关键发现（审计结论）
+
+1. **`base.py` 声明的接口与 runner 实际调用不完全一致**：
+   `base.py` 定义 `load_discharge()`，但 `simulation/baseline.py` 实际调用的是
+   **`load_processed_discharge(cell, rate)`**（鸭子类型，未在基类中声明）。
+   新 adapter 必须实现该方法，否则 baseline 跑不通。
+2. **`df.attrs` 是隐式契约**（决定初始化与溯源）：
+   - `df.attrs["provenance"]`（可含 `initial_state`、温度来源、source_file…）
+   - `df.attrs["initialisation"]`（可选）：`method ∈ {initial_soc, fixed_initial_concentration}`
+   - `df.attrs["initial_soc"]`（full-cell 路径）
+3. **baseline 会强制抽稀到 2000 点**（`_filter_and_downsample`），但**抽稀发生在 df 之后** →
+   adapter 若把 9100 万行读进内存会直接 OOM。**抽稀必须在 adapter 内完成**。
+4. **输出目录约定**：`outputs/platform/<dataset_id>/<task>/<MODEL>/cell<cell>/`，
+   并写 `metrics.csv` / `run_metadata.json` / `<rate_slug>_time_aligned.csv` / `<rate_slug>_Vt.png`。
+   这与用户目标的 `results/{voltage_fit.csv, voltage_fit.png, parameter_summary.json, report.md}`
+   **不一致**——见 §7 的产物映射方案。
+5. **半电池是一等配置**：`cell_configuration: half_cell` + `working_electrode: positive|negative`
+   + `counter_electrode` + `model_options` 已在 datasets.yaml 与
+   `build_model_options("half_cell_negative", ...)` 中支持 → **石墨半电池（工作电极=负极）无需改工厂代码**。
+6. **参数集加载有两条路**：PyBaMM 内置名（直接 `ParameterValues(name)`）与
+   `parameter_sources` 注册的外部仓库集合。**PyBaMM 内置 `Ecker2015_graphite_halfcell`
+   可直接按名加载**（已验证存在于 `pybamm.parameter_sets`）。
+
+---
+
+## 2. 数据流
+
+### 2.1 现有（命令级 / CC / 动态）
+```
+--dataset + --model + --cell + --rate
+  → registry.get_dataset_config → DatasetConfig
+  → registry.get_dataset      → Adapter(config)
+  → adapter.rate_info(rate)   → c_rate/rate_slug/source_rate
+  → adapter.load_processed_discharge(cell, rate) → DataFrame + attrs
+  → baseline._run_one_replay  → pybamm.Simulation（实测电流作 Interpolant）
+  → metrics + time_aligned.csv + Vt.png + run_metadata.json
+```
+
+### 2.2 新增（石墨半电池）——目标数据流
+```
+SINTEF .parquet / DLR .txt（只读）
+  → [新 adapter]  → canonical DataFrame（含 window/分支语义 + attrs 溯源）
+  → [新 extraction/]  → graphite_ocp.csv（双支）+ graphite_diffusion.csv（D_s vs SOC）
+  → [新 parameters/]  → parameter_set.json（有效/表观参数 + 来源）
+  → 回接 runner（先用 PyBaMM 内置 Ecker2015_graphite_halfcell 做 zero-fit）
+  → outputs/... + report.md
+```
+
+---
+
+## 3. 插入点分析（与你的目标目录的差异）
+
+| 你的提议 | 仓库实际 | 建议 | 理由 |
+|---|---|---|---|
+| `battery_sim/adapters/` | ❌ 不存在；现为 `battery_sim/datasets/` | ✅ **新 adapter 放 `battery_sim/datasets/`**（新增文件，不改任何现有文件） | `registry.py` 硬编码了 `battery_sim.datasets.<adapter>` 路径 + 类名约定；换目录必须改 registry（违反冻结） |
+| `battery_sim/extraction/` | ❌ 不存在 | ✅ **顶层 `extraction/`**（新包） | `battery_sim/` 冻结；顶层已有 `user_tools/`、`analysis/` 先例；提取属数据分析，不属仿真内核 |
+| `battery_sim/parameters/` | ❌ 不存在 | ✅ **顶层 `parameters/`**（新包） | 同上；参数构建也不属仿真内核 |
+
+**一句话**：adapter 必须进 `battery_sim/datasets/`（因为注册表按约定解析），
+而 extraction / parameters 应放顶层新包（因为核心不可动）。
+
+---
+
+## 4. 新 adapter 的接口契约（必须实现）
+
+| 成员 | 用途 | 备注 |
+|---|---|---|
+| `get_metadata() -> dict` | 数据集元数据 | 含 chemistry / cell_configuration / 温度来源 |
+| `list_cells()` / `list_rates()` | CLI 枚举 | cell = 电芯 id；rate = 程序 id |
+| `rate_info(rate)` | 归一化 rate | 继承基类即可，需提供 `SOURCE_TO_CANONICAL` |
+| `load_raw(cell) -> DataFrame` | 原始（规范列） | 大文件必须**流式 + 抽稀** |
+| **`load_processed_discharge(cell, rate)`** | **runner 真正调用的方法** | 返回 canonical 列 + `attrs` |
+| `get_initial_state(cell)` | 初始 OCV | 半电池给 rest OCV |
+| `get_ambient_temperature(cell)` | 环境温度 | SINTEF 无温度列 → config 声明 |
+
+### 4.1 SINTEF 适配要点（已审计）
+- 窗口定义：p-OCV 的**脱锂段**（+43.28 µA，0.01 → 1.0 V）对应平台语义的 `discharge`
+  （半电池"放电"= 脱锂）；**锂化段 = charge**；两段都保留为独立 rate
+- 分支识别：`Step Index` + 电流符号（step2 = 锂化，step4 = 脱锂，step3/5 = 静置）
+- 符号：SINTEF 负电流 = 锂化 = 平台 canonical 的"充电（负）"→ **与平台符号一致，无需翻转**
+  （与 Birmingham 相反，需在 provenance 里写明）
+- 采样：8 Hz、91 M 行、121 天 → 必须流式抽稀（建议按时间或按点数抽稀，目标 ≤ 5k 点/窗口）
+- 温度：文件无温度列 → 由 `datasets.yaml` 声明 RT 并记录来源等级
+- 溯源：`file_sha256`（340 MB 全量哈希约 1 s，建议缓存），metadata.csv 提供
+  直径/厚度/载量/面容量/活性物质占比
+
+### 4.2 DLR 适配要点（待补审计）
+- 解析：跳过 `~` 头行，空白分隔，按列位取值；`Time[h] → time_s`
+- 单位：`Ah/kg` 需**活性物质质量**才能换 Ah（质量来源待确认）
+- 段识别：`Command` / `State` 列（含 Pause 等）
+- **符号约定待实测确认**（I>0 的物理含义）
+- 名称 `Hydra.0b_A` + `Testchannel #12` → 需确认是单电芯还是多通道测试台
+
+---
+
+## 5. 参数集接线方案（三选一）
+
+| 方案 | 做法 | 是否改 battery_sim | 建议 |
+|---|---|---|---|
+| **A** | 用 PyBaMM 内置 `Ecker2015_graphite_halfcell` 作 zero-fit 参比：只加 adapter + `datasets.yaml` 条目 | **零改动** | ✅ **先做这个，打通链路** |
+| **B** | 生成的 `parameter_set.json` 接回 runner：在 `parameter_sources.EXTERNAL_PARAMETER_SETS` 追加一条（注册表，非科学逻辑） | 改 1 个 dict（需批准） | Phase D 再做 |
+| **C** | 新包内自带 runner，复用 `pybamm_factory` + `evaluation` | 零改动 | 备选（产物格式更自由） |
+
+---
+
+## 6. 实现计划（分阶段，每阶段带最小测试）
+
+> 原则：每阶段结束跑 `python -m pytest tests -q`（当前 **98 passed**），且新增测试**不依赖 13 GB 数据目录**
+> （用 `tmp_path` 造微型 parquet / txt fixture）。
+
+### Phase A — SINTEF adapter（最小闭环）
+- 新增：`battery_sim/datasets/sintef_graphite.py`（类 `SintefGraphiteAdapter`）
+- 追加：`configs/datasets.yaml` 条目（half_cell / working_electrode=negative /
+  counter=lithium_metal / 参数集 `Ecker2015_graphite_halfcell` / 温度块 / 溯源块）
+- 追加：`configs/chemistry.yaml` 增 `Graphite_LiMetal`
+- 测试：`tests/test_sintef_graphite.py`（合成小 parquet：验证列映射、符号、窗口识别、抽稀、attrs 溯源）
+- 验收：`python run_pipeline.py baseline --dataset sintef_graphite --model SPM --cell <id>`
+  跑通并产出 metrics.csv（**数值不设阈值**，只验通路与语义）
+
+### Phase B — 参数提取
+- 新增：`extraction/ocp_extractor.py`（p-OCV 双支 → `graphite_ocp.csv`：SOC, Voltage, branch）
+- 新增：`extraction/gitt_extractor.py`（GITT → `graphite_diffusion.csv`：SOC, D_eff, 拟合质量；
+  用 `pybop.GITTFit`/`GITTPulseFit`）
+- 测试：合成 GITT 波形（已知 D 的人造响应）验证提取器方向正确；名称强制
+  `effective_diffusivity` / `apparent`
+- 验收：输出两份 CSV + 每脉冲拟合 R² 记录；**不产生"材料常数"表述**
+
+### Phase C — 参数构建
+- 新增：`parameters/graphite_parameter_builder.py` → `parameter_set.json`
+  （maximum concentration / particle radius / diffusivity function / OCP function / loading）
+- 测试：JSON schema 校验 + 每个值必须带 `source` 字段（不许出现无来源数字）
+- 验收：生成的文件可被 `pybamm.ParameterValues(dict)` 成功加载
+
+### Phase D — Pipeline 集成
+- 选项 B（注册表追加）或 C（独立 runner）
+- 新增：`run_pipeline.py` 无需改动（用 `--config` + 新数据集条目）
+- 验收：`python run_pipeline.py --dataset sintef_graphite --model SPM` 一条命令产出
+  `voltage_fit.csv / voltage_fit.png / parameter_summary.json / report.md`
+  （产物映射见 §7）
+- 之后扩展 DFN
+
+### Phase E — 报告与 Gate
+- 新增：`report.md` 生成（含 provenance、匹配等级、措辞表）
+- Gate 复核（数据可用性，非 RMSE 竞赛）：G1 平行样 / G3 OCP 双支 / G4 GITT 拟合质量 /
+  G6 验证集不参与拟合
+
+---
+
+## 7. 产物与既有输出规范的映射（需你拍板）
+
+| 你要求 | 平台现有 | 建议做法 |
+|---|---|---|
+| `voltage_fit.csv` | `<rate_slug>_time_aligned.csv` | 直接用现有文件（同义），不再另造一份 |
+| `voltage_fit.png` | `<rate_slug>_Vt.png` | 同上 |
+| `parameter_summary.json` | `run_metadata.json` + `<rate_slug>_parameter_mapping.json` | **新增** `parameter_summary.json`（仅石墨数据集写） |
+| `report.md` | 无（现为 docs/ 手工报告） | **新增**，由新包生成，写入 `outputs/platform/<dataset>/.../report.md` |
+
+即：**不破坏现有输出格式**（四个冻结数据集输出不变），只对石墨数据集**追加**两个文件。
+
+---
+
+## 8. 冻结边界清单
+
+**可以新增（不改现有文件）**
+- `battery_sim/datasets/sintef_graphite.py`、`battery_sim/datasets/dlr_graphite.py`
+- 顶层 `extraction/`、`parameters/` 新包
+- `tests/test_sintef_graphite.py`、`tests/test_dlr_graphite.py`、`tests/test_extraction.py`
+- `docs/*.md`
+
+**可以追加条目（既有文件，但属注册表/声明，非科学逻辑——需你批准）**
+- `configs/datasets.yaml`、`configs/chemistry.yaml`
+- `battery_sim/models/parameter_sources.py` 的 `EXTERNAL_PARAMETER_SETS`（Phase D，若走方案 B）
+
+**不可修改**
+- `battery_sim/simulation/*`、`battery_sim/evaluation/*`、`battery_sim/models/pybamm_factory.py`
+- `battery_sim/registry.py`、`schemas.py`、`config.py`、`rates.py`、`paths.py`
+- `battery_sim/datasets/base.py` 与现有 5 个 adapter
+- 现有 98 项测试
+
+---
+
+## 9. 风险与待确认决策（5 条）
+
+1. **目录方案**：接受"adapter 进 `battery_sim/datasets/` + 顶层 `extraction/`、`parameters/`"吗？
+   （若坚持 `battery_sim/adapters/`，必须改 registry，等于解冻）
+2. **第一个参比**：Phase A 先用 `Ecker2015_graphite_halfcell` 做 zero-fit（推荐），
+   还是等自建参数集就绪再跑？
+3. **窗口语义**：baseline 的 `discharge` 用 SINTEF 的**脱锂支**（推荐）还是锂化支？
+4. **温度声明**：SINTEF 无温度列，记 25 ℃（目录声明 RT）是否接受？
+5. **大文件策略**：`file_sha256` 全量哈希（慢但强）vs 头尾抽样哈希（快但弱）？
+
+---
+
+## 10. 不变量检查表（新代码必须遵守）
+
+- [ ] `battery_sim/` 科学逻辑零改动；改动仅限 §8 的"可追加"项
+- [ ] 回归门 ≥ 98 passed
+- [ ] adapter 不 import pybamm
+- [ ] 每个输出带 provenance（文件、单位换算、rate 归一化、符号约定）
+- [ ] 参数一律标注 `effective` / `apparent`，不得称"材料本征参数"
+- [ ] zero-fit 与参数辨识分阶段，辨识集/验证集分离
+- [ ] 大文件流式读取，抽稀后入库；原始数据只读不写
+
+---
+
+# Phase A 执行记录（2026-09-10）
+
+状态：**完成**。目标链路已跑通：`run_pipeline.py` 调用 SINTEF 石墨数据 → zero-fit SPM 仿真 → 输出。
+`battery_sim/` 科学核心零改动（`registry.py` / `simulation/` / `evaluation/` /
+`pybamm_factory.py` / `rates.py` 均未修改）。
+
+## 落地内容
+
+| 文件 | 说明 |
+|---|---|
+| `battery_sim/datasets/sintef_graphite.py` | **新增**：SintefGraphiteAdapter（流式读取 + 抽稀、规则化分支识别、逆 OCP 初始化、完整溯源） |
+| `configs/datasets.yaml` | **追加** `sintef_graphite` 条目（半电池一等配置 + 温度声明 + 尺度警告 + rate 表） |
+| `configs/chemistry.yaml` | **追加** `Graphite_LiMetal`（含槽位约定说明） |
+| `external/pybamm-input-data/graphite_ocp_Ecker2015.csv` | **新增（vendored）**：PyBaMM 石墨 OCP 表，供逆 OCP 使用（BSD-3，README 记录来源与 sha256） |
+| `tests/test_sintef_graphite.py` | **新增** 17 项测试（合成 parquet fixture，不依赖真实数据目录；2 项在真实数据存在时额外校验审计事实） |
+
+## 关键实现决定（与计划的对应）
+
+1. **槽位约定**：`Ecker2015_graphite_halfcell` 把石墨放在**正极槽位**（正极 OCP = 石墨，
+   负极 OCP = 0 V + Li 金属动力学）。因此 `working_electrode: "positive"` 是 **PyBaMM 槽位**，
+   物理工作电极另由 `physical_working_electrode: "graphite_negative"` 记录。
+   （审计中修正了原计划里写 `negative` 的错误。）
+2. **rate 表放在 adapter 内**：C/50 不在 `battery_sim/rates.py` 的 `CANONICAL_RATES` 中，
+   而该文件冻结 → adapter 通过覆盖 `rate_info()` 自带 rate 表（`configs/datasets.yaml`
+   的 `rates_meta`），未改任何现有文件。
+3. **符号**：SINTEF 原始符号与平台一致（负 = 充电/锂化），因此**保留原始符号**，
+   并在 provenance 中记录判定依据（负电流段驱动 3.0 V → 0.01 V = 锂化）。
+4. **容量列**：文件内 `Cumulative Capacity / Ah` 为**逐步累积**（与梯形积分交叉校验，
+   偏差 < 0.5%），直接使用并把两者都写入 provenance。
+5. **温度**：文件无温度通道 → `ambient_temperature_source =
+   declared_room_temperature_not_measured`（低于实测等级的显式标记）。
+6. **文件校验**：全量 SHA256（用户决定），每次加载写入 provenance。
+7. **内存**：两遍流式扫描（分类 → 取窗），`max_points` 抽稀，为 Phase B 的
+   9100 万行 GITT 文件预留。
+
+## 实测结果（zero-fit，未做任何拟合）
+
+| 指标 | 值 |
+|---|---|
+| 窗口 | p-OCV cycle 1，静置段 tail(60 s) + 脱锂段（step 4） |
+| 窗口时长 | 148 521 s ≈ 41.3 h |
+| 实测支路电荷 | 1.785 mAh（容量列） vs 1.785 mAh（积分）✓ |
+| rest OCV → x0 | 0.0824 V → x0 = 0.9640（逆 OCP） |
+| RMSE(t) | **151.36 mV** |
+| MAE(t) / bias(t) | 100.00 / −100.00 mV |
+| coverage | 1.00 |
+| Q_exp / Q_sim | 0.001785 / 0.001785 Ah（forced-current window） |
+
+## 结果解读（必须随数字一起引用）
+
+残差是**尺度伪影**，不是模型误差：
+
+| 时间 | V_exp | V_sim | residual |
+|---|---|---|---|
+| 0 s | 0.0824 V | 0.0801 V | −2.3 mV |
+| 末端 | 1.0000 V | 0.0785 V | −921.5 mV |
+
+实验电极被完全脱锂（0.01 → 1.0 V），而参考参数集的电极面积是它的 **55.8 倍**、
+面容量 **1.87 倍**，在**相同绝对电流**下模型看到的电流密度低 **~56 倍**，
+因此模型几乎不脱锂、电压几乎不动（0.080 → 0.079 V）。
+
+**禁止表述**："模型预测误差 151 mV" / "模型不适用石墨" / 任何 validation 措辞。
+**允许表述**："Phase A 通路验证通过；该 RMSE 由参考参数集与目标电芯的尺度失配主导，
+待 Phase C 生成几何匹配参数集后才有模型误差意义。"
+
+## Phase A 未做（按用户范围）
+
+- ❌ OCP / GITT 参数提取（Phase B）
+- ❌ 参数集构建与几何匹配（Phase C）
+- ❌ `parameter_summary.json` / `report.md` 产物（Phase D/E）
+- ❌ DLR adapter（Phase D）

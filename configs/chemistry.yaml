@@ -69,6 +69,25 @@ LFP_Graphite:
     Half-cell LFP||Li work (SINTEF R2032) is tracked separately
     in the H1 line with Jackowska2025_2mAh_cm2.
 
+Graphite_LiMetal:
+  description: "graphite || Li metal half cell (graphite working electrode)"
+  positive_electrode: "graphite"
+  negative_electrode: "Li metal"
+  electrolyte: "LiPF6"
+  cell_form: "half_cell"
+  default_parameter_set: "Ecker2015_graphite_halfcell"
+  parameter_set_grade: "B-compatible_surrogate"
+  notes: >
+    PyBaMM built-in graphite half-cell reference set.  NOTE the slot
+    convention: this set stores the graphite in the POSITIVE
+    electrode slots (positive OCP = graphite_ocp_Ecker2015, negative
+    OCP = 0 V with lithium-metal kinetics), so the platform declares
+    working_electrode = "positive" (PyBaMM slot) while the physical
+    working electrode is the graphite negative electrode.
+    Phase A (SINTEF graphite R2032) uses it as a ZERO-FIT reference;
+    it is NOT fitted to the user's graphite and its electrode scale
+    differs by ~56x in area - see configs/datasets.yaml.
+
 # ---- Literature-agent mapping examples ----
 # "NMC811||graphite"          -> NMC_Graphite
 # "LCO||graphite"             -> LCO_Graphite

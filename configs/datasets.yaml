@@ -427,3 +427,129 @@ calce_a123:
       structurally different.  Each dynamic window starts from
       the protocol's own full charge (nominal SOC 1.0) with the
       preceding history NOT replayed.
+
+# ------------------------------------------------------------
+# Phase A (graphite line): SINTEF graphite R2032 || Li half cell
+#
+# Source: SINTEF open battery dataset catalog for pipeline /
+# workflow-automation testing (Zenodo 10.5281/zenodo.18214281).
+# Raw = one .parquet per (cell, programme); the file stem carries
+# the cell's BDF id.  Cell 4ccc47 = the room-temperature p-OCV
+# programme used in Phase A; the sibling files 677295 (p-ocv-hold),
+# 063b77 (GITT) and 3f39a2 (GITT-hold) are wired in Phases B/D.
+#
+# Half cell is a FIRST-CLASS configuration (never guessed):
+#   physical working electrode = graphite (negative electrode of a
+#   real full cell) BUT the built-in reference set
+#   `Ecker2015_graphite_halfcell` stores the graphite in the
+#   POSITIVE electrode slots (positive OCP = graphite_ocp_Ecker2015,
+#   negative OCP = 0 V + lithium-metal kinetics; audited 2026-09-10).
+#   working_electrode below is therefore the PyBaMM SLOT, and
+#   physical_working_electrode records the physical meaning.
+#
+# Phase A = ZERO-FIT reference replay only.  No extraction, no
+# fitting.  Scale caveat (audited): the reference set describes
+# 85.85 cm2 / ~202 mAh (declared 156.25 mAh) while this coin cell
+# is 1.54 cm2 / ~2.16 mAh nominal -> per-area capacity ratio ~1.9x
+# and absolute current-density ratio ~56x, so the replay RMSE is
+# dominated by the scale mismatch until a geometry-matched
+# parameter set is built (Phase C).  Nothing is rescaled here.
+# ------------------------------------------------------------
+sintef_graphite:
+  name: "SINTEF graphite R2032 (Graphite||Li half cell, p-OCV)"
+  ion: "Li"
+  chemistry: "Graphite_LiMetal"
+
+  raw_dir: "data"
+
+  adapter: "sintef_graphite"
+  protocol: "sintef_graphite_pocv"
+
+  # ---- half-cell first-class configuration (physical vs slot) ----
+  cell_configuration: "half_cell"
+  working_electrode: "positive"              # PyBaMM slot holding graphite
+  physical_working_electrode: "graphite_negative"
+  counter_electrode: "lithium_metal"
+  model_options: {}
+
+  # ---- window selection ----
+  # delithiation branch of p-OCV cycle 1 (user decision 2026-09-10);
+  # the pre-branch rest tail (60 s) is kept so the replay opens at
+  # the measured equilibrium.
+  window_cycle: 1
+  max_points: 20000
+
+  # initialisation: measured pre-branch rest OCV inverted on the
+  # vendored graphite OCP table (the same table PyBaMM interpolates)
+  initialisation_method: "inverse_ocp"
+  initialisation_ocp_file_rel: "external/pybamm-input-data/graphite_ocp_Ecker2015.csv"
+
+  # catalog metadata (electrode properties per cell)
+  metadata_csv_rel: "data/metadata.csv"
+
+  # ---- parameter set: PyBaMM built-in zero-fit reference ----
+  parameter_set: "Ecker2015_graphite_halfcell"
+
+  # ---- dataset-declared rate table ----
+  # C/50 is NOT in battery_sim/rates.py CANONICAL_RATES (frozen), so
+  # the adapter carries this table itself instead of the file being
+  # modified.  c_rate declared from the catalog nominal areal
+  # capacity (1.4049 mAh/cm2) x electrode area (1.539 cm2 = 2.162 mAh);
+  # the adapter also records the value measured from the data.
+  rates_meta:
+    pOCV:
+      programme: "p-ocv"
+      branch: "delithiation"
+      c_rate: 0.02
+      rate_label: "C/50 (p-OCV delithiation)"
+      rate_slug: "pOCV"
+      legacy_rate: "pOCV"
+
+  cells:
+    - "4ccc47"
+
+  rates:
+    - "pOCV"
+
+  supported_models:
+    - "SPM"
+    - "SPMe"
+    - "DFN"
+
+  nominal_capacity_Ah: 0.002162
+
+  lower_voltage_cutoff_V: 0.01
+  upper_voltage_cutoff_V: 1.0
+
+  raw_file_template: "sintef__sintef-graphite-R2032-intelligent-{cell}__*__{programme}__RT.bdf.parquet"
+
+  ambient_temperature:
+    value_C: 25.0
+    source: "declared_room_temperature_not_measured"
+    confidence: low
+    note: >
+      The parquet files carry no temperature channel.  The catalog
+      labels the programme "RT" (room temperature) and the SINTEF
+      cell metadata contains no temperature record, so 25 C is a
+      DECLARED value, not a measurement.  Any temperature-dependent
+      conclusion must be re-measured.
+
+  parameter_match:
+    level: compatible_surrogate
+    grade: B
+    parameter_set: Ecker2015_graphite_halfcell
+    experimental_cell: "Graphite || Li metal, R2032 coin cell, 14 mm disc, 64 um, 1.40 mAh/cm2 (catalog id 4ccc47, label Gr-AQ-1)"
+    fitted_to_dataset: false
+    notes: >
+      PyBaMM BUILT-IN reference set (not fitted to this dataset).
+      Same chemistry class (graphite || Li metal) but a different
+      cell: the set describes an 85.85 cm2 electrode with a
+      per-area capacity of ~2.36 mAh/cm2 (declared nominal 156.25 mAh)
+      against 1.54 cm2 / ~1.40 mAh/cm2 here.  Consequences, recorded
+      rather than hidden: (a) at the same absolute current the model
+      sees ~56x lower current density, (b) the model stores ~1.9x
+      more Li per cm2, so the replayed branch covers only ~1 % of the
+      model capacity.  The Phase A zero-fit RMSE is therefore a SCALE
+      ARTEFACT, reported for chain validation only - never as model
+      error, never as validation.  Geometry-matched parameters are
+      Phase C work.
