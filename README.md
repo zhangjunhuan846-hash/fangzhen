@@ -202,7 +202,7 @@ python run_pipeline.py baseline --dataset chen2020 --model SPMe --cell 02
 ├── user_tools/            # 自助入口：实验 CSV → 校验 → zero-fit baseline
 ├── outputs/               # Simulation results
 ├── external/              # Vendored upstream parameter-set repo (BSD-3)
-├── tests/                 # Regression tests (229 passed gate)
+├── tests/                 # Regression tests (241 passed gate)
 └── README.md
 ```
 
@@ -240,7 +240,7 @@ run_metadata.json
 * [x] Baseline simulation
 * [x] Sensitivity analysis
 * [x] Result tracking
-* [x] Regression testing (229 tests)
+* [x] Regression testing (241 tests)
 * [x] Experimental-CSV self-service entry (`user_tools/` + example case)
 * [x] Graphite half-cell line, Phase A: SINTEF graphite R2032 → zero-fit SPM chain
 * [x] Graphite Phase A.5: geometry-aware zero-fit (measured electrode geometry)
@@ -250,7 +250,8 @@ run_metadata.json
 * [x] Graphite Phase B1: GITT segmentation + apparent D_s(SOC) (consistency-checked)
 * [x] Graphite Phase B2: D_s diagnostics + constant-D sensitivity (when is it a valid model input)
 * [x] Graphite Phase B0.7: initial-state / window-start correction (lith 44.7 -> 1.6 mV)
-* [ ] Graphite Phase B1.5: porous-electrode correction so the GITT D_s becomes usable
+* [x] Graphite Phase B1.5: GITT pulse overpotential budget (why the D_s is biased)
+* [ ] Graphite Phase B1.6: two-term sqrt(t) re-inversion of the whole D_s table
 
 ---
 

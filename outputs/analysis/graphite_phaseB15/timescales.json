@@ -1,0 +1,21 @@
+{
+  "L_m": 6.4e-05,
+  "porosity": 0.329,
+  "bruggeman": 1.6372789338386007,
+  "tau_pulse_s": 1799.9800000000105,
+  "tau_solid_at_reference_D_s": 15396.626052657753,
+  "tau_solid_at_the_gitt_median_D_s": 496235.4023415017,
+  "electrolyte_tau_note": "tau_electrolyte is NOT estimated: the reference set defines D_e via the electrolyte conductivity as a function of c_e, so it cannot be evaluated outside a model context.  The electrolyte's contribution is measured directly instead (dE_electrolyte_mV and dc_e_relative).",
+  "note": "tau_solid uses R from the reference set (not measured of this material) - a systematic caveat",
+  "electrolyte_diffusivity_m2_s": NaN,
+  "electrolyte_eff_diffusivity_m2_s": NaN,
+  "tau_electrolyte_s": NaN,
+  "Fo_pulse_over_tau_solid_at_reference_D_s": 0.11690743113744062,
+  "Fo_pulse_over_tau_solid_at_the_gitt_median_D_s": 0.003627270427516357,
+  "Fo_pulse_over_tau_electrolyte_s": NaN,
+  "gitt_median_D_s_m2_s": 3.7822775060864065e-16,
+  "particle_radius_m": 1.37e-05,
+  "electrode_thickness_m": 6.4e-05,
+  "particle_radius_source": "reference set (NOT measured for this material)",
+  "porosity_source": "reference set (NOT measured); the catalog does not report porosity"
+}
