@@ -1,0 +1,135 @@
+{
+  "cell": "4ccc47",
+  "variants": [
+    {
+      "variant": "lithiation",
+      "parameter_set_id": "sintef_graphite_ocp_lith_v1",
+      "reference_parameter_set": "Ecker2015_graphite_halfcell",
+      "geometry_parameter_set_id": "sintef_graphite_geometry_v1",
+      "ocp_source": "measured lithiation branch of the SINTEF p-OCV",
+      "ocp_table_points": 1707,
+      "ocp_soc_range": [
+        0.0,
+        1.0
+      ],
+      "ocp_voltage_range_V": [
+        0.0099927252,
+        3.0002844334
+      ],
+      "ocp_extrapolation": "pybamm linear Interpolant extrapolates linearly outside [0.000, 1.000]",
+      "kept_unchanged": [
+        "Positive particle diffusivity [m2.s-1]",
+        "Positive electrode exchange-current density [A.m-2]",
+        "Maximum concentration in positive electrode [mol.m-3]",
+        "Positive electrode porosity",
+        "Positive particle radius [m]"
+      ],
+      "voltage_window_override": {
+        "Lower voltage cut-off [V]": 0.005,
+        "Upper voltage cut-off [V]": 3.2,
+        "reason": "the reference set carries Ecker's own 0-1.5 V window; the measured programme spans 0.01-1.0 V with the fresh cell at ~3.0 V, so the published bounds must be replaced or the upper-voltage event fires at t=0"
+      },
+      "geometry_override": {
+        "Electrode height [m]": 0.013524592868773139,
+        "Electrode width [m]": 0.011382083107383334,
+        "Positive electrode thickness [m]": 6.4e-05,
+        "Positive electrode active material volume fraction": 0.26121752979470236,
+        "Nominal cell capacity [A.h]": 0.0022016583309734375
+      },
+      "geometry_scale_ratios": {
+        "area_ratio_reference_over_measured": 55.769191283425386,
+        "thickness_ratio": 1.15625,
+        "per_area_capacity_ratio": 1.2725526400702516
+      },
+      "wording": "reference diffusivity/kinetics + measured geometry + experiment-derived PSEUDO-OCP; nothing fitted to any voltage; NOT validation"
+    },
+    {
+      "variant": "delithiation",
+      "parameter_set_id": "sintef_graphite_ocp_deli_v1",
+      "reference_parameter_set": "Ecker2015_graphite_halfcell",
+      "geometry_parameter_set_id": "sintef_graphite_geometry_v1",
+      "ocp_source": "measured delithiation branch of the SINTEF p-OCV",
+      "ocp_table_points": 1568,
+      "ocp_soc_range": [
+        0.0812458303937023,
+        1.0
+      ],
+      "ocp_voltage_range_V": [
+        0.0966956839,
+        1.0000014305
+      ],
+      "ocp_extrapolation": "pybamm linear Interpolant extrapolates linearly outside [0.081, 1.000]",
+      "kept_unchanged": [
+        "Positive particle diffusivity [m2.s-1]",
+        "Positive electrode exchange-current density [A.m-2]",
+        "Maximum concentration in positive electrode [mol.m-3]",
+        "Positive electrode porosity",
+        "Positive particle radius [m]"
+      ],
+      "voltage_window_override": {
+        "Lower voltage cut-off [V]": 0.005,
+        "Upper voltage cut-off [V]": 3.2,
+        "reason": "the reference set carries Ecker's own 0-1.5 V window; the measured programme spans 0.01-1.0 V with the fresh cell at ~3.0 V, so the published bounds must be replaced or the upper-voltage event fires at t=0"
+      },
+      "geometry_override": {
+        "Electrode height [m]": 0.013524592868773139,
+        "Electrode width [m]": 0.011382083107383334,
+        "Positive electrode thickness [m]": 6.4e-05,
+        "Positive electrode active material volume fraction": 0.26121752979470236,
+        "Nominal cell capacity [A.h]": 0.0022016583309734375
+      },
+      "geometry_scale_ratios": {
+        "area_ratio_reference_over_measured": 55.769191283425386,
+        "thickness_ratio": 1.15625,
+        "per_area_capacity_ratio": 1.2725526400702516
+      },
+      "wording": "reference diffusivity/kinetics + measured geometry + experiment-derived PSEUDO-OCP; nothing fitted to any voltage; NOT validation"
+    },
+    {
+      "variant": "mean",
+      "parameter_set_id": "sintef_graphite_ocp_mean_v1",
+      "reference_parameter_set": "Ecker2015_graphite_halfcell",
+      "geometry_parameter_set_id": "sintef_graphite_geometry_v1",
+      "ocp_source": "0.5 * (lithiation + delithiation) on the overlap grid",
+      "ocp_table_points": "400 (interpolated grid)",
+      "ocp_soc_range": [
+        0.0812458303937023,
+        1.0
+      ],
+      "ocp_voltage_range_V": [
+        0.0099927252,
+        3.0002844334
+      ],
+      "ocp_extrapolation": "pybamm linear Interpolant extrapolates linearly outside [0.081, 1.000]",
+      "kept_unchanged": [
+        "Positive particle diffusivity [m2.s-1]",
+        "Positive electrode exchange-current density [A.m-2]",
+        "Maximum concentration in positive electrode [mol.m-3]",
+        "Positive electrode porosity",
+        "Positive particle radius [m]"
+      ],
+      "voltage_window_override": {
+        "Lower voltage cut-off [V]": 0.005,
+        "Upper voltage cut-off [V]": 3.2,
+        "reason": "the reference set carries Ecker's own 0-1.5 V window; the measured programme spans 0.01-1.0 V with the fresh cell at ~3.0 V, so the published bounds must be replaced or the upper-voltage event fires at t=0"
+      },
+      "geometry_override": {
+        "Electrode height [m]": 0.013524592868773139,
+        "Electrode width [m]": 0.011382083107383334,
+        "Positive electrode thickness [m]": 6.4e-05,
+        "Positive electrode active material volume fraction": 0.26121752979470236,
+        "Nominal cell capacity [A.h]": 0.0022016583309734375
+      },
+      "geometry_scale_ratios": {
+        "area_ratio_reference_over_measured": 55.769191283425386,
+        "thickness_ratio": 1.15625,
+        "per_area_capacity_ratio": 1.2725526400702516
+      },
+      "wording": "reference diffusivity/kinetics + measured geometry + experiment-derived PSEUDO-OCP; nothing fitted to any voltage; NOT validation"
+    }
+  ],
+  "reference_baseline": {
+    "parameter_set_id": "Ecker2015_graphite_halfcell",
+    "note": "published reference OCP + reference geometry (Phase A)"
+  }
+}

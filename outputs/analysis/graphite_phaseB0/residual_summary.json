@@ -1,0 +1,454 @@
+{
+  "dataset": "sintef_graphite",
+  "cell": "4ccc47",
+  "model": "SPM",
+  "ocp_extraction": {
+    "soc_definition": "Q_ref = charge of the cycle's lithiation branch (canonical current > 0) from the fresh state to the lower cutoff; lithiation SOC = Q/Q_ref; delithiation SOC = 1 - |Q|/Q_ref",
+    "soc_reference_charge_mAh": 1.9424659492079026,
+    "branch_steps": {
+      "lithiation": 2,
+      "delithiation": 4
+    },
+    "n_points": {
+      "lithiation": 1707,
+      "delithiation": 1568
+    },
+    "voltage_range_V": {
+      "lithiation": [
+        0.0099927252,
+        3.0002844334
+      ],
+      "delithiation": [
+        0.0966956839,
+        1.0000014305
+      ]
+    },
+    "soc_range": {
+      "lithiation": [
+        0.0,
+        1.0
+      ],
+      "delithiation": [
+        0.08124583039370237,
+        1.0
+      ]
+    },
+    "hysteresis_proxy_mV": 115.26866435956568,
+    "hysteresis_at_soc_mV": {
+      "SOC_0.20": 134.7903315983059,
+      "SOC_0.50": 85.84017899815109,
+      "SOC_0.80": 64.73069588421906
+    },
+    "handover_voltage_gap_mV": 86.7029587,
+    "rest_ocv_after_lithiation_V": 0.0824394673,
+    "polarization_estimate_at_handover_mV": 14.256216599999997
+  },
+  "equilibrium_warning": "pseudo-OCP: extracted from a ~C/50 galvanostatic p-OCV with rests only at the branch endpoints. The curve therefore contains the C/50 polarisation (lithiation branch biased low, delithiation branch biased high) and is NOT a true equilibrium OCP. Using it as the model OCP double-counts that polarisation, so the replay residual is a conservative (pessimistic) estimate. Not a material constant: it is the measured quasi-equilibrium response of this electrode at the declared room temperature.",
+  "variants": {},
+  "windows": {
+    "lith": {
+      "phaseA": {
+        "parameter_set": "Ecker2015_graphite_halfcell",
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 875.752828973872,
+          "mae_mV": 867.9264940979941,
+          "bias_mV": 866.2826238118498,
+          "max_abs_mV": 1643.8702861443949,
+          "residual_std_mV": 128.4423338989038,
+          "residual_skew": -3.594919018302309,
+          "residual_quantiles_mV": {
+            "p05": 733.8638740026305,
+            "p25": 764.7460945111822,
+            "p50": 843.0898517458654,
+            "p75": 963.5389123966364,
+            "p95": 1072.3853164790917
+          },
+          "v_exp_start_V": 3.0160996914,
+          "v_exp_end_V": 0.0099927252,
+          "v_sim_start_V": 1.3722294052556052,
+          "v_sim_end_V": 0.752265930308581,
+          "v_exp_span_mV": 3006.1069662,
+          "v_sim_span_mV": 619.9634749470242,
+          "v_sim_span_ratio": 0.2062346689315304
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1812,
+            "mae_mV": 857.732737943771
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 169,
+            "mae_mV": 1000.5284619554537
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 18,
+            "mae_mV": 606.0048158477173
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 1,
+            "mae_mV": 1643.8702861443949
+          }
+        },
+        "x0_mapping": "adapter default (inverse-OCP on the reference table)"
+      },
+      "A5_reference": {
+        "parameter_set": "sintef_graphite_geometry_v1",
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 81.39077327076888,
+          "mae_mV": 67.8056894360799,
+          "bias_mV": 66.16181914993551,
+          "max_abs_mV": 1643.8702861443949,
+          "residual_std_mV": 47.40328744280226,
+          "residual_skew": -22.829568610297265,
+          "residual_quantiles_mV": {
+            "p05": 35.00100110378593,
+            "p25": 50.42614050936638,
+            "p50": 64.55791637129781,
+            "p75": 82.29530798869348,
+            "p95": 87.51595962434095
+          },
+          "v_exp_start_V": 3.0160996914,
+          "v_exp_end_V": 0.0099927252,
+          "v_sim_start_V": 1.3722294052556052,
+          "v_sim_end_V": 0.0832463064866601,
+          "v_exp_span_mV": 3006.1069662,
+          "v_sim_span_mV": 1288.983098768945,
+          "v_sim_span_ratio": 0.42878816797339053
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1812,
+            "mae_mV": 61.75463044504666
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 169,
+            "mae_mV": 105.8196211212353
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 18,
+            "mae_mV": 232.4779027834491
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 1,
+            "mae_mV": 1643.8702861443949
+          }
+        },
+        "x0_mapping": "adapter default (inverse-OCP on the reference table)"
+      },
+      "lithiation": {
+        "parameter_set": "sintef_graphite_ocp_lith_v1",
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 45.052851972863415,
+          "mae_mV": 7.751666516081372,
+          "bias_mV": 4.945288410808737,
+          "max_abs_mV": 1936.4661292024143,
+          "residual_std_mV": 44.78061626890214,
+          "residual_skew": -40.973555826439494,
+          "residual_quantiles_mV": {
+            "p05": 0.38605671554744997,
+            "p25": 2.0766480939053498,
+            "p50": 4.66801171139635,
+            "p75": 6.91973823362365,
+            "p95": 21.55361493415598
+          },
+          "v_exp_start_V": 3.0160996914,
+          "v_exp_end_V": 0.0099927252,
+          "v_sim_start_V": 1.0796335621975854,
+          "v_sim_end_V": 0.0415908558281207,
+          "v_exp_span_mV": 3006.1069662,
+          "v_sim_span_mV": 1038.042706369465,
+          "v_sim_span_ratio": 0.3453113006426541
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1812,
+            "mae_mV": 5.344792964185992
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 169,
+            "mae_mV": 17.81817229490301
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 18,
+            "mae_mV": 48.37949633426123
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 1,
+            "mae_mV": 1936.4661292024143
+          }
+        },
+        "x0_mapping": [
+          {
+            "variant": "lithiation",
+            "rest_ocv_V": 3.0160996914,
+            "x0": 0.001,
+            "x0_before_margin": 0.0,
+            "margin_applied": true,
+            "clamped_to_table_edge": true,
+            "table_soc_range": [
+              0.0,
+              1.0
+            ],
+            "table_voltage_range": [
+              0.0099927252,
+              3.0002844334
+            ]
+          }
+        ]
+      },
+      "verdict": {
+        "best_variant": "lithiation",
+        "control": "A5_reference (Ecker OCP + measured geometry)",
+        "rmse_delta_mV": -36.33792129790546,
+        "rmse_ratio": 0.553537583713361,
+        "rmse_phaseA_mV": 875.752828973872,
+        "span_ratio_before": 0.42878816797339053,
+        "span_ratio_after": 0.3453113006426541,
+        "region_mae_delta_mV": {
+          "V_exp<=0.15": -56.409837480860666,
+          "0.15<V_exp<=0.60": -88.0014488263323,
+          "0.60<V_exp<=1.43": -184.09840644918788,
+          "V_exp>1.43_outside_ref_table": 292.59584305801945
+        }
+      }
+    },
+    "deli": {
+      "phaseA": {
+        "parameter_set": "Ecker2015_graphite_halfcell",
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 150.05925543689233,
+          "mae_mV": 98.62621218318718,
+          "bias_mV": -98.62621218318718,
+          "max_abs_mV": 918.7561038004017,
+          "residual_std_mV": 113.09575771297277,
+          "residual_skew": -3.662720220748895,
+          "residual_quantiles_mV": {
+            "p05": -319.9344126883597,
+            "p25": -103.62184177641183,
+            "p50": -66.70441228412045,
+            "p75": -35.21869334070195,
+            "p95": -31.52675764716859
+          },
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 1.0000014305,
+          "v_sim_start_V": 0.0800975099516614,
+          "v_sim_end_V": 0.0812453266995982,
+          "v_exp_span_mV": 917.5975397,
+          "v_sim_span_mV": 1.1478167479368055,
+          "v_sim_span_ratio": 0.001250893445411889
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1128,
+            "mae_mV": 45.7137565608701
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 832,
+            "mae_mV": 142.75697134936394
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 40,
+            "mae_mV": 672.8376700760521
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        },
+        "x0_mapping": "adapter default (inverse-OCP on the reference table)"
+      },
+      "A5_reference": {
+        "parameter_set": "sintef_graphite_geometry_v1",
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 109.12307106829822,
+          "mae_mV": 61.86313988576123,
+          "bias_mV": -61.86313988576123,
+          "max_abs_mV": 803.5078921245839,
+          "residual_std_mV": 89.89325093048757,
+          "residual_skew": -4.647465183726342,
+          "residual_quantiles_mV": {
+            "p05": -219.2199942403379,
+            "p25": -55.56175172997975,
+            "p50": -33.8519925059339,
+            "p75": -27.658451392450498,
+            "p95": -24.154277120646903
+          },
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 1.0000014305,
+          "v_sim_start_V": 0.0800975099516614,
+          "v_sim_end_V": 0.196493538375416,
+          "v_exp_span_mV": 917.5975397,
+          "v_sim_span_mV": 116.3960284237546,
+          "v_sim_span_ratio": 0.12684867099993447
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1128,
+            "mae_mV": 31.195522786565473
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 832,
+            "mae_mV": 79.48909900526812
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 40,
+            "mae_mV": 560.0699923973386
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        },
+        "x0_mapping": "adapter default (inverse-OCP on the reference table)"
+      },
+      "delithiation": {
+        "parameter_set": "sintef_graphite_ocp_deli_v1",
+        "metrics": {
+          "n_points": 2000,
+          "rmse_mV": 91.86054587360371,
+          "mae_mV": 31.18627144192211,
+          "bias_mV": -30.868523103431347,
+          "max_abs_mV": 762.6939883231627,
+          "residual_std_mV": 86.51875039324932,
+          "residual_skew": -4.861491285979898,
+          "residual_quantiles_mV": {
+            "p05": -171.58585656929077,
+            "p25": -21.93600906835865,
+            "p50": -4.3865092393503495,
+            "p75": -0.7569598923195251,
+            "p95": 0.696259863597955
+          },
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 1.0000014305,
+          "v_sim_start_V": 0.1098097265948622,
+          "v_sim_end_V": 0.2373074421768373,
+          "v_exp_span_mV": 917.5975397,
+          "v_sim_span_mV": 127.49771558197509,
+          "v_sim_span_ratio": 0.13894731629692392
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1128,
+            "mae_mV": 2.3038157980815104
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 832,
+            "mae_mV": 46.8863998686683
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 40,
+            "mae_mV": 519.1088493219061
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        },
+        "x0_mapping": [
+          {
+            "variant": "delithiation",
+            "rest_ocv_V": 0.0824216753,
+            "x0": 0.999,
+            "x0_before_margin": 1.0,
+            "margin_applied": true,
+            "clamped_to_table_edge": true,
+            "table_soc_range": [
+              0.0812458303937023,
+              1.0
+            ],
+            "table_voltage_range": [
+              0.0966956839,
+              1.0000014305
+            ]
+          }
+        ]
+      },
+      "mean": {
+        "parameter_set": "sintef_graphite_ocp_mean_v1",
+        "metrics": {
+          "n_points": 1912,
+          "rmse_mV": 397.4243433098587,
+          "mae_mV": 144.1044228358185,
+          "bias_mV": 114.05583309886838,
+          "max_abs_mV": 2624.599694103576,
+          "residual_std_mV": 380.7064165356233,
+          "residual_skew": 3.1299258265922285,
+          "residual_quantiles_mV": {
+            "p05": -30.977541159562566,
+            "p25": -24.843798048993776,
+            "p50": -15.293846202106149,
+            "p75": -4.0501115723616,
+            "p95": 1193.9993684014212
+          },
+          "v_exp_start_V": 0.0824038908,
+          "v_exp_end_V": 0.4307555854,
+          "v_sim_start_V": 0.0824216753,
+          "v_sim_end_V": 3.055355279503576,
+          "v_exp_span_mV": 348.3516946,
+          "v_sim_span_mV": 2972.9336042035757,
+          "v_sim_span_ratio": 8.534287762306686
+        },
+        "region_mae_mV": {
+          "V_exp<=0.15": {
+            "n_points": 1128,
+            "mae_mV": 22.527172678410114
+          },
+          "0.15<V_exp<=0.60": {
+            "n_points": 784,
+            "mae_mV": 319.026792960253
+          },
+          "0.60<V_exp<=1.43": {
+            "n_points": 0,
+            "mae_mV": NaN
+          },
+          "V_exp>1.43_outside_ref_table": {
+            "n_points": 0,
+            "mae_mV": NaN
+          }
+        },
+        "x0_mapping": [
+          {
+            "variant": "mean",
+            "rest_ocv_V": 0.0824216753,
+            "x0": 0.7752798548240457,
+            "x0_before_margin": 0.7752798548240457,
+            "margin_applied": false,
+            "clamped_to_table_edge": false,
+            "table_soc_range": [
+              0.0812458303937023,
+              1.0
+            ],
+            "table_voltage_range": [
+              0.053344204549999996,
+              0.5851008593844418
+            ]
+          }
+        ]
+      },
+      "verdict": {
+        "best_variant": "delithiation",
+        "control": "A5_reference (Ecker OCP + measured geometry)",
+        "rmse_delta_mV": -17.262525194694504,
+        "rmse_ratio": 0.8418068239310256,
+        "rmse_phaseA_mV": 150.05925543689233,
+        "span_ratio_before": 0.12684867099993447,
+        "span_ratio_after": 0.13894731629692392,
+        "region_mae_delta_mV": {
+          "V_exp<=0.15": -28.89170698848396,
+          "0.15<V_exp<=0.60": -32.60269913659982,
+          "0.60<V_exp<=1.43": -40.961143075432574,
+          "V_exp>1.43_outside_ref_table": NaN
+        }
+      }
+    }
+  },
+  "hypotheses": {
+    "H1_ocp_range": "Phase A.5 found the reference OCP table tops out at 1.4325 V while the fresh cell sits at ~3 V; the region V_exp > 1.43 V should collapse when the measured OCP is used",
+    "H2_ocp_shape": "Phase A.5 found the reference curve needs x ~0.004 to reach 1.0 V; with the measured OCP the delithiation end region should collapse"
+  }
+}

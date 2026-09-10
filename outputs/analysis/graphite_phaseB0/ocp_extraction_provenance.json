@@ -1,0 +1,73 @@
+{
+  "source_file": "sintef__sintef-graphite-R2032-intelligent-4ccc47__20250514__p-ocv__RT.bdf.parquet",
+  "source_sha256": "72f208de682a205f6053969d3958fa55d889a326218cc963bad5510e3447b369",
+  "temperature_source": "declared_room_temperature_not_measured",
+  "extraction": "extraction/ocp_extractor.py::extract_ocp_branches",
+  "soc_definition": "Q_ref = charge of the cycle's lithiation branch (canonical current > 0) from the fresh state to the lower cutoff; lithiation SOC = Q/Q_ref; delithiation SOC = 1 - |Q|/Q_ref",
+  "soc_reference_charge_Ah": 0.0019424659492079026,
+  "soc_reference_charge_mAh": 1.9424659492079026,
+  "soc_anchor_cycle": 1,
+  "branch_steps": {
+    "lithiation": 2,
+    "delithiation": 4
+  },
+  "n_points": {
+    "lithiation": 1707,
+    "delithiation": 1568
+  },
+  "voltage_range_V": {
+    "lithiation": [
+      0.0099927252,
+      3.0002844334
+    ],
+    "delithiation": [
+      0.0966956839,
+      1.0000014305
+    ]
+  },
+  "soc_range": {
+    "lithiation": [
+      0.0,
+      1.0
+    ],
+    "delithiation": [
+      0.08124583039370237,
+      1.0
+    ]
+  },
+  "hysteresis_proxy_mV": 115.26866435956568,
+  "hysteresis_proxy_definition": "mean( V_delithiation(SOC) - V_lithiation(SOC) ) on a common 200-point SOC grid over the overlap; positive = the delithiation branch sits above the lithiation branch",
+  "hysteresis_max_abs_mV": 829.8011422311166,
+  "hysteresis_at_mid_overlap_mV": 88.82409409290992,
+  "hysteresis_at_soc_mV": {
+    "SOC_0.20": 134.7903315983059,
+    "SOC_0.50": 85.84017899815109,
+    "SOC_0.80": 64.73069588421906
+  },
+  "hysteresis_mean_caveat": "the mean is dominated by the steep dilute-stage end (large dV/dSOC); prefer the fixed-SOC values for reporting",
+  "handover_voltage_gap_mV": 86.7029587,
+  "handover_gap_note": "delithiation-branch start minus lithiation-branch end; this is NOT hysteresis (cutoff overshoot + switched-on polarisation)",
+  "rest_ocv_after_lithiation_V": 0.0824394673,
+  "polarization_estimate_at_handover_mV": 14.256216599999997,
+  "polarization_estimate_note": "first-order C/50 polarisation read off the delithiation branch start vs the preceding rest OCV; RECORDED ONLY, never applied to the extracted curve",
+  "branch_direction_check": "lithiation lowers the voltage (3.0 V -> 0.01 V), delithiation raises it (0.01 V -> 1.0 V); both verified from the data",
+  "equilibrium_warning": "pseudo-OCP: extracted from a ~C/50 galvanostatic p-OCV with rests only at the branch endpoints. The curve therefore contains the C/50 polarisation (lithiation branch biased low, delithiation branch biased high) and is NOT a true equilibrium OCP. Using it as the model OCP double-counts that polarisation, so the replay residual is a conservative (pessimistic) estimate. Not a material constant: it is the measured quasi-equilibrium response of this electrode at the declared room temperature.",
+  "flags": [],
+  "wording": "experiment-derived PSEUDO-OCP for this electrode; not a material constant, not validation",
+  "dataset": "sintef_graphite",
+  "cell": "4ccc47",
+  "scope": "p-OCV cycle 1, both branches (canonical sign)",
+  "boundary_conditions": {
+    "lithiation_charge_Ah": 0.0019424659492079026,
+    "voltage_range_V": {
+      "lithiation": [
+        0.0099927252,
+        3.0002844334
+      ],
+      "delithiation": [
+        0.0966956839,
+        1.0000014305
+      ]
+    }
+  }
+}

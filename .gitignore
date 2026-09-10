@@ -42,3 +42,4 @@ outputs/analysis/lfp_gitt_audit/canonical_preview/
 outputs/analysis/lfp_gitt_audit/*.png
 # Phase A.5: per-run V(t) PNGs are regenerable; the comparison figure is kept
 outputs/analysis/graphite_phaseA5/**/*_Vt.png
+outputs/analysis/graphite_phaseB0/runs/**/*_Vt.png

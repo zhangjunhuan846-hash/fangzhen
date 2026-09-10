@@ -533,15 +533,18 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
         expected_rows: int,
     ) -> pd.DataFrame:
         """
-        Pass 2: materialise the (cycle, step) pairs in ``want`` with a
-        uniform decimation stride computed from pass 1, so memory stays
-        bounded even for the 9.1e7-row GITT files.
+        Pass 2: materialise the (cycle, step) pairs in ``want``.
+
+        Decimation is PER GROUP with a row-count-proportional budget,
+        and each group keeps its FIRST and LAST sample: a global
+        stride with an offset would silently drop branch endpoints
+        (audited: it lost the 3.0 V first sample of the fresh-cell
+        lithiation branch, which is the SOC = 0 anchor).
         """
         want_set = {(int(c), int(s)) for c, s in want}
-        stride = max(1, int(np.ceil(expected_rows / self._max_points)))
-        keep_every = stride
         chunks: List[pd.DataFrame] = []
         seen = 0
+        max_stride = 1
         for df in self._iter_batches(path, TRACE_COLUMNS):
             cyc = df[COL_CYCLE].to_numpy(np.int64)
             stp = df[COL_STEP].to_numpy(np.int64)
@@ -552,20 +555,29 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
             if not mask.any():
                 continue
             sub = df.loc[mask]
-            if keep_every > 1:
-                # offset-continuous decimation across batches
-                start = seen % keep_every
-                sub = sub.iloc[start::keep_every]
-            seen += int(mask.sum())
-            chunks.append(sub)
+            seen += len(sub)
+            out_parts = []
+            for _key, g in sub.groupby([COL_CYCLE, COL_STEP], sort=False):
+                budget = max(
+                    2,
+                    int(round(self._max_points * len(g) / max(expected_rows, 1))),
+                )
+                idx = _decimate_index(len(g), budget)
+                max_stride = max(max_stride, int(np.ceil(len(g) / budget)))
+                out_parts.append(g.iloc[idx])
+            chunks.append(pd.concat(out_parts))
         if not chunks:
             raise ValueError(
                 f"{path.name}: no rows matched cycle/step {sorted(want_set)}"
             )
         out = pd.concat(chunks, ignore_index=True)
         out = out.sort_values(COL_TIME, kind="stable").reset_index(drop=True)
-        out.attrs["decimation_stride"] = int(keep_every)
+        out.attrs["decimation_stride"] = int(max_stride)
         out.attrs["rows_matched_before_decimation"] = int(seen)
+        out.attrs["decimation"] = (
+            "per-(cycle,step) budget proportional to row count; the first "
+            "and last sample of every group are always retained"
+        )
         return out
 
     # ------------------------------------------------------------------
@@ -677,9 +689,15 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
     # ------------------------------------------------------------------
     def load_raw(self, cell) -> pd.DataFrame:
         """
-        Whole file as a canonical (decimated) trace, for audits.
+        Whole file as a canonical (decimated) trace, for audits and
+        for the OCP extractor.
+
         Columns: time_s / current_A / voltage_V / capacity_Ah /
         cycle / step (+ temperature_ambient_C).
+
+        Canonical sign is applied here as well (raw cycler negative =
+        discharge -> flipped), so branch classification downstream can
+        rely on: current > 0 = discharge = lithiation of graphite.
         """
         rate = self.list_rates()[0]
         path = self._raw_path(str(cell), rate)
@@ -690,12 +708,14 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
             [(int(r["cycle"]), int(r["step"])) for _, r in steps.iterrows()],
             n_total,
         )
+        t = df[COL_TIME].to_numpy(float)
+        I = -df[COL_CURRENT].to_numpy(float)  # -> canonical (discharge +)
         out = pd.DataFrame(
             {
-                "time_s": df[COL_TIME].to_numpy(float),
-                "current_A": df[COL_CURRENT].to_numpy(float),
+                "time_s": t,
+                "current_A": I,
                 "voltage_V": df[COL_VOLTAGE].to_numpy(float),
-                "capacity_Ah": df[COL_CAPACITY].to_numpy(float),
+                "capacity_Ah": _cumulative_capacity(t, I),
                 "cycle": df[COL_CYCLE].to_numpy(np.int64),
                 "step": df[COL_STEP].to_numpy(np.int64),
             }
@@ -709,6 +729,18 @@ class SintefGraphiteAdapter(BatteryDatasetAdapter):
         out.attrs["rows_before_decimation"] = int(
             df.attrs.get("rows_matched_before_decimation", len(out))
         )
+        out.attrs["sign_convention"] = (
+            "canonical (discharge = +) applied: raw cycler negative = "
+            "discharge flipped; for a graphite||Li half cell the discharge "
+            "direction lithiates the graphite"
+        )
+        out.attrs["provenance"] = {
+            "source_file": path.name,
+            "source_file_sha256": _sha256(path),
+            "scope": "whole file (all cycles/steps), decimated",
+            "ambient_temperature_C": float(self._ambient_C),
+            "ambient_temperature_source": self._temperature_source,
+        }
         return out
 
     def load_processed_discharge(self, cell: str, rate: str) -> pd.DataFrame:

@@ -1,0 +1,43 @@
+{
+  "dataset": "sintef_graphite",
+  "model": "SPM",
+  "cell": "4ccc47",
+  "mode": "baseline",
+  "rates": [
+    "pOCVlith"
+  ],
+  "rate_labels": [
+    "C/50 (p-OCV lithiation)"
+  ],
+  "c_rates": [
+    0.02
+  ],
+  "source_rates": [
+    "p-ocv"
+  ],
+  "parameter_set": "Ecker2015_graphite_halfcell",
+  "capacity_metric_type": "forced_current_window",
+  "capacity_is_predictive": false,
+  "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
+  "parameter_match": {
+    "level": "compatible_surrogate",
+    "grade": "B",
+    "parameter_set": "Ecker2015_graphite_halfcell",
+    "experimental_cell": "Graphite || Li metal, R2032 coin cell, 14 mm disc, 64 um, 1.40 mAh/cm2 (catalog id 4ccc47, label Gr-AQ-1)",
+    "fitted_to_dataset": false,
+    "notes": "PyBaMM BUILT-IN reference set (not fitted to this dataset). Same chemistry class (graphite || Li metal) but a different cell: the set describes an 85.85 cm2 electrode with a per-area capacity of ~2.36 mAh/cm2 (declared nominal 156.25 mAh) against 1.54 cm2 / ~1.40 mAh/cm2 here.  Consequences, recorded rather than hidden: (a) at the same absolute current the model sees ~56x lower current density, (b) the model stores ~1.9x more Li per cm2, so the replayed branch covers only ~1 % of the model capacity.  The Phase A zero-fit RMSE is therefore a SCALE ARTEFACT, reported for chain validation only - never as model error, never as validation.  Geometry-matched parameters are Phase C work.\n"
+  },
+  "cell_configuration": "half_cell",
+  "working_electrode": "positive",
+  "model_options": {
+    "working electrode": "positive",
+    "x-average side reactions": "true"
+  },
+  "parameter_source": {},
+  "parameter_repo_commit": "",
+  "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
+  "reused_reference": "scripts/run_baseline.py",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-10T10:32:51+00:00",
+  "runtime_s": 0.4433153919999313
+}

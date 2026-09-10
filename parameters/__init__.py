@@ -8,6 +8,15 @@
 # touches the platform's scientific core.
 # ============================================================
 
+from parameters.sintef_graphite_ocp import (  # noqa: F401
+    OCP_DELI_ID,
+    OCP_LITH_ID,
+    OCP_MEAN_ID,
+    build_ocp_variant,
+    load_ocp_tables,
+    register_variants,
+    variant_summary,
+)
 from parameters.sintef_graphite_geometry import (  # noqa: F401
     GEOMETRY_PARAMETER_SET_ID,
     KEPT_PARAMETERS,
@@ -20,6 +29,13 @@ from parameters.sintef_graphite_geometry import (  # noqa: F401
 )
 
 __all__ = [
+    "OCP_DELI_ID",
+    "OCP_LITH_ID",
+    "OCP_MEAN_ID",
+    "build_ocp_variant",
+    "load_ocp_tables",
+    "register_variants",
+    "variant_summary",
     "GEOMETRY_PARAMETER_SET_ID",
     "KEPT_PARAMETERS",
     "OVERRIDDEN_PARAMETERS",
