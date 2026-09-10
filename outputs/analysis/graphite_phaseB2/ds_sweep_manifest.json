@@ -1,0 +1,838 @@
+{
+  "cell": "4ccc47",
+  "branches": [
+    "lithiation",
+    "delithiation"
+  ],
+  "grade": "prescribed_constant_D_sensitivity_grid_not_an_estimate",
+  "what_this_is": "constant-D sensitivity lattice: the frozen graphite set with the diffusivity key replaced by a prescribed constant",
+  "what_this_is_not": "not a diffusivity estimate, not fitted, and it does not read or modify the Phase B1 GITT apparent D_s(SOC) table",
+  "diffusivity_key": "Positive particle diffusivity [m2.s-1]",
+  "radius_key": "Positive particle radius [m]",
+  "particle_radius_m": 1.37e-05,
+  "grid_m2_s": [
+    1e-17,
+    3e-17,
+    1e-16,
+    3e-16,
+    1e-15,
+    3e-15,
+    1e-14,
+    3e-14,
+    1e-13
+  ],
+  "grid_note": "a priori log grid, 4 decades, 3 values per decade",
+  "entries": [
+    {
+      "branch": "lithiation",
+      "set_id": "sintef_graphite_Dsweep_lith_1e-17_v2",
+      "base_set_id": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-17,
+      "prescribed_D_cm2_s": 1e-13,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 18768999.999999996,
+      "tau_d_h": 5213.61111111111,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.009590281847727639,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.00038361127390910553,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.00019180563695455277,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 9.590281847727638e-05,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.008609373754595346,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.007913117907187387,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "lithiation",
+      "set_id": "sintef_graphite_Dsweep_lith_3e-17_v2",
+      "base_set_id": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+      "prescribed_D_m2_s": 3e-17,
+      "prescribed_D_cm2_s": 3e-13,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 6256333.333333332,
+      "tau_d_h": 1737.87037037037,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.028770845543182915,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.0011508338217273166,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.0005754169108636583,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.00028770845543182915,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.025828121263786037,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.02373935372156216,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "lithiation",
+      "set_id": "sintef_graphite_Dsweep_lith_1e-16_v2",
+      "base_set_id": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-16,
+      "prescribed_D_cm2_s": 1e-12,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 1876899.9999999998,
+      "tau_d_h": 521.3611111111111,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.09590281847727637,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.003836112739091055,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.0019180563695455274,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.0009590281847727637,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.08609373754595345,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.07913117907187385,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "lithiation",
+      "set_id": "sintef_graphite_Dsweep_lith_3e-16_v2",
+      "base_set_id": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+      "prescribed_D_m2_s": 3e-16,
+      "prescribed_D_cm2_s": 2.9999999999999997e-12,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 625633.3333333333,
+      "tau_d_h": 173.787037037037,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.2877084554318291,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.011508338217273165,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.005754169108636582,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.002877084554318291,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.25828121263786036,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.23739353721562156,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "lithiation",
+      "set_id": "sintef_graphite_Dsweep_lith_1e-15_v2",
+      "base_set_id": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-15,
+      "prescribed_D_cm2_s": 1.0000000000000001e-11,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 187689.99999999997,
+      "tau_d_h": 52.136111111111106,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.9590281847727639,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.038361127390910556,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.019180563695455278,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.009590281847727639,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.8609373754595345,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.7913117907187387,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "lithiation",
+      "set_id": "sintef_graphite_Dsweep_lith_3e-15_v2",
+      "base_set_id": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+      "prescribed_D_m2_s": 3e-15,
+      "prescribed_D_cm2_s": 3e-11,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 62563.33333333333,
+      "tau_d_h": 17.378703703703703,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 2.8770845543182912,
+          "equilibrated": true
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.11508338217273163,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.057541691086365816,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.028770845543182908,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 2.5828121263786032,
+          "equilibrated": true
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 2.3739353721562155,
+          "equilibrated": true
+        }
+      }
+    },
+    {
+      "branch": "lithiation",
+      "set_id": "sintef_graphite_Dsweep_lith_1e-14_v2",
+      "base_set_id": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-14,
+      "prescribed_D_cm2_s": 1e-10,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 18768.999999999996,
+      "tau_d_h": 5.21361111111111,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 9.590281847727637,
+          "equilibrated": true
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.3836112739091055,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.19180563695455274,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.09590281847727637,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 8.609373754595346,
+          "equilibrated": true
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 7.913117907187386,
+          "equilibrated": true
+        }
+      }
+    },
+    {
+      "branch": "lithiation",
+      "set_id": "sintef_graphite_Dsweep_lith_3e-14_v2",
+      "base_set_id": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+      "prescribed_D_m2_s": 3e-14,
+      "prescribed_D_cm2_s": 3e-10,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 6256.333333333333,
+      "tau_d_h": 1.7378703703703702,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 28.770845543182908,
+          "equilibrated": true
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 1.1508338217273164,
+          "equilibrated": true
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.5754169108636582,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.2877084554318291,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 25.828121263786034,
+          "equilibrated": true
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 23.739353721562157,
+          "equilibrated": true
+        }
+      }
+    },
+    {
+      "branch": "lithiation",
+      "set_id": "sintef_graphite_Dsweep_lith_1e-13_v2",
+      "base_set_id": "sintef_graphite_ocp_lith_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-13,
+      "prescribed_D_cm2_s": 1e-09,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 1876.8999999999996,
+      "tau_d_h": 0.521361111111111,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 95.90281847727637,
+          "equilibrated": true
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 3.836112739091055,
+          "equilibrated": true
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 1.9180563695455275,
+          "equilibrated": true
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.9590281847727637,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 86.09373754595346,
+          "equilibrated": true
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 79.13117907187386,
+          "equilibrated": true
+        }
+      }
+    },
+    {
+      "branch": "delithiation",
+      "set_id": "sintef_graphite_Dsweep_deli_1e-17_v2",
+      "base_set_id": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-17,
+      "prescribed_D_cm2_s": 1e-13,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 18768999.999999996,
+      "tau_d_h": 5213.61111111111,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.009590281847727639,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.00038361127390910553,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.00019180563695455277,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 9.590281847727638e-05,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.008609373754595346,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.007913117907187387,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "delithiation",
+      "set_id": "sintef_graphite_Dsweep_deli_3e-17_v2",
+      "base_set_id": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+      "prescribed_D_m2_s": 3e-17,
+      "prescribed_D_cm2_s": 3e-13,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 6256333.333333332,
+      "tau_d_h": 1737.87037037037,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.028770845543182915,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.0011508338217273166,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.0005754169108636583,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.00028770845543182915,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.025828121263786037,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.02373935372156216,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "delithiation",
+      "set_id": "sintef_graphite_Dsweep_deli_1e-16_v2",
+      "base_set_id": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-16,
+      "prescribed_D_cm2_s": 1e-12,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 1876899.9999999998,
+      "tau_d_h": 521.3611111111111,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.09590281847727637,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.003836112739091055,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.0019180563695455274,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.0009590281847727637,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.08609373754595345,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.07913117907187385,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "delithiation",
+      "set_id": "sintef_graphite_Dsweep_deli_3e-16_v2",
+      "base_set_id": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+      "prescribed_D_m2_s": 3e-16,
+      "prescribed_D_cm2_s": 2.9999999999999997e-12,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 625633.3333333333,
+      "tau_d_h": 173.787037037037,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.2877084554318291,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.011508338217273165,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.005754169108636582,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.002877084554318291,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.25828121263786036,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.23739353721562156,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "delithiation",
+      "set_id": "sintef_graphite_Dsweep_deli_1e-15_v2",
+      "base_set_id": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-15,
+      "prescribed_D_cm2_s": 1.0000000000000001e-11,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 187689.99999999997,
+      "tau_d_h": 52.136111111111106,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 0.9590281847727639,
+          "equilibrated": false
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.038361127390910556,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.019180563695455278,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.009590281847727639,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 0.8609373754595345,
+          "equilibrated": false
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 0.7913117907187387,
+          "equilibrated": false
+        }
+      }
+    },
+    {
+      "branch": "delithiation",
+      "set_id": "sintef_graphite_Dsweep_deli_3e-15_v2",
+      "base_set_id": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+      "prescribed_D_m2_s": 3e-15,
+      "prescribed_D_cm2_s": 3e-11,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 62563.33333333333,
+      "tau_d_h": 17.378703703703703,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 2.8770845543182912,
+          "equilibrated": true
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.11508338217273163,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.057541691086365816,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.028770845543182908,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 2.5828121263786032,
+          "equilibrated": true
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 2.3739353721562155,
+          "equilibrated": true
+        }
+      }
+    },
+    {
+      "branch": "delithiation",
+      "set_id": "sintef_graphite_Dsweep_deli_1e-14_v2",
+      "base_set_id": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-14,
+      "prescribed_D_cm2_s": 1e-10,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 18768.999999999996,
+      "tau_d_h": 5.21361111111111,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 9.590281847727637,
+          "equilibrated": true
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 0.3836112739091055,
+          "equilibrated": false
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.19180563695455274,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.09590281847727637,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 8.609373754595346,
+          "equilibrated": true
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 7.913117907187386,
+          "equilibrated": true
+        }
+      }
+    },
+    {
+      "branch": "delithiation",
+      "set_id": "sintef_graphite_Dsweep_deli_3e-14_v2",
+      "base_set_id": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+      "prescribed_D_m2_s": 3e-14,
+      "prescribed_D_cm2_s": 3e-10,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 6256.333333333333,
+      "tau_d_h": 1.7378703703703702,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 28.770845543182908,
+          "equilibrated": true
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 1.1508338217273164,
+          "equilibrated": true
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 0.5754169108636582,
+          "equilibrated": false
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.2877084554318291,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 25.828121263786034,
+          "equilibrated": true
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 23.739353721562157,
+          "equilibrated": true
+        }
+      }
+    },
+    {
+      "branch": "delithiation",
+      "set_id": "sintef_graphite_Dsweep_deli_1e-13_v2",
+      "base_set_id": "sintef_graphite_ocp_deli_capmatch_v1_v2",
+      "prescribed_D_m2_s": 1e-13,
+      "prescribed_D_cm2_s": 1e-09,
+      "origin": "PRESCRIBED grid value from a priori log grid 1e-17..1e-13 m2/s; NOT extracted, NOT fitted, NOT an estimate of this material's diffusivity",
+      "particle_radius_m": 1.37e-05,
+      "particle_radius_source": "",
+      "tau_d_s": 1876.8999999999996,
+      "tau_d_h": 0.521361111111111,
+      "fo_note": "Fo = D t / R^2 = t_protocol / tau_d; recorded per protocol so the voltage sensitivity can be read against a dimensionless group rather than against a rate label",
+      "protocols": {
+        "CC C/50": {
+          "duration_s": 180000.0,
+          "Fo": 95.90281847727637,
+          "equilibrated": true
+        },
+        "CC 0.5C": {
+          "duration_s": 7200.0,
+          "Fo": 3.836112739091055,
+          "equilibrated": true
+        },
+        "CC 1C": {
+          "duration_s": 3600.0,
+          "Fo": 1.9180563695455275,
+          "equilibrated": true
+        },
+        "CC 2C": {
+          "duration_s": 1800.0,
+          "Fo": 0.9590281847727637,
+          "equilibrated": false
+        },
+        "pOCV-lith measured window": {
+          "duration_s": 161589.336,
+          "Fo": 86.09373754595346,
+          "equilibrated": true
+        },
+        "pOCV-deli measured window": {
+          "duration_s": 148521.31000000003,
+          "Fo": 79.13117907187386,
+          "equilibrated": true
+        }
+      }
+    }
+  ],
+  "wording": "the spread of V(t) across this lattice measures the model's SENSITIVITY to solid diffusivity at a given protocol; it is not a measurement of D"
+}

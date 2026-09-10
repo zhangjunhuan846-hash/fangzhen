@@ -46,3 +46,7 @@ outputs/analysis/graphite_phaseB0/runs/**/*_Vt.png
 outputs/analysis/graphite_phaseB05/runs/**/*_Vt.png
 outputs/analysis/graphite_phaseB06/runs/**/*_Vt.png
 outputs/analysis/graphite_phaseB1/runs/**/*_Vt.png
+outputs/analysis/graphite_phaseB2/runs/**/*_Vt.png
+# Phase B2: the per-D CC trajectory dump is large and regenerable; the
+# summary tables and figures that carry the conclusion are kept
+outputs/analysis/graphite_phaseB2/cc_rate_curves.csv
