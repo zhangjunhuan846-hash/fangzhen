@@ -1,0 +1,151 @@
+{
+  "cell": "4ccc47",
+  "variants": [
+    {
+      "parameter_set_id": "sintef_graphite_ocp_lith_capmatch_v1",
+      "base_parameter_set": "sintef_graphite_ocp_lith_v1",
+      "reference_parameter_set": "Ecker2015_graphite_halfcell",
+      "geometry_parameter_set": "sintef_graphite_geometry_v1",
+      "variant": "lithiation",
+      "purpose": "Phase B0.5 capacity consistency: make the model's Li inventory equal the MEASURED reference charge of the p-OCV extraction, so the model's stoichiometry x and the OCP table's charge-based SOC mean the same thing",
+      "capacity_model": "Q_model = eps_am * L * A * c_max * F / 3600, validated against a measured d(x_volume-averaged)/dt from a constant-current solve (0.00 % difference); the surface stoichiometry is NOT used because diffusion has not equilibrated the particle",
+      "q_before_Ah": 0.0022016583309734375,
+      "q_before_mAh": 2.2016583309734377,
+      "q_before_declared_Ah": 0.0022016583309734375,
+      "q_target_Ah": 0.0019424659492079026,
+      "q_target_mAh": 1.9424659492079026,
+      "q_target_source": {
+        "q_target_Ah": 0.0019424659492079026,
+        "source": "Phase B0 extraction provenance (measured charge)",
+        "provenance_file": "outputs/analysis/graphite_phaseB0/ocp_extraction_provenance.json",
+        "soc_definition": "Q_ref = charge of the cycle's lithiation branch (canonical current > 0) from the fresh state to the lower cutoff; lithiation SOC = Q/Q_ref; delithiation SOC = 1 - |Q|/Q_ref",
+        "temperature_source": "declared_room_temperature_not_measured",
+        "equilibrium_warning": "pseudo-OCP: extracted from a ~C/50 galvanostatic p-OCV with rests only at the branch endpoints. The curve therefore contains the C/50 polarisation (lithiation branch biased low, delithiation branch biased high) and is NOT a true equilibrium OCP. Using it as the model OCP double-counts that polarisation, so the replay residual is a conservative (pessimistic) estimate. Not a material constant: it is the measured quasi-equilibrium response of this electrode at the declared room temperature."
+      },
+      "scaling_factor": 0.8822740213051423,
+      "scaling_factor_definition": "Q_target / Q_before  (applied to eps_am)",
+      "q_after_Ah": 0.0019424659492079026,
+      "q_after_mAh": 1.9424659492079026,
+      "q_after_relative_error": 0.0,
+      "changed_parameter": "Positive electrode active material volume fraction",
+      "changed_parameters_detail": [
+        {
+          "parameter": "Positive electrode active material volume fraction",
+          "role": "physics - sets the model's Li inventory (Q_model)",
+          "before": 0.26121752979470236,
+          "after": 0.2304654404473679,
+          "relative_change_pct": -11.772597869485768
+        },
+        {
+          "parameter": "Nominal cell capacity [A.h]",
+          "role": "bookkeeping - declared capacity only; does not enter the particle equation (asserted in tests)",
+          "before": 0.0022016583309734375,
+          "after": 0.0019424659492079026,
+          "relative_change_pct": -11.772597869485768
+        }
+      ],
+      "apply": {
+        "Positive electrode active material volume fraction": 0.2304654404473679,
+        "Nominal cell capacity [A.h]": 0.0019424659492079026
+      },
+      "kept_unchanged": [
+        "Positive electrode OCP [V]",
+        "Positive particle diffusivity [m2.s-1]",
+        "Positive electrode exchange-current density [A.m-2]",
+        "Maximum concentration in positive electrode [mol.m-3]",
+        "Positive electrode porosity",
+        "Positive particle radius [m]",
+        "Lower voltage cut-off [V]",
+        "Upper voltage cut-off [V]"
+      ],
+      "electrode_volume_balance": {
+        "eps_am_after": 0.2304654404473679,
+        "porosity": 0.329,
+        "sum_after": 0.5594654404473679,
+        "sum_before": 0.5902175297947023,
+        "feasible": true,
+        "note": "the reference set declares no inactive-material volume fraction, so eps_am + porosity must simply stay < 1"
+      },
+      "measured_structure_cross_reference": {
+        "active_material_loading_g_cm2_before": 0.0034362275019281163,
+        "active_material_loading_g_cm2_after": 0.003031694256245443,
+        "note": "coating loading x active-material weight fraction, scaled by the same factor; reported for the electrode-fabrication record only - the model parameter is eps_am"
+      },
+      "is_fitted_to_voltage": false,
+      "wording": "capacity-CONSISTENT, not fitted: Q_target is a measured charge from the p-OCV extraction, OCP / diffusivity / kinetics / voltage window are unchanged by object identity, and this remains a zero-fit reference replay - NOT validation"
+    },
+    {
+      "parameter_set_id": "sintef_graphite_ocp_deli_capmatch_v1",
+      "base_parameter_set": "sintef_graphite_ocp_deli_v1",
+      "reference_parameter_set": "Ecker2015_graphite_halfcell",
+      "geometry_parameter_set": "sintef_graphite_geometry_v1",
+      "variant": "delithiation",
+      "purpose": "Phase B0.5 capacity consistency: make the model's Li inventory equal the MEASURED reference charge of the p-OCV extraction, so the model's stoichiometry x and the OCP table's charge-based SOC mean the same thing",
+      "capacity_model": "Q_model = eps_am * L * A * c_max * F / 3600, validated against a measured d(x_volume-averaged)/dt from a constant-current solve (0.00 % difference); the surface stoichiometry is NOT used because diffusion has not equilibrated the particle",
+      "q_before_Ah": 0.0022016583309734375,
+      "q_before_mAh": 2.2016583309734377,
+      "q_before_declared_Ah": 0.0022016583309734375,
+      "q_target_Ah": 0.0019424659492079026,
+      "q_target_mAh": 1.9424659492079026,
+      "q_target_source": {
+        "q_target_Ah": 0.0019424659492079026,
+        "source": "Phase B0 extraction provenance (measured charge)",
+        "provenance_file": "outputs/analysis/graphite_phaseB0/ocp_extraction_provenance.json",
+        "soc_definition": "Q_ref = charge of the cycle's lithiation branch (canonical current > 0) from the fresh state to the lower cutoff; lithiation SOC = Q/Q_ref; delithiation SOC = 1 - |Q|/Q_ref",
+        "temperature_source": "declared_room_temperature_not_measured",
+        "equilibrium_warning": "pseudo-OCP: extracted from a ~C/50 galvanostatic p-OCV with rests only at the branch endpoints. The curve therefore contains the C/50 polarisation (lithiation branch biased low, delithiation branch biased high) and is NOT a true equilibrium OCP. Using it as the model OCP double-counts that polarisation, so the replay residual is a conservative (pessimistic) estimate. Not a material constant: it is the measured quasi-equilibrium response of this electrode at the declared room temperature."
+      },
+      "scaling_factor": 0.8822740213051423,
+      "scaling_factor_definition": "Q_target / Q_before  (applied to eps_am)",
+      "q_after_Ah": 0.0019424659492079026,
+      "q_after_mAh": 1.9424659492079026,
+      "q_after_relative_error": 0.0,
+      "changed_parameter": "Positive electrode active material volume fraction",
+      "changed_parameters_detail": [
+        {
+          "parameter": "Positive electrode active material volume fraction",
+          "role": "physics - sets the model's Li inventory (Q_model)",
+          "before": 0.26121752979470236,
+          "after": 0.2304654404473679,
+          "relative_change_pct": -11.772597869485768
+        },
+        {
+          "parameter": "Nominal cell capacity [A.h]",
+          "role": "bookkeeping - declared capacity only; does not enter the particle equation (asserted in tests)",
+          "before": 0.0022016583309734375,
+          "after": 0.0019424659492079026,
+          "relative_change_pct": -11.772597869485768
+        }
+      ],
+      "apply": {
+        "Positive electrode active material volume fraction": 0.2304654404473679,
+        "Nominal cell capacity [A.h]": 0.0019424659492079026
+      },
+      "kept_unchanged": [
+        "Positive electrode OCP [V]",
+        "Positive particle diffusivity [m2.s-1]",
+        "Positive electrode exchange-current density [A.m-2]",
+        "Maximum concentration in positive electrode [mol.m-3]",
+        "Positive electrode porosity",
+        "Positive particle radius [m]",
+        "Lower voltage cut-off [V]",
+        "Upper voltage cut-off [V]"
+      ],
+      "electrode_volume_balance": {
+        "eps_am_after": 0.2304654404473679,
+        "porosity": 0.329,
+        "sum_after": 0.5594654404473679,
+        "sum_before": 0.5902175297947023,
+        "feasible": true,
+        "note": "the reference set declares no inactive-material volume fraction, so eps_am + porosity must simply stay < 1"
+      },
+      "measured_structure_cross_reference": {
+        "active_material_loading_g_cm2_before": 0.0034362275019281163,
+        "active_material_loading_g_cm2_after": 0.003031694256245443,
+        "note": "coating loading x active-material weight fraction, scaled by the same factor; reported for the electrode-fabrication record only - the model parameter is eps_am"
+      },
+      "is_fitted_to_voltage": false,
+      "wording": "capacity-CONSISTENT, not fitted: Q_target is a measured charge from the p-OCV extraction, OCP / diffusivity / kinetics / voltage window are unchanged by object identity, and this remains a zero-fit reference replay - NOT validation"
+    }
+  ]
+}
