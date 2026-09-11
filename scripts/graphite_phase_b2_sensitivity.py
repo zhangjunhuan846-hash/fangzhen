@@ -1241,4 +1241,6 @@ def _report(out_dir, diag, by_soc, prov, replay, cc, sens, summary,
 
 
 if __name__ == "__main__":
+    from scripts._output_isolation import isolate_platform_outputs
+    isolate_platform_outputs(OUT_DIR / "platform_runs")
     raise SystemExit(main())

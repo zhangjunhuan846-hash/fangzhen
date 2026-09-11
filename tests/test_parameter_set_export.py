@@ -200,6 +200,33 @@ def test_summarise_reports_the_shape_of_the_export(tmp_path):
 # ------------------------------------------------------------------
 # 真实产物：存在、可加载、指纹仍然对得上
 # ------------------------------------------------------------------
+def test_apply_scalars_works_on_a_real_parameter_values(tmp_path):
+    """
+    上面所有测试都用普通 dict 代替 ParameterValues。这里用真正的那一类
+    跑一遍，确认 .copy() 的语义、__setitem__ 与 keys() 都成立——
+    否则"回套标量层"这条路就是纸面上的。
+    """
+    pybamm = pytest.importorskip("pybamm")
+    pv = pybamm.ParameterValues({"a scalar": 1.0,
+                                 "another scalar [V]": 3.0})
+    original = pv["another scalar [V]"]
+
+    out = export_parameter_set(pv, tmp_path / "s.json", set_id="pv")
+    loaded = load_parameter_set(out)
+    assert scalar_diff(pv, loaded) == {}
+
+    merged = apply_scalars(pv, loaded)
+    assert merged["another scalar [V]"] == original
+    assert set(merged.keys()) == set(pv.keys())
+
+    # 真正的覆盖：设一个与原件不同的值，两边都要能分辨出来
+    loaded["scalars"]["another scalar [V]"] = 9.5
+    merged = apply_scalars(pv, loaded)
+    assert merged["another scalar [V]"] == 9.5
+    assert pv["another scalar [V]"] == original        # 原集不动
+    assert scalar_diff(pv, loaded) != {}
+
+
 def test_exported_graphite_sets_are_present_and_verify():
     from pathlib import Path
 

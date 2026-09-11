@@ -198,20 +198,12 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # 本阶段的回放运行**不应污染被跟踪的 outputs/platform/**。
-    # 平台按 battery_sim.paths.PLATFORM_OUTPUT_ROOT 解析运行目录，所以把它
-    # 重定向到本阶段的产物目录即可（与 tests/conftest.py 同一手法：
+    # 本阶段的回放运行**不应污染被跟踪的 outputs/platform/**：
+    # 见 scripts/_output_isolation.py（与 tests/conftest.py 同一手法，
     # 只换模块属性的值，不改冻结代码）。
-    # benchmark.py 是按值 import 的，需要单独改一份。
-    import battery_sim.paths as _paths
+    from scripts._output_isolation import isolate_platform_outputs
 
-    _platform_root = OUT_DIR / "platform_runs"
-    _paths.PLATFORM_OUTPUT_ROOT = _platform_root
-    try:
-        from battery_sim.simulation import benchmark as _bench
-        _bench.PLATFORM_OUTPUT_ROOT = _platform_root
-    except Exception:                       # pragma: no cover - import guard
-        pass
+    isolate_platform_outputs(OUT_DIR / "platform_runs")
 
     from battery_sim.registry import get_dataset
 
