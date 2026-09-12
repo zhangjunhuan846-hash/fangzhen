@@ -202,7 +202,7 @@ python run_pipeline.py baseline --dataset chen2020 --model SPMe --cell 02
 ├── user_tools/            # 自助入口：实验 CSV → 校验 → zero-fit baseline
 ├── outputs/               # Simulation results
 ├── external/              # Vendored upstream parameter-set repo (BSD-3)
-├── tests/                 # Regression tests (241 passed gate)
+├── tests/                 # Regression tests (293 passed gate)
 └── README.md
 ```
 
@@ -240,7 +240,7 @@ run_metadata.json
 * [x] Baseline simulation
 * [x] Sensitivity analysis
 * [x] Result tracking
-* [x] Regression testing (241 tests)
+* [x] Regression testing (293 tests)
 * [x] Experimental-CSV self-service entry (`user_tools/` + example case)
 * [x] Graphite half-cell line, Phase A: SINTEF graphite R2032 → zero-fit SPM chain
 * [x] Graphite Phase A.5: geometry-aware zero-fit (measured electrode geometry)
@@ -251,7 +251,8 @@ run_metadata.json
 * [x] Graphite Phase B2: D_s diagnostics + constant-D sensitivity (when is it a valid model input)
 * [x] Graphite Phase B0.7: initial-state / window-start correction (lith 44.7 -> 1.6 mV)
 * [x] Graphite Phase B1.5: GITT pulse overpotential budget (why the D_s is biased)
-* [ ] Graphite Phase B1.6: two-term sqrt(t) re-inversion of the whole D_s table
+* [x] Graphite Phase B1.6: drift-corrected re-inversion of the whole D_s(SOC) table
+      (fit-form line closed; corrected table still below the reference, not adopted)
 
 ---
 
@@ -303,20 +304,21 @@ Experiment
 
 # 🚀 Quick Start
 
+**先跑这个。** `examples/half_cell_demo/` 是自包含案例，clone 后即可运行，
+不需要 13 GB 的 `data/` 原始库：实验 CSV → 12 项导入校验 → zero-fit DFN baseline。
+
 ```bash
 # 1) 环境（详见 HANDOFF.md：WSL Ubuntu + conda + pip install -r requirements.txt）
 conda activate pybamm
 
-# 2) 一键运行示例（自动：读数据 → 选参数集 → 建模型 → 仿真 → 评价 → 保存）
-python run_pipeline.py --config configs/example.yaml
+# 2) 自包含案例：导入校验 + zero-fit baseline（预期结果已固化在 result/）
+python -m user_tools.import_dataset --package examples/half_cell_demo
+python -m user_tools.run_baseline    --package examples/half_cell_demo --models DFN
 
-# 3) 查看可用数据集
+# 3) 平台本体（以下命令需要先准备 data/ 原始库；该目录不在仓库内，见 HANDOFF.md）
 python run_pipeline.py --list-datasets
+python run_pipeline.py --config configs/example.yaml
 ```
-
-最小真实数据案例（无需 13 GB 原始数据库，clone 后即可跑）：
-**`examples/half_cell_demo/`** —— 实验CSV → 12项导入校验 → zero-fit DFN
-baseline（RMSE 104.29 mV）→ 预期结果已固化在 `result/`。
 
 化学体系显式注册表：`configs/chemistry.yaml` —— 化学体系 → 正负极/电解液/
 电池形式/参数集 + 溯源等级（A-exact / B-compatible_surrogate），可直接对接
