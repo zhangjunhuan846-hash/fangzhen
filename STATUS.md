@@ -90,7 +90,10 @@ run_metadata.json                  （24 个键）
 
 ```text
 G4 OCP/GITT 提取         PASS（受限）  — 见下方限定
-G5 参数辨识              NOT DONE      — 平台自身代码零拟合代码
+G5 参数辨识              IN PROGRESS   — G5.0 PASS；G5.1/G5.2 NOT STARTED
+  G5.0 synthetic recovery  PASS        — 2026-09-15，D_s 单参数
+  G5.1 二参数 identifiability  NOT STARTED
+  G5.2 真实数据辨识        NOT STARTED
 G6 held-out 预测         NOT DONE
 G7 再生状态泛化          NOT STARTED
 G8 优化闭环              NOT DONE
@@ -108,22 +111,55 @@ G8 优化闭环              NOT DONE
 - `B1` 与 `B1.6` 是**诊断**，不是验证。
 - 实验反演出的 D_s 是 **apparent / effective**，不是本征材料常数。
 
-### G5 参数辨识 — NOT DONE
+### G5.0 单参数 synthetic recovery — **PASS**（2026-09-15）
+
+**问题**：给定一个在已知 $D_s$ 处生成的 synthetic 电压响应，管道能不能把它找回来？
+
+**完整报告**：`docs/g5.0_synthetic_recovery.md`
+**可复现命令**：`python scripts/identification/g5_0_synthetic_recovery.py`（约 39 s）
+
+```text
+dataset/cell/rate   chen2020 / 02 / C2      model  SPM
+D_s_true            2.0e-15                 z = log10(D_s) ∈ [-16, -13]
+三个初值            1e-15, 4e-15, 1e-14     同一份观测（284 点，t_end 7090.5 s）
+optimiser           pybop.SciPyMinimize(method="Nelder-Mead")
+```
+
+| 验收项 | 结果 | 数字 |
+|---|---|---|
+| ① 同一 basin | **PASS** | 三个初值 → `1.999979e-15` / `1.999815e-15` / `1.999979e-15`，散布 **0.00004 dex** |
+| ② 接近真值 | **PASS** | 最差相对误差 **0.009 %**（容差 5 %） |
+| ③ cost 曲线最低点在真值附近 | **PASS** | 显式扫描（粗扫 0.2 dex + 细扫 0.043 dex），argmin 距真值 **0.0010 dex**；**真值处实测 $J = 0.000\times10^{0}$** |
+| ④ provenance 完整 | **PASS** | **92 次评估，0 次缺失**；每次都有 requested / applied(old,new,source) / run_metadata.json 路径 |
+
+**这一步证明的是管道连通，不是物理**：
+`PyBOP → parameter override → PyBaMM → cost → optimizer → recovered parameter` 闭合。
+
+**没有证明的（必须一起引用）**：
+- 不证明 $D_s$ 在**真实**数据上可辨识（→ G5.2）
+- 不证明 $D_s$ 与其它参数**不互相补偿**（→ G5.1 二维）
+- 观测是平台自己的输出，**zero residual 是构造出来的，不是拟合出来的**
+- 单倍率（C2）、单模型（SPM）；换倍率/模型不保证同样成立
+
+**两处判据错误已修并记档**（都不是物理问题，是我把验收标准写错了）：
+① 容差比网格间距还小 → 一条**网格定位精度不可能优于其步长**；
+② 用线性插值估"真值处 cost" → 最低点仅 ~$10^{-3}$ dex 宽，插值暴涨 4 个数量级。
+→ 修法：容差取 `max(名义, 实测分辨率)` + 加细化扫描；**真值直接实测，不插值**。
+
+### G5 的历史起点 — 平台曾零拟合代码
 
 **证据（2026-09-15，全仓搜索）**：
 
 ```bash
 grep -rn "import pybop\|from pybop" --include="*.py" \
   battery_sim/ parameters/ extraction/ user_tools/
-# → 0 命中
-grep -rln "minimize|curve_fit|least_squares|Parameterisation|FittingProblem|Optimisation" \
-  battery_sim/ parameters/ extraction/ user_tools/
-# → 0 命中
+# → 0 命中（G5.0 开工前）
 ```
 
-平台自身代码中**没有任何拟合**。所有命中均在 `.venv/`（第三方库内部）。
+`identification/` 是 G5.0 新增的层；平台冻结内核
+（runner / evaluator / factory / registry / rates.py / paths.py）**未改动**。
 
-**环境侧已就绪**：PyBOP 26.3 已安装且可 import。但注意 ——
+**环境侧**：PyBOP 26.3 已安装且可 import。但注意 ——
 **26.3 的 API 与公开教程不一致**，以下名字在 26.3 中**不存在**：
 
 | 教程里的写法 | 26.3 实际 |
@@ -276,15 +312,11 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 
 ## 一句话状态
 
-> 工程基础设施（G0–G4）已可用且 provenance 扎实；**科学闭环（G5–G8）尚未开始**。
-> 平台当前是 **zero-fit 回放与诊断平台**，不是参数辨识平台。
-> 下一阶段应停止扩功能，直接做 **G5 → G6**。
+> 工程基础设施（G0–G4）可用且 provenance 扎实。
+> **G5 已启动：G5.0（单参数 synthetic recovery）PASS（2026-09-15）** ——
+> 平台第一次具备"从数据辨识参数"的能力，但**只在合成数据上验证过**。
+> 下一步是 G5.1（二参数 identifiability）与 G5.2（真实 Chen2020），
+> 之后才是 G6（held-out 倍率预测）。
 >
-> **G5 的两个路障已拆**（2026-09-15）：
-> ① 参数表示改为按 `(参数, 参数集)` 运行时解析 → Chen2020 的 $D_s$ 不再被假拒；
-> ② `requested` / `applied` / `source` 三件套已补齐并提交（`12a6cd9`，**未 push**）。
->
-> **G5 第一版向量应收缩为 $\theta=\{D_s,\epsilon_{am}\}$**，甚至先只做 $\{D_s\}$：
-> 先跑 **synthetic recovery**（人为设定 $D_s^{true}$ 生成曲线，看能否从不同初值恢复），
-> 验证 `optimizer → override → PyBaMM → cost → recovered` 整条 plumbing，
-> 再上真实数据。$k_0$ 是函数型，本平台暂无法表达，**不要进第一版**。
+> **口径提醒**：G5.0 PASS 说明**管道连通**，不说明 $D_s$ 在真实数据上可辨识、
+> 也不说明它与其它参数不互相补偿。引用时必须带这句限定。
