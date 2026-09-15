@@ -97,6 +97,8 @@ def _run_one_replay(
     model_name: str,
     parameter_set: str,
     model_options: Optional[dict] = None,
+    parameter_overrides: Optional[dict] = None,
+    parameter_override_sources: Optional[dict] = None,
 ) -> dict:
     """Time-aligned replay for one processed discharge CSV.
 
@@ -111,6 +113,28 @@ def _run_one_replay(
       ``initial_soc`` convention to a fixed initial concentration
       (inverse-OCP method).  Datasets without that block keep the
       exact v0.1-v0.4 behaviour.
+
+    ``parameter_overrides`` (additive, default path unchanged):
+      an explicit mapping ``{pybamm_parameter_name: new_scalar_value}``
+      applied to the loaded ``ParameterValues`` BEFORE any temperature /
+      current / initial-concentration logic runs, so every downstream
+      consumer sees one single effective parameter object.  A key that is
+      not present in the parameter set raises ``KeyError`` -- nothing is
+      silently created or ignored.  Every applied entry is echoed back
+      under ``_applied_overrides`` as ``{key, old, new}``.  When the
+      argument is ``None`` or empty this function behaves exactly as
+      before (no-op branch).
+
+    ``parameter_override_sources`` (additive, default ``None``):
+      optional ``{pybamm_parameter_name: source_record}`` recording
+      WHERE each overridden value came from (an experiment, a reference
+      set, a model suggestion, a human).  It is deliberately a SEPARATE
+      argument rather than a richer ``parameter_overrides`` value, so
+      the existing ``{key: number}`` contract -- which callers already
+      depend on -- does not change shape.  Keys not in
+      ``parameter_overrides`` are ignored, and no key is required to
+      have a source; absence is recorded as ``None`` rather than
+      invented.  ``None`` keeps every existing output byte-identical.
     """
     t_exp = df["time_s"].to_numpy(dtype=float)
     I_exp = df["current_A"].to_numpy(dtype=float)
@@ -121,6 +145,56 @@ def _run_one_replay(
     model = build_model(model_name, options=model_options)
 
     params = load_parameter_values(parameter_set)
+
+    # --------------------------------------------------------------
+    # additive: explicit parameter override path (v0.6)
+    #
+    # Applied immediately after the set is loaded and BEFORE the
+    # temperature / current / initial-concentration logic below, so
+    # that every downstream consumer (including the
+    # fixed_initial_concentration override and the Simulation
+    # constructor) sees ONE effective ParameterValues object.
+    #
+    # Default path: parameter_overrides is None or empty -> the loop
+    # body never executes -> byte-identical behaviour to before.
+    # The tests in tests/test_parameter_overrides.py guard this.
+    #
+    # No silent fallback: a key absent from the parameter set is an
+    # error, not an insertion.  This is deliberate -- a typo in a
+    # parameter name must fail loudly instead of quietly simulating
+    # something else.
+    # --------------------------------------------------------------
+    applied_overrides: list = []
+    if parameter_overrides:
+        unknown = sorted(
+            k for k in parameter_overrides if k not in params
+        )
+        if unknown:
+            raise KeyError(
+                f"parameter_overrides: key(s) not present in parameter "
+                f"set '{parameter_set}': {unknown}"
+            )
+        sources = dict(parameter_override_sources or {})
+        for key, value in parameter_overrides.items():
+            old_value = params[key]
+            params[key] = value
+            applied_overrides.append(
+                {
+                    "parameter_set": parameter_set,
+                    "key": str(key),
+                    # BEFORE/AFTER pair.  ``old`` is read from the
+                    # loaded set, never copied from the request -- a
+                    # request-sourced ``old`` would make the audit
+                    # trail say ``old == new`` for every override.
+                    "old": old_value,
+                    "new": params[key],
+                    # WHERE the value came from.  Not every caller
+                    # supplies one, and absence is recorded as None
+                    # rather than invented.
+                    "source": sources.get(key),
+                }
+            )
+    # ---------------- end additive (v0.6) -------------------------
 
     # v0.3 (interface extension, additive): a dynamic-protocol
     # window can carry its own starting state of charge (e.g. the
@@ -397,6 +471,11 @@ def _run_one_replay(
         "_residual": residual,
         "_init_method": init_method,
         "_mapping_rows": mapping_rows or None,
+        # additive (v0.6): explicit parameter overrides that were
+        # actually applied, as [{parameter_set, key, old, new}, ...].
+        # None when no override was requested -- so a caller can tell
+        # "no override" from "override requested and applied".
+        "_applied_overrides": applied_overrides or None,
     }
 
 
@@ -411,12 +490,44 @@ def run_baseline_cell(
     parameter_set: Optional[str] = None,
     plot: bool = True,
     quiet: bool = False,
+    parameter_overrides: Optional[dict] = None,
+    parameter_override_sources: Optional[dict] = None,
 ) -> dict:
     """
     Run the time-aligned baseline replay for one (cell [, rate]).
 
     ``rate=None`` runs every rate of the dataset.
     Returns {"metrics": DataFrame, "output_dir": Path, "runtime_s": ...}.
+
+    ``parameter_overrides`` (additive, v0.6; default None keeps the
+    previous behaviour exactly): explicit scalar overrides
+    ``{pybamm_parameter_name: value}`` forwarded to every replay.
+    A key absent from the parameter set raises ``KeyError``.  The
+    applied entries are surfaced per rate in the metrics DataFrame
+    column ``applied_overrides`` and in the run metadata JSON.
+
+    ``parameter_override_sources`` (additive, default ``None``):
+    optional ``{pybamm_parameter_name: source_record}`` saying WHERE
+    each overridden value came from.  A separate argument on purpose:
+    widening ``parameter_overrides``' values would break the existing
+    ``{key: number}`` contract, and this one is purely optional.
+
+    Traceability contract (v0.7).  The run metadata records THREE
+    things, and they are not interchangeable:
+
+      ``parameter_overrides_requested`` -- what the caller asked for,
+      verbatim, or ``null``.
+      ``parameter_overrides_applied``   -- what actually took effect,
+      as ``[{key, old, new, source, rate_slug}]``, with ``old`` read
+      from the loaded set.  This is the authoritative record.
+      ``parameter_override_sources``    -- where the values came from,
+      or ``null``.
+
+    The returned dict exposes the applied list under
+    ``parameter_overrides_applied``.  The older ``applied_overrides``
+    key is RETAINED unchanged (it carries the REQUEST mapping, not the
+    before/after pair) because callers depend on that shape; it is
+    legacy and should not be used for new work.
     """
     if parameter_set is None:
         parameter_set = adapter.config.parameter_set
@@ -468,6 +579,11 @@ def run_baseline_cell(
     )
 
     rows = []
+    # additive (v0.7): the AUTHORITATIVE applied record, accumulated
+    # across rates.  The metrics column carries it per rate; the run
+    # metadata carries the whole run.  Both come from the same
+    # ``_applied_overrides`` source, so they cannot disagree.
+    applied_all: list = []
     tic_all = time.perf_counter()
 
     for r in rates:
@@ -492,6 +608,8 @@ def run_baseline_cell(
             model_name=model_name,
             parameter_set=parameter_set,
             model_options=model_options,
+            parameter_overrides=parameter_overrides,
+            parameter_override_sources=parameter_override_sources,
         )
 
         row = {
@@ -514,6 +632,37 @@ def run_baseline_cell(
         for k, v in res.items():
             if not k.startswith("_"):
                 row[k] = v
+
+        # additive (v0.6): surface the explicit parameter overrides
+        # that were applied to this rate.  Written ONLY when an
+        # override was requested, so the frozen datasets keep
+        # byte-identical metrics.csv output.
+        applied = res.get("_applied_overrides")
+        if applied:
+            row["applied_overrides"] = json.dumps(
+                [
+                    {
+                        "key": e["key"],
+                        "old": float(e["old"])
+                        if isinstance(e["old"], (int, float))
+                        else e["old"],
+                        "new": float(e["new"])
+                        if isinstance(e["new"], (int, float))
+                        else e["new"],
+                        # additive (v0.7): where the value came from.
+                        # ``None`` when the caller supplied no source,
+                        # which is recorded rather than invented.
+                        "source": e.get("source"),
+                    }
+                    for e in applied
+                ],
+                ensure_ascii=False,
+            )
+            # Accumulate the same entries for the run-level record.
+            # One source of truth: this is the identical list that
+            # produced the column above, so the two can never drift.
+            for e in applied:
+                applied_all.append({**e, "rate_slug": rate_slug})
 
         # v0.5 half-cell pilot: report the cell configuration on the
         # metrics row ONLY when it is not the default full cell, so
@@ -633,6 +782,38 @@ def run_baseline_cell(
                     str(adapter.rate_info(r)["source_rate"]) for r in rates
                 ],
                 "parameter_set": parameter_set,
+                # additive (v0.6): the explicit overrides requested
+                # for this run, or null when none were.  Recorded
+                # verbatim so a reader can always recover what the
+                # solver was actually given.
+                #
+                # NOTE: this is what was ASKED FOR, not what took
+                # effect.  Anything that needs the before/after pair
+                # must read ``parameter_overrides_applied`` below.
+                # Conflating the two is what makes an audit trail say
+                # ``old == new`` for every override.
+                "parameter_overrides_requested": (
+                    dict(parameter_overrides)
+                    if parameter_overrides
+                    else None
+                ),
+                # additive (v0.7): the AUTHORITATIVE applied record --
+                # ``[{parameter_set, key, old, new, source, rate_slug}]``
+                # with ``old`` read from the loaded parameter set.
+                # Same list that produced the per-rate metrics column,
+                # so the two cannot disagree.
+                "parameter_overrides_applied": (
+                    applied_all if applied_all else None
+                ),
+                # additive (v0.7): where each value came from, or null.
+                # Separate from ``requested`` because provenance is a
+                # different question from the value itself, and because
+                # a caller may legitimately not know it.
+                "parameter_override_sources": (
+                    dict(parameter_override_sources)
+                    if parameter_override_sources
+                    else None
+                ),
                 # C: capacity semantics of the open-loop replay
                 "capacity_metric_type": "forced_current_window",
                 "capacity_is_predictive": False,
@@ -689,6 +870,30 @@ def run_baseline_cell(
         "metrics": metrics,
         "output_dir": out_dir,
         "runtime_s": runtime_s,
+        # LEGACY, kept deliberately and unchanged.
+        #
+        # Despite the name, this carries the REQUEST mapping
+        # ``{key: value}`` -- NOT the before/after pair.  Callers
+        # already depend on that shape (one of them even documents the
+        # workaround), so renaming or re-typing it would break them.
+        # It is retained for compatibility only; new code must read
+        # ``parameter_overrides_applied``.
+        "applied_overrides": (
+            dict(parameter_overrides) if parameter_overrides else None
+        ),
+        # additive (v0.7): the authoritative applied record, or None
+        # when no override was requested.  This is the key a reader
+        # should use to recover ``old``/``new``/``source``.
+        "parameter_overrides_applied": (
+            applied_all if applied_all else None
+        ),
+        # additive (v0.7): provenance for the overridden values, or
+        # None when the caller supplied none.
+        "parameter_override_sources": (
+            dict(parameter_override_sources)
+            if parameter_override_sources
+            else None
+        ),
     }
 
 
