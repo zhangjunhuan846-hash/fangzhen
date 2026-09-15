@@ -83,7 +83,8 @@ python run_pipeline.py --list-datasets     # 应列出 5 个数据集
 | `configs/` | 数据集 / 模型 / 敏感性配置 |
 | `user_tools/` + `user_dataset_template/` | 免编程自助入口 |
 | `analysis/` `scripts/` `docs/` | 科学分析脚本、阶段脚本与报告 |
-| `tests/` | 88 项回归测试（**需要完整数据目录才能跑**，数据不在本包内） |
+| `STATUS.md` | **唯一可信状态页**：门控表 / 测试数 / 已知限制。与本文档冲突时以它为准 |
+| `tests/` | 回归测试（**需要完整数据目录才能跑**，数据不在本包内）。当前项数见 `STATUS.md`，勿引用本文档里的历史数字 |
 | `external/Jackowska-2025-JPS/` | 公开的 Jackowska 半电池参数集代码（第三方仓库快照，commit 9f3b526） |
 
 不在包内：`data/`（14 GB 数据集）、`outputs/`（历史结果）、`logs/`、`.git`。

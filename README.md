@@ -202,7 +202,8 @@ python run_pipeline.py baseline --dataset chen2020 --model SPMe --cell 02
 ├── user_tools/            # 自助入口：实验 CSV → 校验 → zero-fit baseline
 ├── outputs/               # Simulation results
 ├── external/              # Vendored upstream parameter-set repo (BSD-3)
-├── tests/                 # Regression tests (293 passed gate)
+├── STATUS.md              # **唯一可信状态页**（门控表 / 测试数 / 已知限制）
+├── tests/                 # Regression tests (see STATUS.md for the current gate)
 └── README.md
 ```
 
@@ -230,6 +231,9 @@ run_metadata.json
 
 # ✅ Current Status
 
+> 完整门控表、测试数、已知限制见 **`STATUS.md`**。下面这份清单只表示"曾经完成过"，
+> 不表示"当前仍然通过" —— 两者可能不一致，以 `STATUS.md` 为准。
+
 * [x] Dataset standardization
 * [x] PyBaMM integration
 * [x] SPM/SPMe/DFN support
@@ -240,7 +244,7 @@ run_metadata.json
 * [x] Baseline simulation
 * [x] Sensitivity analysis
 * [x] Result tracking
-* [x] Regression testing (293 tests)
+* [x] Regression testing (count in `STATUS.md`)
 * [x] Experimental-CSV self-service entry (`user_tools/` + example case)
 * [x] Graphite half-cell line, Phase A: SINTEF graphite R2032 → zero-fit SPM chain
 * [x] Graphite Phase A.5: geometry-aware zero-fit (measured electrode geometry)
