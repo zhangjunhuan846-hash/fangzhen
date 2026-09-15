@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ============================================================
-# 一键修复本仓库在本机上的两个环境问题
+# 一键修复本仓库在本机上的三个环境问题
 #
-# 这两条都是 **workaround，不是根治**：
+# 前两条是 **workaround，不是根治**：
 #   1. 全局 credential.helper = git-credential-manager(GCM 2.9)
 #      在本机任何上下文都会死锁（git credential fill 45s 超时、
 #      GCM_TRACE 无输出），于是 push 卡 90-120s 后被 SIGTERM。
@@ -12,6 +12,13 @@
 #      （git fetch / update-ref 都报成功，文件随即消失，status 显示
 #      [gone]）。改为把该引用写进 .git/packed-refs——安全软件只盯
 #      松散引用，packed 能存活。
+#
+# 第三条是 **防御性开关**，2026-09-15 加：
+#   3. 同一类删除行为会连 .git/objects 里的松散对象和 refs/ 一起清掉，
+#      最严重的一次（git repack -ad 之后）整个 .git 只剩 info/。
+#      两次事故都紧跟"一次写/删很多 .git 内文件"的 git 操作，
+#      所以这里把自动重打包全关掉，并坚持改完就 bundle。
+#      完整现象与恢复流程见 docs/dev_environment_notes.md 第 3 节。
 #
 # 换机器 / 重新 clone 之后跑一次即可。幂等，可重复执行。
 #
@@ -84,6 +91,32 @@ else
     echo "拿不到任何 SHA，跳过 packed-refs 修复"
 fi
 
+# ------------------------------------------------------------
+# 3) 关掉一切"会自动重打包"的机制
+#
+#    2026-09-15 两次事故：refs/ 与松散对象被成批删除；其中一次
+#    （git repack -ad 之后）整个 .git 只剩 info/，HEAD/config/index/
+#    packed-refs/objects 全没，git status 报 "not a git repository"。
+#    两次都紧跟"一次写/删很多 .git 内文件"的操作，间隔约 12 min。
+#
+#    收益（省几十 MB）远小于风险，所以直接关掉。
+#    恢复流程与校验方式见 docs/dev_environment_notes.md 第 3 节。
+# ------------------------------------------------------------
+git config gc.auto 0
+git config gc.autoDetach false
+git config fetch.writeCommitGraph false
+git config maintenance.auto false
+echo "自动重打包已关闭:"
+for k in gc.auto gc.autoDetach fetch.writeCommitGraph maintenance.auto; do
+    printf '    %-26s = %s\n' "$k" "$(git config --local --get "$k")"
+done
+
+# 单文件备份：目录形态两次都被清过，单文件更抗删
+BUNDLE_DIR="${BUNDLE_DIR:-$(dirname "$(git rev-parse --show-toplevel)")/_git_bundles}"
+mkdir -p "$BUNDLE_DIR" 2>/dev/null || true
+echo "bundle 备份目录: $BUNDLE_DIR"
+echo "    （建议每次提交后跑：git bundle create <该目录>/<name>.bundle --all）"
+
 echo
-echo "完成。注意：这两条都只作用于**本机本仓库**；"
+echo "完成。注意：这三条都只作用于**本机本仓库**；"
 echo "换机器或新 clone 需要重新执行本脚本（见 docs/dev_environment_notes.md）。"
