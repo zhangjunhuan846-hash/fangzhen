@@ -29,7 +29,7 @@ WHY THE COST IS MODEL-TO-MODEL
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -85,7 +85,18 @@ class MultiplierScan:
 
     def __init__(self, adapter, cell, protocol_id, df, protocol,
                  parameter_set, model_options, alignment,
-                 zero_current: bool = False):
+                 zero_current: bool = False,
+                 override_builder: Optional[Callable[[float], Any]] = None,
+                 override_source_fn: Optional[Callable[[float], Dict[str, Any]]] = None,
+                 source_label: str = ""):
+        """``override_builder`` / ``override_source_fn`` 是 G6.2a 加的**可注入**接口。
+
+        默认（都不给）保持原行为：``D_s(x) = D_ref(x) * 10**a``。
+        给了的话，扫描变量 ``a`` 的含义由调用方定义（例如 G6.2a 的
+        "shape 幅度（RMS 归一化 dex）"），而 **cost / compare / reachable /
+        pre_pulse_leak 这些定义完全不变** —— 这正是把它放在这里的理由：
+        形状换了，代价函数不允许换。
+        """
         self.adapter = adapter
         self.cell = cell
         self.protocol_id = protocol_id
@@ -94,6 +105,10 @@ class MultiplierScan:
         self.model_options = model_options
         self.alignment = alignment
         self.zero_current = bool(zero_current)
+        self._builder = override_builder
+        self._source_fn = override_source_fn
+        self.source_label = (source_label
+                             or "G6.1b-1/G6.1c log-multiplier scan")
 
         frame = df
         if self.zero_current:
@@ -125,22 +140,30 @@ class MultiplierScan:
 
         V_ref = np.full(self.n_ref, np.nan, dtype=float)
         tic = time.perf_counter()
+        override = (
+            self._builder(key) if self._builder is not None
+            else build_multiplier_override(self.parameter_set, key)
+        )
+        source = (
+            self._source_fn(key) if self._source_fn is not None
+            else {
+                "source": self.source_label,
+                "method": "log10 D_s(x) = log10 D_ref(x) + a0",
+                "a0_dex": key,
+                "multiplier": float(10.0 ** key),
+            }
+        )
         res = _run_one_replay(
             self.frame,
             model_name="SPM",
             parameter_set=self.parameter_set,
             model_options=self.model_options,
             parameter_overrides={
-                DS_KEY: build_multiplier_override(self.parameter_set, key),
+                DS_KEY: override,
                 **self.alignment["overrides"],
             },
             parameter_override_sources={
-                DS_KEY: {
-                    "source": "G6.1b-1/G6.1c log-multiplier scan",
-                    "method": "log10 D_s(x) = log10 D_ref(x) + a0",
-                    "a0_dex": key,
-                    "multiplier": float(10.0 ** key),
-                },
+                DS_KEY: source,
                 **self.alignment["source"],
             },
         )
