@@ -13,7 +13,7 @@
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
 Last verified commit:   f957128  (2026-09-16, 平台冻结包：接入模板 + 模式治理 + 自动报告)
-origin/main:            ee45d62  (本地领先 33 个 commit，**尚未 push**)
+origin/main:            **与本地同链，已 push**（2026-09-16；33 个 commit 积压已清零）
 Working tree:           见「已知限制 #1」
 STATUS.md last updated: 2026-09-16
 ```
@@ -956,10 +956,13 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
    当前 48.36 mV 是公共接口的诚实结果。闭合需要把初值策略放进 request
    （与"顶层只有四个字段"冲突），属独立设计任务。
 
-2. **本地领先远端 33 个 commit，尚未 push。**
-   `origin/main` 还停在 `ee45d62`（2026-09-15 之前）。
-   → **任何人 clone 远程仓库看不到覆盖 API、G6.1a 的协议层、尺度对齐门、G6.1b-1、
-   G6.1c 与整个平台冻结包。** 需要 push 才对导师可见。
+2. **推送通道已恢复（2026-09-16）。** 远端 `main` 与 `feat/parameter-identification`
+   都指向同一条链，33 个 commit 的积压已清零 ——
+   **导师现在 clone 就能看到**覆盖 API、G6.1a 的协议层、尺度对齐门、G6.1b-1、
+   G6.1c 与整个平台冻结包。
+   ⚠️ **判断推送状态必须用 `git ls-remote --heads origin`**：
+   本机的 `refs/remotes/origin/main` 会被安全软件删掉/不更新
+   （显示成旧的 `ee45d62`），信它会得出"没推上去"的错误结论。
 
 3. **跑一次 pipeline 会改动被 git 跟踪的产物文件。**
    `outputs/` 有 418 个文件在版本控制内。一次 baseline 会改 6 个文件。
