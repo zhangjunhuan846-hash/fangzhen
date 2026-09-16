@@ -96,8 +96,13 @@ G5 参数辨识 / 可信性      IN PROGRESS   — G5.0 PASS；G5.1 IN PROGRESS
   G5.2 模型失配（SPMe→SPM）+ cross-protocol   PASS     — 2026-09-16（参数被污染，见下）
   G5.3 联合 D_s–R_p 辨识几何与失配补偿         PASS     — 2026-09-16（退化方向即补偿方向，见下）
   G5.4 多协议辨识性 + 模型一致性                PASS **FROZEN**  — 2026-09-16（多协议无效，独立测量有效）
-  G5.5 测量 → 模型尺度映射 + 不确定度传递       IN PROGRESS — 来源审计已完成，见下
-  G5.6 真实实验 + cross-protocol 验证           NOT STARTED
+  G5.5 测量 → 模型尺度映射 + 不确定度传递       PASS **FROZEN** — 2026-09-16（含 G5.5a，见下）
+  ══ Chen2020 方法学分支到此封存 ══
+G6 graphite‖Li 实验约束模型                   IN PROGRESS
+  G6.0 graphite 参数 provenance 审计            IN PROGRESS — 见下
+  G6.1 graphite baseline 复现                   NOT STARTED
+  G6.2 graphite identifiability                 NOT STARTED
+  G6.3 独立 protocol 验证                       NOT STARTED
 G6 held-out 预测         NOT DONE
 G7 再生状态泛化          NOT STARTED
 G8 优化闭环              NOT DONE
@@ -247,6 +252,73 @@ Mismatch  SPMe truth → SPM  inverse   （4 个倍率）
 （SPMe→SPM）；单电芯（cell 02）、单参数集；倍率覆盖不全。
 **没有**结论说"SPM 不能用" —— 结论是**SPM 下辨识出的 $D_s$ 是 effective parameter，
 不是材料常数**，而它"看起来很好"本身就是失配的证据。
+
+### G5.5a 模型尺度不确定度传递 — **PASS ｜ Chen2020 分支封存**（2026-09-16）
+
+完整报告 `docs/g5.5a_radius_uncertainty.md`。
+可复现：`python scripts/identification/g5_5a_radius_uncertainty.py`（340.6 s）
+\+ `python scripts/identification/g5_5a_beta_analysis.py`（后处理）
+
+**定位**：Chen2020 方法学分支的**收尾**。刻意**不**解释 5.22 µm 对应哪个 PSD 统计量，
+也**不**虚构数量/面积/体积三套加权 —— 没有对应原始测量时那是制造伪信息。
+
+$$\beta=\frac{d\log D_s^*}{d\log R_p}$$
+
+| 臂 | 绕 δ=0 拟合 | LOO 范围 |
+|---|---|---|
+| control | **2.0751** | **[2.0708, 2.0812]** |
+| mismatch | **2.0564** | **[2.0533, 2.0606]** |
+
+**两臂都紧贴理论参照 $\beta=2$（只约束 $\tau_d=R_p^2/D_s$ 时的精确值）。**
+
+> **判据修正（本轮踩的坑）**：失配臂在 δ=0 处**本身带 −25.0 % 偏差**，
+> 过原点的幂律拟合把常数偏移折进指数 → LOO 炸到 `[1.22, 2.96]`。
+> **绕 δ=0 归一化**后 LOO 立刻收到 `[2.053, 2.061]`。
+> 控制臂两种算法给出同一数（偏移为零），是一致性检查。
+
+**产出：粒径表征精度要求**（$\Delta D_s/D_s \approx 2\,\Delta R_p/R_p$）
+
+| 粒径精度 | $D_s$ 不可约偏差 |
+|---|---|
+| ±2 % | ∓4 % |
+| **±5 %** | **∓10 %** |
+| ±10 % | ∓20 % |
+| ±20 % | ∓37~46 % |
+
+**边界**：合成数据；**协议只有 0.1C 一个**（β 是否依赖倍率/协议集未测）；
+扰动是均匀相对扰动，非真实误差分布。
+
+---
+
+### G6.0 graphite 参数 provenance 审计 — **IN PROGRESS**（2026-09-16）
+
+完整文档 `docs/g6.0_graphite_parameter_provenance.md`。
+参数集 dump：`outputs/graphite/g6_0_parameter_set.json`（89 key，含 callable 源文件）
+脚本：`scripts/graphite/dump_graphite_parameters.py`、`list_graphite_parameter_keys.py`
+
+**两个结构性发现（都比单行数值重要）**：
+
+**① graphite 参数挂在 `Positive electrode ...` 名下**（半电池把工作电极映射到 positive 槽）。
+`configs/datasets.yaml` 已写明 `working_electrode: "positive"`；
+`Negative electrode OCP [V] = 0.0` 是**锂金属对电极**。
+→ **任何按名字取参数的脚本在这里都会取错。**
+
+**② ⚠️ `Positive particle diffusivity` 是 CALLABLE 函数，不是标量。**
+
+> **这对 G5 → G6 的迁移是决定性的**：G5 全链条辨识的是**标量** $D_s$，
+> 而 graphite 的 $D_s = D_s(x)$ 是**化学计量数的函数**。
+> **G6 的辨识问题不是"换数据集重跑"，而是"如何辨识函数值参数"。**
+> 平台当前**无法表示函数型参数**（G5 阶段 $k_0$ 即因此不能进第一版向量）。
+> **G6.2 之前必须先定义 $D_s(x)$ 的有限维表示。**
+
+**关键当前值**：thickness 74 µm · porosity 0.329 · active frac 0.372 ·
+**particle radius 13.7 µm** · $D_s(x)$ 函数 · OCP 函数 ·
+Bruggeman(electrolyte) **1.6372789…**（非整数 → 拟合/推导）· Contact resistance **0**（假定）
+
+**待办**：逐项回溯 ⚠️ 行为"实测/文献/拟合/假定"；
+核对 `data/metadata.csv` 与参数集的 geometry/loading；
+说明两套 OCP（Ecker2015 内置 vs 平台从 p-OCV 派生）的关系；
+**定义 $D_s(x)$ 的有限维表示**。
 
 ### G5.5 测量 → 模型尺度映射 — **IN PROGRESS**（2026-09-16）
 
