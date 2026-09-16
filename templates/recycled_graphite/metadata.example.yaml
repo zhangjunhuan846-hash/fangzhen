@@ -1,0 +1,61 @@
+# ============================================================
+# 回收石墨材料元数据（模板）
+#
+# 用法
+#   cp metadata.example.yaml data/raw/LIB/<你的样品>.yaml
+#   填完校验：
+#     python -m battery_sim.datasets.template --metadata data/raw/LIB/<你的样品>.yaml
+#   缺字段会**逐条列出**；errors = 0 才能开始分析。
+#
+# 为什么这些字段是必填
+#   模型侧需要的不是数据文件，而是电极/颗粒的实测量。它们不在任何仪器导出里，
+#   只在人手里。缺了它们分析照样能"跑出一个数"，但那个数不可比较也不能复算。
+#   D ∝ R²：粒径错一倍，扩散系数差 4 倍。
+# ============================================================
+
+sample_id: null                  # 例："RG_500-a"
+material_class: null             # pristine | recycled | regenerated | reference | unknown
+regeneration_condition: null     # 例："500 °C, Ar 气氛, 2 h"；material_class=pristine 可留空
+source: null                     # 例："本实验室 2026-08 批次；LFP 回收线拆解负极"
+
+electrode:
+  mass_loading_mg_cm2: null      # 活性物质载量 (mg/cm²)，实测
+  coating_thickness_um: null     # 涂层厚度 (µm)，实测（不是标称）
+  area_cm2: null                 # 电极几何面积 (cm²)
+  binder: null                   # 配方（建议写：PVDF:导电剂:活性物质）
+  porosity: null                 # 孔隙率（可选，但模型对它敏感）
+
+particle:
+  d50_um: null                   # 粒径中位 D50 (µm)
+
+cell:
+  format: "CR2032"
+  counter_electrode: null        # 例："Li 片 φ15.6 mm × 0.45 mm（过量）"
+  electrolyte: null              # 例："1 M LiPF6 in EC:DEC = 1:1"
+  separator: null                # 例："Celgard 2400"
+
+# technique 只能取 TECHNIQUE_VOCAB：
+#   GITT | pOCV | CC_charge_discharge | rate_capability | EIS | cycling
+# role 只能取：identification | validation | exploration
+measurements:
+  - technique: GITT
+    file: null                   # 相对仓库根的路径
+    role: identification
+    notes: null                  # 例："C/10, 10 min 脉冲 + 60 min 静置"
+  - technique: CC_charge_discharge
+    file: null
+    role: identification
+    notes: null
+  - technique: EIS
+    file: null
+    role: exploration
+    notes: null                  # 例："10/50/90 % SOC 各一个点"
+
+# 可选：逐参数来源。审稿人一定会问"这个参数怎么来的"，
+# 答案必须落在下面这个词表里（不许写"拟合得到"）。
+#   gitt_fitting | eis_fitting | ocv_derived | literature_prior |
+#   inferred | parameter_set_default | user_override | not_measured
+parameter_sources:
+  Ds: null
+  k0: null
+  Rct: null

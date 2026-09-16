@@ -633,6 +633,10 @@ dlr_gitt:
   adapter: "dlr_gitt"
   protocol: "dlr_basytec_gitt"
 
+  # 数据来源（extra.source 是平台的 provenance 字段；契约见 docs/adding_a_dataset.md）。
+  # 缺了它，任何"这个参数从哪来"的问题都答不出来。
+  source: "DLR Hydra.0b Li||graphite GITT (2022-11-14, 25 degC, Basytec export, Latin-1) — data/DLR__LiGrHydra0b__20221114__GITT__25degC__Basytec.txt"
+
   # ---- half-cell first-class configuration (physical vs slot) ----
   # Ecker2015_graphite_halfcell 把石墨放正极槽位（与 sintef_graphite 一致）。
   cell_configuration: "half_cell"

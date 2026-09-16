@@ -1,0 +1,35 @@
+# ============================================================
+# 贴进 configs/datasets.yaml 的声明块（回收石墨半电池）
+#
+# 注意
+#   · adapter 名必须与文件/类名对应：recycled_graphite -> RecycledGraphiteAdapter
+#   · extra.source 必填（数据从哪来），缺失时 adapter 构造即报错
+#   · extra.material_metadata 必填，且文件要过材料元数据契约
+#   · dataset_role 必须显式声明；回收石墨通常是 identification（参数由它标定）
+#   · 一切就绪前**不要**加进 live config：空数据集会让管线在 list_cells 处失败
+# ============================================================
+
+recycled_graphite:
+  name: "Recycled graphite half-cell (CR2032)"
+  ion: "Li"
+  chemistry: "graphite"
+  raw_dir: "data/raw/LIB/recycled_graphite"
+  processed_dir: "data/processed/recycled_graphite"
+  adapter: "recycled_graphite"
+  protocol: "halfcell_gitt"
+  parameter_set: "Ecker2015_graphite_halfcell"   # 或本实验室标定的半电池参数集
+  cells: ["G0-a", "G0-b", "G0-c", "RG_raw", "RG_500", "RG_800"]
+  rates: ["c20", "c10", "c2", "1c"]              # 与 SOURCE_TO_CANONICAL 对齐
+  supported_models: ["SPM", "SPMe"]
+  nominal_capacity_Ah: null                       # 用实测标称容量填（不要用参数集容量）
+  lower_voltage_cutoff_V: 0.005
+  upper_voltage_cutoff_V: 1.5
+  raw_file_template: "{cell}.txt"                 # 按实际导出格式改
+  dataset_role: "identification"
+  dataset_role_note: >
+    本实验室自测半电池；参数将由该数据集标定（G0 参照 + RG_* 处理组同批对照）。
+    注意：fresh 侧必须是**本实验室自己的** G0，不得用 SINTEF/DLR 公开记录当基准。
+  extra:
+    source: "本实验室 <批次/日期>；<样品来源>"
+    material_metadata: "data/raw/LIB/recycled_graphite/<sample_id>.yaml"
+    ambient_temperature_C: 25.0                   # 若逐点记录温度则删掉这一行并实现 read_ambient_temperature
