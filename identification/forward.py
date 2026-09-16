@@ -40,27 +40,57 @@ import json
 import math
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
 
 from battery_sim.registry import get_dataset
 from battery_sim.simulation.baseline import run_baseline_cell
 
-#: The pybamm key being identified.
+#: The pybamm keys this package can identify.
 DS_KEY = "Positive particle diffusivity [m2.s-1]"
+RP_KEY = "Positive particle radius [m]"
 
 #: Name of the optimised variable as PyBOP sees it.
 Z_NAME = "log10_Ds"
+R_NAME = "log10_Rp"
+
+#: logical optimisation variable -> pybamm parameter key.
+#:
+#: Everything the simulator writes goes through this table, so a one-parameter
+#: problem and a two-parameter problem share exactly one code path and cannot
+#: drift apart.  Adding a third parameter means adding a row here.
+PARAM_KEYS: Dict[str, str] = {
+    Z_NAME: DS_KEY,
+    R_NAME: RP_KEY,
+}
 
 #: The variable compared against the data.
 TARGET = "Voltage [V]"
 DOMAIN = "Time [s]"
 
 
+def _source_record(name: str, z: float, note: str = "") -> Dict[str, Any]:
+    return {
+        "logical_name": {Z_NAME: "particle_diffusivity",
+                         R_NAME: "particle_radius"}.get(name, name),
+        "source": "PyBOP candidate evaluation",
+        "method": "identification joint-parameter recovery",
+        "unit": "m2/s" if name == Z_NAME else "m",
+        "z": z,
+        **({"note": note} if note else {}),
+    }
+
+
 @dataclass
 class EvaluationRecord:
-    """One candidate evaluation, fully attributable."""
+    """One candidate evaluation, fully attributable.
+
+    ``z`` and ``ds`` describe the ONE-parameter (diffusivity) case and are NaN
+    when that parameter was not part of the problem.  ``values`` carries the
+    optimised variables for the general case, so a joint two-parameter run
+    records both of its coordinates rather than pretending to be one-parameter.
+    """
 
     index: int
     z: float
@@ -74,12 +104,14 @@ class EvaluationRecord:
     n_points: int
     json_path: str
     status: str
+    values: Dict[str, float] = field(default_factory=dict)
 
     def as_dict(self) -> Dict[str, Any]:
         return {
             "index": self.index,
             "z": self.z,
             "ds": self.ds,
+            "values": self.values,
             "requested": self.requested,
             "applied": self.applied,
             "sources": self.sources,
@@ -196,14 +228,19 @@ def _read_time_aligned(out_dir: Path, rate_slug: str):
     )
 
 
-def replay(
+def replay_with(
     case: ReplayCase,
-    ds: float,
-    *,
-    source_record: Optional[Dict[str, Any]] = None,
+    overrides: Dict[str, float],
+    sources: Optional[Dict[str, Any]] = None,
     output_root: Optional[Path] = None,
 ):
-    """Run ONE platform replay with the given D_s. Returns (t, V, platform result)."""
+    """Run ONE platform replay with an arbitrary override set.
+
+    ``overrides`` maps pybamm keys to values.  The general form exists so that
+    a joint two-parameter problem and a single-parameter problem go through
+    the same door into the platform -- and so that the platform's override API
+    is exercised identically in both.
+    """
     import battery_sim.paths as paths
 
     saved = paths.PLATFORM_OUTPUT_ROOT
@@ -219,16 +256,30 @@ def replay(
             parameter_set=case.parameter_set,
             plot=False,
             quiet=True,
-            parameter_overrides={DS_KEY: float(ds)},
-            parameter_override_sources=(
-                {DS_KEY: source_record} if source_record else None
-            ),
+            parameter_overrides={k: float(v) for k, v in overrides.items()},
+            parameter_override_sources=(dict(sources) if sources else None),
         )
     finally:
         paths.PLATFORM_OUTPUT_ROOT = saved
 
     t, v = _read_time_aligned(Path(res["output_dir"]), case.rate_slug)
     return t, v, res
+
+
+def replay(
+    case: ReplayCase,
+    ds: float,
+    *,
+    source_record: Optional[Dict[str, Any]] = None,
+    output_root: Optional[Path] = None,
+):
+    """Run ONE replay with a given D_s. Convenience wrapper over replay_with."""
+    return replay_with(
+        case,
+        {DS_KEY: float(ds)},
+        {DS_KEY: source_record} if source_record else None,
+        output_root,
+    )
 
 
 def make_replay_simulator(
@@ -238,6 +289,7 @@ def make_replay_simulator(
     audit_dir: Path,
     min_coverage: float = 0.5,
     replay_case: Optional[ReplayCase] = None,
+    param_names: Sequence[str] = (Z_NAME,),
 ):
     """Build a PyBOP simulator whose forward model is the platform replay.
 
@@ -281,6 +333,14 @@ def make_replay_simulator(
             self.audit_dir = Path(audit_dir)
             self.audit_dir.mkdir(parents=True, exist_ok=True)
             self.min_coverage = float(min_coverage)
+            # The ONE table mapping optimised variables to pybamm keys.
+            # A one-parameter and a two-parameter problem therefore share a
+            # single code path and cannot drift apart.
+            unknown = [n for n in param_names if n not in PARAM_KEYS]
+            if unknown:
+                raise KeyError(f"no pybamm key registered for {unknown}; "
+                               f"known: {sorted(PARAM_KEYS)}")
+            self.param_keys = {n: PARAM_KEYS[n] for n in param_names}
             self.records: List[EvaluationRecord] = []
             self.n_calls = 0
 
@@ -291,24 +351,35 @@ def make_replay_simulator(
             if not isinstance(inputs, dict):
                 inputs = dict(inputs)
 
-            z = float(inputs[Z_NAME])
-            ds = 10.0 ** z
             # Index from the record list, NOT a call counter: PyBOP shallow-
             # copies the simulator when it builds the Problem, so the list is
             # shared while instance attributes are not.  Deriving the index
             # from the shared list keeps the audit correct under that copy.
             idx = len(self.records) + 1
 
-            src = {
-                "logical_name": "particle_diffusivity",
-                "source": "PyBOP candidate evaluation",
-                "method": "identification/G5.0 synthetic recovery",
-                "unit": "m2/s",
-                "z": z,
-            }
+            values: Dict[str, float] = {}
+            overrides: Dict[str, float] = {}
+            srcs: Dict[str, Any] = {}
+            for name, key in self.param_keys.items():
+                if name not in inputs:
+                    continue
+                zz = float(inputs[name])
+                values[name] = zz
+                overrides[key] = 10.0 ** zz
+                srcs[key] = _source_record(name, zz)
 
-            t_sim, v_sim, res = replay(
-                self.case, ds, source_record=src, output_root=self.output_root
+            if not overrides:
+                raise ValueError(
+                    f"none of the problem's parameters "
+                    f"{sorted(self.param_keys)} were supplied; "
+                    f"got {sorted(inputs)}"
+                )
+
+            z_D = values.get(Z_NAME, float("nan"))
+            ds = (10.0 ** z_D) if Z_NAME in values else float("nan")
+
+            t_sim, v_sim, res = replay_with(
+                self.case, overrides, srcs, output_root=self.output_root
             )
 
             t_obs = np.asarray(self.observation.time_s, dtype=float)
@@ -322,7 +393,7 @@ def make_replay_simulator(
 
             if mask_obs.sum() < 2 or coverage < self.min_coverage:
                 self._record(EvaluationRecord(
-                    index=idx, z=z, ds=ds,
+                    index=idx, z=z_D, ds=ds, values=dict(values),
                     requested=requested, applied=applied, sources=sources,
                     cost=math.inf, rmse_mV=None,
                     overlap_fraction=coverage,
@@ -341,7 +412,7 @@ def make_replay_simulator(
                 if metrics is not None and len(metrics) else None
             )
             self._record(EvaluationRecord(
-                index=idx, z=z, ds=ds,
+                index=idx, z=z_D, ds=ds, values=dict(values),
                 requested=requested, applied=applied, sources=sources,
                 cost=math.nan,          # the cost function fills this in
                 rmse_mV=rmse,
@@ -395,7 +466,8 @@ def make_replay_simulator(
 
 def build_problem(observation: Observation, output_root: Path, audit_dir: Path,
                   z_bounds=(-16.0, -13.0), z_initial: float = -14.398,
-                  replay_case: Optional[ReplayCase] = None):
+                  replay_case: Optional[ReplayCase] = None,
+                  params: Optional[Dict[str, tuple]] = None):
     """Assemble the PyBOP Problem: parameters + simulator + cost.
 
     ``z_initial`` defaults to log10(4e-15), the Chen2020 nominal D_s -- i.e.
@@ -408,11 +480,20 @@ def build_problem(observation: Observation, output_root: Path, audit_dir: Path,
     """
     import pybop
 
-    parameter = pybop.Parameter(
-        initial_value=float(z_initial),
-        bounds=list(z_bounds),
-    )
-    parameters = pybop.Parameters({Z_NAME: parameter})
+    # ``params`` is the JOINT form: {logical_name: (initial_value, (lo, hi))}.
+    # The legacy single-parameter arguments remain the default so that
+    # G5.0/G5.1/G5.2 keep working unchanged.
+    if params is None:
+        params = {Z_NAME: (float(z_initial), tuple(float(b) for b in z_bounds))}
+    names = tuple(params)
+
+    parameters = pybop.Parameters({
+        n: pybop.Parameter(
+            initial_value=float(params[n][0]),
+            bounds=[float(params[n][1][0]), float(params[n][1][1])],
+        )
+        for n in names
+    })
 
     simulator = make_replay_simulator(
         parameters,
@@ -420,6 +501,7 @@ def build_problem(observation: Observation, output_root: Path, audit_dir: Path,
         output_root=Path(output_root),
         audit_dir=Path(audit_dir),
         replay_case=replay_case,
+        param_names=names,
     )
 
     cost = pybop.SumSquaredError(
