@@ -12,10 +12,11 @@
 
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
-Last verified commit:   12a6cd9  (2026-09-15, "feat: add traceable runtime parameter overrides")
-origin/main:            ee45d62  (本地领先 1 个 commit，**尚未 push**)
+Last verified commit:   8a3050e  (2026-09-16, "feat: make capacity alignment a gate,
+                                    and scan the global D_s multiplier")
+origin/main:            ee45d62  (本地领先 28 个 commit，**尚未 push**)
 Working tree:           见「已知限制 #1」
-STATUS.md last updated: 2026-09-15
+STATUS.md last updated: 2026-09-16
 ```
 
 ---
@@ -101,6 +102,9 @@ G5 参数辨识 / 可信性      IN PROGRESS   — G5.0 PASS；G5.1 IN PROGRESS
 G6 graphite‖Li 实验约束模型                   IN PROGRESS
   G6.0 graphite 参数 provenance 审计            IN PROGRESS — 见下
   G6.1a 协议依赖的数值活性门                    PASS(实质)/FAIL(判据) — 2026-09-16，见下
+  G6.1b-1 全局 log-multiplier 恢复门            **FAIL(I1)** — 2026-09-16，见下
+  ══ 尺度对齐门（scale alignment gate）═         已提升为一级概念 —— 2026-09-16，见下
+  G6.1b-2 3-region basis                        **暂缓**（理由见 G6.1b-1 报告 §6）
   G6.2 graphite identifiability                 NOT STARTED
   G6.3 独立 protocol 验证                       NOT STARTED
 G6 held-out 预测         NOT DONE
@@ -382,6 +386,122 @@ Ecker2015 描述 86 cm² / **202.398 mAh** 电芯，而 DLR 扫程电荷只有 *
 ② 相位靠 **`Command` 列**（Pause/Charge/Discharge），不靠 step 编号；
 ③ **符号** —— 本文件 Discharge 电流为负（Basytec 惯例），平台 canonical 是 discharge = +，须翻转；
 且符号**在数据内被验证**（canonical I>0 与 V 下降同时发生），契约测试钉住。
+
+### 尺度对齐门（Scale alignment gate）— **已提升为平台一级概念**（2026-09-16）
+
+完整说明 `docs/scale_alignment_gate.md`；实现 `governance/scale_alignment.py`；
+测试 `tests/test_scale_alignment.py`（18 项）。
+
+**为什么它必须是流程而不是脚本里的一段**：同一个坑踩了两次，**两次的输出完全一样**。
+
+| | 参数集描述的电芯 | 记录实际通过的电荷 | 比值 | 当时的（错误）读数 |
+|---|---|---|---|---|
+| G5 p-OCV | 202.398 mAh | 1.7846 mAh | **113×** | "准平衡不激发固相扩散" |
+| G6 DLR GITT | 202.398 mAh | 6.5277 mAh | **31×** | "C/10 脉冲只动 0.4 mV" |
+
+标称 C/10 的脉冲在 31× 失配的模型上实跑 **C/309**（瞬态小 43 倍）；
+判别"接线问题 vs 尺度问题"的办法：把电流 ×1/×10/×100 →
+响应 −0.394 / −4.019 / −29.92 mV **成比例** ⇒ **是尺度问题**。
+
+```
+Dataset -> Geometry audit -> Capacity alignment -> Protocol excitation -> Parameter inference
+```
+顺序写成常量 `PIPELINE_STAGES` 并有测试钉住：**跳过前三步，"参数不可辨识"无法归因**。
+
+**门的产物是两个 C-rate**（历来只报第一个）：
+
+```
+c_rate_on_cell           = I_pulse / Q_measured  = 0.1004    （读数怎么写的）
+c_rate_on_model_unscaled = I_pulse / Q_model     = 0.003237  （模型实际跑的，C/309）
+```
+**只有第二个决定固相扩散是否被激发。**
+
+**强制点是新增的 additive 入口**（冻结内核一行未改）：`run_protocol_replay(scale_alignment=...)`
+默认 `"check"` → **不对齐就拒绝跑**；`"align"` → 自动施加 footprint 配方；
+`"assume"` → 声明豁免并在 `run_metadata.json` 留下
+`scale_alignment.verdict == "assumed_by_caller"` + "没有证据表明它真的对齐"。
+异常类型是专用的 `ScaleMisalignment`（不是 `ValueError`）：尺度失配**可修**，
+参数名写错不可修，混进同一类型就是它们被混为一谈的开始。
+
+**两个附属结论**：① 容量基准必须是**扫程**不是单个脉冲（单脉冲 0.0271 mAh
+→ 模型缩到 1/7400 → 撞截止 → 瞬态全 NaN，**读起来正好像"参数惰性"**）；
+② 缩放的是电极 footprint（长宽各 ×√scale），不是 ε_am/厚度
+（那会得到 0.012 / 2.4 µm 的荒谬值）；③ 容差是**声明**值 ±0.05 dex，
+有测试专门证明它不是隐藏常数（同一组数字 + 容差放宽 → verdict 必须翻面）。
+
+### G6.1b-1 全局 log-multiplier 恢复门 — **FAIL（I1 可辨识性）**（2026-09-16）
+
+完整报告 `docs/g6.1b1_global_recovery.md`。
+可复现：`python scripts/graphite/g6_1b1_global_recovery.py`（266 次仿真，**52.8 s**）
+
+$$\log_{10}D_s(x)=\log_{10}D_{\rm ref}(x)+a_0,\quad \varphi_0(x)=1,\quad a_0\in[-1,+1]\ \text{dex}$$
+
+先过尺度对齐门（模型 202.398 mAh vs 扫程 6.5277 mAh → MISALIGNED 31.0×，footprint ×0.032252）。
+
+**判据跑前固定：过 8 条，`I1 可辨识性` 失败。**
+
+| 判据 | 结果 | 数字 |
+|---|---|---|
+| F1 前向活性 | PASS | 峰值 model-to-model RMSE **15.5726 mV** |
+| F2 前向有序 | PASS | `dV_pulse` 沿 41 点严格单调 |
+| R1 恢复 | PASS | 最大误差 **0.000000 dex**（**inverse crime，见下**） |
+| R2 内点 | PASS | argmin 全部 = 真值 |
+| **I1 可辨识带** | **FAIL** | 最大带 **1.0089 dex**（上限 0.30） |
+| C1 优化器一致 | PASS | Brent 与扫描差 **0 dex** |
+| C2 扫描覆盖 | PASS | 41/41 可达 |
+| C3 脉冲外干净 | PASS | 泄漏 **0.000e+00 mV** |
+| N1 负对照平坦 | PASS | 无激励面**精确平坦**（max\|dV\| = 0） |
+
+**1 mV 代价带**（带的分辨率一律 0.05 dex，即粗网格步长）：
+
+| 真值 $a_0$ | 平台区带宽 | 陡峭区带宽 |
+|---|---|---|
+| −0.5 | 0.682 dex | **0.140 dex** |
+| 0.0 | 0.897 dex | 0.350 dex |
+| +0.5 | **1.009 dex（截断）** | **0.826 dex（截断）** |
+
+**三条主结论**：
+
+1. **R1 是接线检查，不是成绩。** 观测就是同一次扫描在 $a_0$ 点的输出
+   （同模型、同参数化、同求解器、无噪声）⇒ $J(a_0)$ **精确为 0** ⇒ 不可能失败。
+   **inverse crime**：$\text{synthetic recovery success}\neqq\text{experimental identifiability}$（同 G5.0 红线）。
+2. **活性 ≠ 可辨识（实测）**：G6.1a 判"活跃"（平台区 8.2450 / 陡峭区 29.3874 mV 展开）没错，
+   但 1 mV 水平上 $D_s$ 在平台区可动 **7.9×**（0.897 dex）而轨迹不动 —— 报不出材料参数。
+3. **单侧性：$D_s$ 只有下界**（本轮最实质的结论）。六个 (窗口, 真值) 组合**全部**同一方向：
+   曲率不对称量六个**全为负**（−0.007…−0.043）；1 mV 带**右侧一律 ≥ 左侧**；
+   $a_0=+0.5$ 的两个窗口**右侧撞到扫描边界仍未穿过 1 mV**（⇒ 报出的是**下界**）。
+   端点对比最直白（$a_0=0$，陡峭区）：$a=-1$（$D_s$ 小 10 倍）→ **13.775 mV**；
+   $a=+1$ → **2.501 mV**。
+   > **这些脉冲协议给的是 $\tau_d$ 的上界（$D_s$ 的下界），不是 $D_s$ 的估计值。**
+   > 报点估计在数学上是一个**没有上界的**量。
+
+   （与 G5.3"谷是脊不是碗"同族但**更严重**：G5 是两参数沿一条浅方向**线性**补偿，
+   G6.1b-1 是单参数**单向半轴**失去约束 —— 后者长得像一次成功的拟合。）
+
+**④ 幅度与带宽不成比例**：活性比 3.56× / 曲率比 6.24× / **带宽改善只有 2.56×**
+⇒ **不能拿"响应大"当协议选择的代理指标**，必须直接测带。
+（G5.4"残差排序与精度排序相反"在同一主题上的第二次出现。）
+
+**⑤ 负对照把"没有信息"翻译成"误差有多大"**：零电流 → 代价矩阵 max **0.000000e+00 mV²**，
+任何确定性优化器返回**初值**；以 $a_{\rm init}=0$ 计，$a_0=\pm0.5$ 的隐含误差是
+**0.5 dex（$D_s$ −68.4 % / +216 %）**（标注 `derived_not_measured`）。
+
+**判据更正**：设计里要求的 **Hessian condition number 在 $d=1$ 时是空话**
+（$1\times1$ 矩阵条件数恒为 1）—— 按规定上报，并同时写明它为什么不含信息；
+替代量是**实测** $J''(\hat a_0)$ 与 1 mV 带宽度（最小值是测出的网格点，**不插值**）。
+条件数到 G6.1b-2（$3\times3$）才成为真判据。
+
+**为什么暂缓 G6.1b-2**：本轮**没通过**，而失败方向说明**加基函数会变糟**
+（3-region 把 1 个系数换成 3 个，每个的带只会更宽）。
+带宽本身就是选择下一步的依据：陡峭区带比平台区窄 **4.9×** ⇒ **协议选择比参数化更重要**；
+建议先在这份记录里把 239 个可用三元组逐个跑出"1 mV 带宽度"（成本极低：266 次仿真 53 s），
+再决定是否进 3-region。
+
+**边界**：无噪声、无模型形式差异（**理想条件下的最好情况**，真机只会更宽）；
+1 mV 是本轮选定的**可辨识水平**不是仪器噪声；带分辨率 0.05 dex
+（最窄的 0.140 dex 相对不确定度约 ±36 %，I1 的失败不是分辨率产物）；
+两个组合的带**被扫描边界截断**；只有 SPM / 单电芯 / 26 °C / 150 s 脉冲；
+**不是对 Ecker2015 的验证**（另一颗电芯，`dataset_role: benchmark`，不许叫 validation）。
 
 ### G6.0 graphite 参数 provenance 审计 — **IN PROGRESS**（2026-09-16）
 
@@ -672,30 +792,39 @@ representable → accepted → resolved → numerically_active → identifiable
 p-ocv 是 C/50，`gitt`/`gitthold` 实为 C/50 CC–CV 且多通道交错。
 唯一真实的脉冲数据是 **DLR LiGrHydra0b GITT**，已建 adapter 并纳入治理（**benchmark**）。
 **这是数据受阻，不是能力受阻** —— 换数据源即解。
-**另有一条常驻教训**：参数惰性有两个来源（**协议不激发** 与 **模型不在同一尺度**），
-两者看起来完全一样，**必须先把尺度对齐（Q_model == Q_measured）再谈协议**。
+**另有一条常驻教训（已升级为平台概念）**：参数惰性有两个来源（**协议不激发** 与
+**模型不在同一尺度**），两者看起来完全一样，**必须先把尺度对齐（Q_model == Q_measured）再谈协议**。
+→ 2026-09-16 已实现为 **`governance/scale_alignment.py`（尺度对齐门）**，
+在 protocol replay 入口**默认强制**，见上文独立小节。
+
+**G6 当前的真实卡点（2026-09-16，G6.1b-1 之后）**：不是能力，也不是数据，而是
+**可观测量本身的信息量**。1 mV 水平上，平台区窗口把 $D_s$ 约束到 0.9 dex（约 8 倍），
+陡峭区 0.35 dex，而且**全部单侧**（只有下界）。
+⇒ 下一步是 **protocol/观测量的设计**（把 239 个三元组逐个跑成"1 mV 带宽度"的地图），
+**不是**加基函数。理由与数字见 `docs/g6.1b1_global_recovery.md` §6。
 
 ---
 
 ## 测试状态
 
 ```text
-pytest:        329 passed, 5 warnings
+pytest:        374 passed, 5 warnings
 failures:      0
-duration:      100.16s
-last run date: 2026-09-15  (提交前复跑)
+duration:      126.89s
+last run date: 2026-09-16  (提交前复跑)
 command:       python -m pytest -q   (WSL, conda env pybamm)
 ```
 
-**文档中的测试数已过期，勿引用**（2026-09-15 核对）：
+**文档中的测试数已过期，勿引用**（2026-09-15 核对，2026-09-16 更新）：
 
 | 文件 | 写的数 | 实际 |
 |---|---|---|
-| `README.md` | 293 | **329** |
-| `HANDOFF.md` | 88 | **329** |
+| `README.md` | 293 | **374** |
+| `HANDOFF.md` | 88 | **374** |
 
 两个数字互不相同，且都与实际不符。已改为指向本文件，不再写死数字。
-**引用测试数时只引用本文件的 329。**
+**引用测试数时只引用本文件的 374。**（2026-09-16：329 → 356 是 G6.1a 的 28 项
+`test_dlr_gitt.py`，356 → 374 是本轮的 18 项 `test_scale_alignment.py`。）
 
 ---
 
@@ -705,10 +834,10 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
    当前 48.36 mV 是公共接口的诚实结果。闭合需要把初值策略放进 request
    （与"顶层只有四个字段"冲突），属独立设计任务。
 
-2. **覆盖 API 已提交但未 push。**
-   `12a6cd9 feat: add traceable runtime parameter overrides`（+753/−0）在本地 `main` 上，
-   `origin/main` 还停在 `ee45d62`。
-   → **任何人 clone 远程仓库仍看不到这个 API。** 需要 push 才对导师可见。
+2. **本地领先远端 28 个 commit，尚未 push。**
+   `origin/main` 还停在 `ee45d62`（2026-09-15 之前）。
+   → **任何人 clone 远程仓库看不到覆盖 API、G6.1a 的协议层、尺度对齐门与 G6.1b-1。**
+   需要 push 才对导师可见。
 
 3. **跑一次 pipeline 会改动被 git 跟踪的产物文件。**
    `outputs/` 有 418 个文件在版本控制内。一次 baseline 会改 6 个文件。
@@ -759,5 +888,23 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 > $$\text{parameters become identifiable} \neqq \text{they became meaningful}$$
 > $$\text{residual minimum} \neqq \text{parameter truth}$$
 >
+> **G6 补上的第四条（标量 → 函数值参数）**：
+>
+> ```text
+> G6.1a   函数型 D_s(x) 的数值活性依赖协议（无激励读数逐位不变；GITT 展开 8–29 mV）
+> G6.1b-1 但"活性"不给出可辨识性：1 mV 带上，平台区要 0.9 dex、陡峭区 0.35 dex，
+>         而且六个 (窗口,真值) 组合全部单侧 —— D_s 只有下界，没有上界
+>         （τ_d 的上界，不是 D_s 的估计值）
+>         幅度与带宽不成比例（活性比 3.56× / 带宽改善只有 2.56×）
+> ```
+>
+> $$\text{parameter activity} \neqq \text{parameter identifiability}$$
+>
+> 以及一条**流程**结论（两次踩同一个坑换来）：
+> $$\text{scale mismatch} \equiv \text{parameter inertness} \ \text{（输出里不可区分）}$$
+> ⇒ Dataset → Geometry audit → **Capacity alignment** → Protocol excitation → Parameter inference
+>
 **口径提醒**：G5.0–5.3 **全部是合成数据**。
 > 换掉的是模型形式与噪声，**不是数据来源**；真实实验辨识是 G5.4，尚未开始。
+> **G6.1b-1 同样是合成数据**（观测就是同一模型在真值处的输出，**inverse crime**），
+> 所以它的可辨识带宽是**理想条件下的最好情况**。
