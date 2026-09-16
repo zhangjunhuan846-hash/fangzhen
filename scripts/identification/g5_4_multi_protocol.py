@@ -70,7 +70,10 @@ D10, D50, D90 = 10.72, 17.58, 27.82
 RP_LOW = (D10 / 2) * 1e-6          # 5.36 um
 RP_MID = (D50 / 2) * 1e-6          # 8.79 um
 
-SETS = (("P1", ("C10",)), ("P2", ("C10", "C2")), ("P4", ("C10", "C2", "1C", "1p5C")))
+SETS = (("P1", ("C10",)),
+        ("P2", ("C10", "C2")),
+        ("P3", ("C10", "C2", "1C")),
+        ("P4", ("C10", "C2", "1C", "1p5C")))
 ARMS = (("control", "SPM"), ("mismatch", "SPMe"))
 Z_BOUNDS = (-16.0, -13.0)
 R_BOUNDS = (math.log10(1e-6), math.log10(2e-5))
@@ -118,8 +121,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--out", default="outputs/fitting/g5.4")
+    ap.add_argument("--ab-only", action="store_true",
+                    help="run only groups A and B (protocol sets)")
     ap.add_argument("--group-c-only", action="store_true",
-                    help="re-run only group C (the R_p constraint)")
+                    help="run only group C (the R_p constraint)")
     args = ap.parse_args()
 
     out = ROOT / args.out
@@ -132,6 +137,75 @@ def main() -> int:
 
     tic = time.perf_counter()
     log = print
+
+    # ---- persistence ---------------------------------------------------
+    # Each stage owns its OWN files and never rewrites another stage's.
+    # An earlier version wrote everything to a single report.json, so the
+    # follow-up --group-c-only run silently destroyed the A/B results and the
+    # headline numbers survived only in a terminal log.  That is exactly the
+    # provenance gap this platform is supposed to close, so the layout is now
+    # per-stage and immutable.
+    #
+    #   out/manifest.json                        what was run, on what revision
+    #   out/group_A_single_protocol.json         P1
+    #   out/group_B_multi_protocol.json          P2 + P3 + P4
+    #   out/group_C_radius_constraint.json       group C
+    #   out/runs/<arm>_<set>.json                one leaf per fit
+    #   out/summary.json                         REBUILT from the above
+    def _write_json(path, obj):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        tmp.write_text(
+            json.dumps(obj, indent=2, ensure_ascii=False, default=str),
+            encoding="utf-8")
+        tmp.replace(path)          # atomic on the same volume
+
+    def _read_json(path):
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:          # noqa: BLE001
+            return None
+
+    def rebuild_summary():
+        """Recompose summary.json from whatever stages are on disk."""
+        leaf = {}
+        for f in sorted((out / "runs").glob("*.json")):
+            d = _read_json(f)
+            if d is not None:
+                leaf[f.stem] = d
+        groups = {}
+        for name in ("A_single_protocol", "B_multi_protocol",
+                     "C_radius_constraint"):
+            d = _read_json(out / f"group_{name}.json")
+            if d is not None:
+                groups[name] = d
+        summary = {
+            "gate": "G5.4",
+            "objective": ("J = (1/K) sum_k (1/N_k) SSR_k -- equal weight per "
+                          "protocol"),
+            "truth": {"ds": DS_TRUE, "rp": RP_TRUE},
+            "measured_psd_um": {"D10": D10, "D50": D50, "D90": D90},
+            "protocol_sets": {n: list(r) for n, r in SETS},
+            "leaf_fits": leaf,
+            "groups_present": sorted(groups),
+            "groups": groups,
+        }
+        _write_json(out / "summary.json", summary)
+        return summary
+
+    _write_json(out / "manifest.json", {
+        "gate": "G5.4",
+        "argv": sys.argv,
+        "started_local": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "protocol_sets": {n: list(r) for n, r in sets},
+        "arms": [a for a, _ in arms],
+        "maxiter_2d": maxiter_2d, "maxiter_1d": maxiter_1d,
+        "truth": {"ds": DS_TRUE, "rp": RP_TRUE},
+        "measured_psd_um": {"D10": D10, "D50": D50, "D90": D90,
+                            "note": "diameters; the PyBaMM radius is an "
+                                    "effective diffusion length"},
+    })
+
     log("=" * 84)
     log("G5.4  multi-protocol identifiability and model consistency")
     log("=" * 84)
@@ -176,7 +250,8 @@ def main() -> int:
     log("A + B   protocol sets, both arms"
         + ("   [SKIPPED by --group-c-only]" if args.group_c_only else ""))
     log(f"{'=' * 84}")
-    for arm, model in (() if args.group_c_only else arms):
+    ab_ran = not args.group_c_only
+    for arm, model in (arms if ab_ran else ()):
         inv = "SPM"
         for name, rates in sets:
             multi = MultiObservation(
@@ -214,6 +289,7 @@ def main() -> int:
                 "message": b["message"],
             }
             report["results"][f"{arm}:{name}"] = entry
+            _write_json(out / "runs" / f"{arm}_{name}.json", entry)
             log(f"\n  [{arm}] {name} ({'+'.join(rates)})")
             log(f"     D_s={entry['ds']:.5e} ({entry['bias_D']*100:+9.2f} %)"
                 f"   R_p={entry['rp']*1e6:7.3f} um ({entry['bias_R']*100:+8.2f} %)")
@@ -235,12 +311,23 @@ def main() -> int:
                 log(f"        {p['rate']:6s}  n={p['n_points']:5d}"
                     f"  RMS={rms_txt:>14s}  bias={bias_txt:>12s}")
 
+    if ab_ran:
+        _write_json(out / "group_A_single_protocol.json",
+                    {k: v for k, v in report["results"].items()
+                     if len(v["protocols"]) == 1})
+        _write_json(out / "group_B_multi_protocol.json",
+                    {k: v for k, v in report["results"].items()
+                     if len(v["protocols"]) > 1})
+        log(f"\n  persisted: group_A_single_protocol.json, "
+            f"group_B_multi_protocol.json, {len(report['results'])} leaf fits")
+
     # ---------------- group C ----------------
     log(f"\n{'=' * 84}")
     log("C   multi-protocol (P4) + an INDEPENDENT R_p constraint")
     log(f"{'=' * 84}")
-    p4 = max(sets, key=lambda s: len(s[1]))[1]   # widest set actually run
-    for arm, model in arms:
+    p4 = max(SETS, key=lambda s: len(s[1]))[1]   # always the full P4
+    group_c_ran = not args.ab_only
+    for arm, model in (arms if group_c_ran else ()):
         multi = MultiObservation([obs_cache[arm][r] for r in p4],
                                  name=f"{arm}:P4")
         for label, rp in (("C_low", RP_LOW), ("C_mid", RP_MID)):
@@ -268,11 +355,14 @@ def main() -> int:
                 log(f"     (free R_p, same P4: D_s={f0['ds']:.5e}"
                     f"  {f0['bias_D']*100:+.1f} %  cost={f0['cost']:.6e})")
 
+    if group_c_ran:
+        _write_json(out / "group_C_radius_constraint.json", report["group_C"])
+        log(f"\n  persisted: group_C_radius_constraint.json")
     report["runtime_s"] = time.perf_counter() - tic
-    (out / "g5_4_report.json").write_text(
-        json.dumps(report, indent=2, ensure_ascii=False, default=str),
-        encoding="utf-8")
-    log(f"\nreport -> {out / 'g5_4_report.json'}")
+    s = rebuild_summary()
+    log(f"\nsummary -> {out / 'summary.json'}"
+        f"   (groups present: {', '.join(s['groups_present']) or 'none'},"
+        f" leaf fits: {len(s['leaf_fits'])})")
     log(f"runtime {report['runtime_s']:.1f} s")
     return 0
 
