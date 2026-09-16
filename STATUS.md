@@ -100,7 +100,7 @@ G5 参数辨识 / 可信性      IN PROGRESS   — G5.0 PASS；G5.1 IN PROGRESS
   ══ Chen2020 方法学分支到此封存 ══
 G6 graphite‖Li 实验约束模型                   IN PROGRESS
   G6.0 graphite 参数 provenance 审计            IN PROGRESS — 见下
-  G6.1a 函数型 D_s(x) 数值活性门                BLOCKED — SINTEF 无脉冲序列，见下
+  G6.1a 协议依赖的数值活性门                    PASS(实质)/FAIL(判据) — 2026-09-16，见下
   G6.2 graphite identifiability                 NOT STARTED
   G6.3 独立 protocol 验证                       NOT STARTED
 G6 held-out 预测         NOT DONE
@@ -290,19 +290,56 @@ $$\beta=\frac{d\log D_s^*}{d\log R_p}$$
 
 ---
 
-### G6.1a 函数型 $D_s(x)$ 数值活性门 — **BLOCKED**（2026-09-16）
+### G6.1a — Protocol-dependent activity gate for function-valued parameters（2026-09-16）
 
-完整审计 `docs/g6.1a_gitt_protocol_audit.md`。7 个探针脚本在 `scripts/graphite/`。
+完整报告 `docs/g6.1a_protocol_dependent_activity.md`；先行审计 `docs/g6.1a_gitt_protocol_audit.md`。
 
-**门的目标**：确认函数型参数覆盖（`Positive particle diffusivity` 是 $f(sto,T)$ 而非标量）
-能真正进入 PyBaMM 并**改变轨迹**。
-```text
-pOCV (C/50)            → 应基本不敏感   → negative control
-GITT pulse (扩散受限)  → 瞬态必须明显变化 → positive control
-```
+**结论：门的实质成立，但按预先登记的判据「未通过」—— 负对照失败。**
+正对照干净通过且按倍数单调；单变量负对照完全惰性；原定 pOCV 负对照失败，
+**而那个失败推翻了我上一轮的结论**。
+**四臂结果**（`dV_pulse` 的展开是观测量；判据跑前固定）
 
-**负对照已完成**：整条 $D_s$ 曲线 ×10，RMSE 只动 **0.018 mV / 150 mV（0.012 %）** ✓
-（不是 bug，是准平衡窗口本来就不激发固相扩散）
+| 臂 | 协议 | ×0.316 | ×1.000 | ×3.162 | 展开 | 判定 |
+|---|---|---|---|---|---|---|
+| 负（单变量） | GITT 窗口**电流置零** | +0.0000 | +0.0000 | +0.0000 mV | **0.0000** | **惰性 ✓** |
+| 正 | GITT 平台区（C/10, 150 s） | −16.9640 | −12.4358 | −8.7190 mV | **8.2450** | **活跃 ✓** |
+| 正 | GITT 陡峭区（$V\approx0.93$） | −215.1409 | −193.2171 | −185.7535 mV | **29.3874** | **活跃 ✓** |
+| 负 | pOCV（C/50） | RMSE 77.6701 | 76.2860 | 79.7139 mV | **3.4279** | **失败 ✗** |
+
+**正对照严格按倍数单调**；零电流臂三个倍数**逐位相同**（证明覆盖链路干净）。
+三档梯度 `无激励 0.00 < pOCV 3.43 < GITT 平台区 8.25 < GITT 陡峭区 29.39` 即协议依赖性的直接度量。
+
+⚠️ **推翻了上一轮结论**：此前记的"pOCV 整条 $D_s$ ×10 只动 0.018 mV、
+准平衡本来就不激发固相扩散"**是错的** —— 那次用的是未做容量一致化的 Ecker2015 几何（202 mAh），
+$4.33\times10^{-5}$ A 实际是 **C/4670**。**惰性是 31 倍尺度失配造的，与准平衡无关。**
+修正表述：**模型与电芯同尺度时，C/50 的 sweep 仍能分辨 $D_s$（RMSE 展开 3.43 mV）。**
+
+**必须先解决的前提：容量一致化（Q_model == Q_measured）**
+Ecker2015 描述 86 cm² / **202.398 mAh** 电芯，而 DLR 扫程电荷只有 **6.528 mAh** →
+那条"C/10"脉冲实际是 **C/309**，sim 瞬态比实测小 **43 倍**。
+判别接线问题 vs 尺度问题：把电流缩放 ×1/×10/×100 → 响应 **−0.394 / −4.019 / −29.92 mV**
+⇒ **成比例，电流确实进了模型** ⇒ 是尺度问题。
+两个修正：① **容量基准取扫程电荷，不取单个脉冲**（单个脉冲只有 0.0273 mAh，
+用它当容量会把模型缩到 1/7400、直接撞截止、`dV_pulse` 全 NaN，
+**读起来正好像"参数惰性"**）—— 契约测试已钉住；
+② 缩放电极 footprint（长宽各 ×√scale，保长宽比），面积缩放 DLR 0.032252 / SINTEF 0.008818。
+
+**新增代码（四层）**：`battery_sim/excitation/`（纯数据 protocol schema + Basytec 解析）、
+`battery_sim/datasets/dlr_gitt.py`、`battery_sim/simulation/protocol_replay.py`、
+`scripts/graphite/g6_1a_activity_gate.py`、`tests/test_dlr_gitt.py`（28 项）。
+**additive**：adapter 契约加**可选** protocol 能力；`resolve_model_options` 从
+`run_baseline_cell` **原样抽取**（避免第二个入口变成第二份半电池翻译副本）。
+平台全量 **356 passed**。
+**治理**：`dlr_gitt` 声明 **benchmark**（仅评估、禁标定）。
+
+**边界**：**不是对 Ecker2015 的验证** —— 另一颗电芯、另一实验室、另一种电极与 OCP；
+容量一致化是**构造前提**不是测量（DLR 几何无数据手册，footprint 按实测电荷缩放）；
+只有 SPM、单电芯、单温度；pOCV 臂覆盖率 0.957，其瞬态量为 NaN（**"跑不完" ≠ "瞬态小"**）；
+×0.316 与实测吻合（−16.96 vs −17.17 mV）**不能**读成"真实 $D_s$ 是参考的 0.316 倍"。
+
+**原定的 pOCV 负对照为什么不再当对照**：它**不是单变量** —— 同时改了尺度、时长、状态，
+无法把"没有激励"和"什么都不同"分开。零电流臂是追加的更强对照；
+**原判据的失败保留在报告里，没有事后改阈值。**
 
 **正对照被阻断 —— SINTEF `gitt`/`gitthold` 不含脉冲序列**：
 
@@ -340,12 +377,11 @@ GITT pulse (扩散受限)  → 瞬态必须明显变化 → positive control
 脉冲段采样 ~1 Hz（~154 点），窗口内温度 26.05–26.08 °C（无温度混杂）。
 备选 #4（$V$ 0.93→0.65，ΔV −279 mV）、#6（ΔV −121 mV）用于更大信噪。
 
-**阻断原因**：DLR 文件**尚未纳入平台治理**（无 adapter、无 `dataset_role`），
-需要先新建 Basytec adapter 才能"暴露成可 replay 的 protocol"。
-三个已记录的坑：① 编码是 **Latin-1**；② 相位靠 `Command` 列；
-③ **符号** —— 本文件 Discharge 电流为负（Basytec 惯例），平台 canonical 是 discharge = +，须翻转。
-
-**未采用**：造人工 1C（导师明确排除）；假设存在 rate-capability 文件（inventory 里确实没有）。
+**建 adapter 时的三个坑（已记入代码与测试）**：
+① 编码是 **Latin-1**（UTF-8 在 `0xb0` 处失败）；
+② 相位靠 **`Command` 列**（Pause/Charge/Discharge），不靠 step 编号；
+③ **符号** —— 本文件 Discharge 电流为负（Basytec 惯例），平台 canonical 是 discharge = +，须翻转；
+且符号**在数据内被验证**（canonical I>0 与 V 下降同时发生），契约测试钉住。
 
 ### G6.0 graphite 参数 provenance 审计 — **IN PROGRESS**（2026-09-16）
 
@@ -632,10 +668,12 @@ representable → accepted → resolved → numerically_active → identifiable
 
 `G6` 依赖 G5；`G7` 依赖回收石墨数据到位；`G8` 依赖 G5+G6。
 
-**G6.1a 卡点（2026-09-16）**：SINTEF 石墨线**没有任何扩散受限的真实协议** ——
+**G6.1a 卡点已解除（2026-09-16）**：SINTEF 石墨线**没有任何扩散受限的真实协议** ——
 p-ocv 是 C/50，`gitt`/`gitthold` 实为 C/50 CC–CV 且多通道交错。
-唯一真实的脉冲数据是 **DLR LiGrHydra0b GITT**（尚未纳入治理）。
-**这是数据受阻，不是能力受阻。**
+唯一真实的脉冲数据是 **DLR LiGrHydra0b GITT**，已建 adapter 并纳入治理（**benchmark**）。
+**这是数据受阻，不是能力受阻** —— 换数据源即解。
+**另有一条常驻教训**：参数惰性有两个来源（**协议不激发** 与 **模型不在同一尺度**），
+两者看起来完全一样，**必须先把尺度对齐（Q_model == Q_measured）再谈协议**。
 
 ---
 
