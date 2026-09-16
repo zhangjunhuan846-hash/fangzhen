@@ -25,6 +25,7 @@ from identification.forward import (  # noqa: F401
     ReplayCase,
     build_problem,
     make_replay_simulator,
+    predict_at,
     replay,
 )
 
@@ -38,5 +39,6 @@ __all__ = [
     "ReplayCase",
     "build_problem",
     "make_replay_simulator",
+    "predict_at",
     "replay",
 ]

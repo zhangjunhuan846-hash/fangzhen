@@ -172,13 +172,19 @@ def recover_from(
     z_bounds: Sequence[float] = (-16.0, -13.0),
     method: str = "Nelder-Mead",
     maxiter: int = 400,
+    replay_case=None,
 ) -> StartResult:
-    """One multi-start leg: PyBOP ``SciPyMinimize`` from ``z_init``."""
+    """One multi-start leg: PyBOP ``SciPyMinimize`` from ``z_init``.
+
+    ``replay_case`` lets the inverse model differ from the truth model, which
+    is what a model-mismatch test needs (SPMe generates, SPM inverts).
+    """
     import pybop
 
     problem, sim = build_problem(
         observation, output_root=output_root, audit_dir=audit_dir,
         z_bounds=tuple(z_bounds), z_initial=float(z_init),
+        replay_case=replay_case,
     )
 
     options = pybop.SciPyMinimizeOptions(method=method, maxiter=int(maxiter))
