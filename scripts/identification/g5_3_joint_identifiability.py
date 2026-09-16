@@ -73,7 +73,12 @@ ZR_TRUE = math.log10(RP_TRUE)
 
 #: The two rates that carry the most information, per the G5.2 result:
 #: 0.1C is where the mismatch is almost invisible, 0.5C where it is moderate.
+#: The high rates are run separately (G5.3.1 / G5.3.2) to ask whether the
+#: ridge rotates or narrows once transport limitation is strong.
 RATES = ("C10", "C2")
+
+#: Every rate chen2020 provides, so --rates can be validated.
+RATE_KEYS = ("C10", "C2", "1C", "1p5C")
 
 Z_BOUNDS = (-16.0, -13.0)
 R_BOUNDS = (math.log10(1.0e-6), math.log10(2.0e-5))   # 1 um .. 20 um
@@ -227,12 +232,24 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--out", default="outputs/fitting/g5.3")
+    ap.add_argument("--rates", default=None,
+                    help="comma-separated rate keys, e.g. 1C,1p5C "
+                         "(default: the two rates used in the first pass)")
+    ap.add_argument("--no-profile", action="store_true",
+                    help="skip section 3 (the leverage profile)")
     args = ap.parse_args()
 
     out = ROOT / args.out
     runs, audit = out / "runs", out / "audit"
     out.mkdir(parents=True, exist_ok=True)
-    rates = RATES[:1] if args.quick else RATES
+    if args.rates:
+        rates = tuple(r.strip() for r in args.rates.split(",") if r.strip())
+        unknown = [r for r in rates if r not in RATE_KEYS]
+        if unknown:
+            raise SystemExit(f"unknown rate key(s) {unknown}; "
+                             f"known: {sorted(RATE_KEYS)}")
+    else:
+        rates = RATES[:1] if args.quick else RATES
     n_map = 7 if args.quick else 15
     maxiter = 80 if args.quick else 400
 
@@ -384,7 +401,15 @@ def main() -> int:
     log("    a floor alone does NOT prove flatness. This measures it.)")
     log(f"{'=' * 80}")
     deltas = (-0.20, -0.10, -0.05, 0.0, 0.05, 0.10, 0.20)
-    for rate, model in (("1p5C", "SPMe"), ("C2", "SPMe"), ("C10", "SPMe")):
+    profile_rates = (() if args.no_profile
+                     else tuple(r for r in ("C10", "C2", "1C", "1p5C")
+                                if r in rates))
+    if args.no_profile:
+        log(f"\n{'=' * 80}")
+        log("3. PROFILE  skipped (--no-profile)")
+        log(f"{'=' * 80}")
+    for rate in profile_rates:
+        model = "SPMe"
         obs = generate(DATASET, CELL, rate, DS_TRUE, runs / "profile",
                        model_name=model)
         pr, _ = build_problem(obs, output_root=runs / "profile",
