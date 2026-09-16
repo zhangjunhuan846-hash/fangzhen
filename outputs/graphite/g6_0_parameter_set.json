@@ -1,0 +1,452 @@
+{
+  "gate": "G6.0",
+  "purpose": "exact list of what the graphite model consumes, as the input to a per-parameter provenance audit",
+  "parameter_set": "Ecker2015_graphite_halfcell",
+  "pybamm_version": "26.8.0.0",
+  "n_parameters": 89,
+  "groups": {
+    "geometry": {
+      "Negative electrode thickness [m]": {
+        "kind": "float",
+        "value": 0.0007
+      },
+      "Electrode height [m]": {
+        "kind": "float",
+        "value": 0.101
+      },
+      "Electrode width [m]": {
+        "kind": "float",
+        "value": 0.085
+      },
+      "Separator thickness [m]": {
+        "kind": "float",
+        "value": 2e-05
+      }
+    },
+    "composition": {
+      "Negative electrode porosity": {
+        "kind": "ABSENT"
+      },
+      "Negative electrode active material volume fraction": {
+        "kind": "ABSENT"
+      },
+      "Separator porosity": {
+        "kind": "float",
+        "value": 0.508
+      },
+      "Negative electrode density [kg.m-3]": {
+        "kind": "ABSENT"
+      }
+    },
+    "particle": {
+      "Negative particle radius [m]": {
+        "kind": "ABSENT"
+      },
+      "Negative particle diffusivity [m2.s-1]": {
+        "kind": "ABSENT"
+      },
+      "Maximum concentration in negative electrode [mol.m-3]": {
+        "kind": "ABSENT"
+      },
+      "Initial concentration in negative electrode [mol.m-3]": {
+        "kind": "ABSENT"
+      }
+    },
+    "kinetics": {
+      "Negative electrode exchange-current density [A.m-2]": {
+        "kind": "ABSENT"
+      },
+      "Negative electrode charge transfer coefficient": {
+        "kind": "float",
+        "value": 0.5
+      },
+      "Negative electrode double-layer capacity [F.m-2]": {
+        "kind": "float",
+        "value": 0.2
+      }
+    },
+    "thermodynamics": {
+      "Negative electrode OCP [V]": {
+        "kind": "float",
+        "value": 0.0
+      },
+      "Negative electrode OCP entropic change [V.K-1]": {
+        "kind": "float",
+        "value": 0.0
+      }
+    },
+    "transport": {
+      "Negative electrode conductivity [S.m-1]": {
+        "kind": "float",
+        "value": 10776000.0
+      },
+      "Negative electrode Bruggeman coefficient (electrolyte)": {
+        "kind": "ABSENT"
+      },
+      "Negative electrode Bruggeman coefficient (electrode)": {
+        "kind": "ABSENT"
+      },
+      "Separator Bruggeman coefficient (electrolyte)": {
+        "kind": "float",
+        "value": 1.9804586773134945
+      }
+    },
+    "thermal": {
+      "Negative electrode specific heat capacity [J.kg-1.K-1]": {
+        "kind": "ABSENT"
+      },
+      "Negative electrode thermal conductivity [W.m-1.K-1]": {
+        "kind": "ABSENT"
+      },
+      "Ambient temperature [K]": {
+        "kind": "float",
+        "value": 298.15
+      },
+      "Initial temperature [K]": {
+        "kind": "float",
+        "value": 298.15
+      }
+    },
+    "protocol": {
+      "Typical current [A]": {
+        "kind": "ABSENT"
+      },
+      "Typical cell capacity [A.h]": {
+        "kind": "ABSENT"
+      },
+      "Lower voltage cut-off [V]": {
+        "kind": "int",
+        "value": 0
+      },
+      "Upper voltage cut-off [V]": {
+        "kind": "float",
+        "value": 1.5
+      }
+    },
+    "_not_grouped": {
+      "Bulk solvent concentration [mol.m-3]": {
+        "kind": "float",
+        "value": 2636.0
+      },
+      "Cation transference number": {
+        "kind": "float",
+        "value": 0.26
+      },
+      "Cell cooling surface area [m2]": {
+        "kind": "float",
+        "value": 0.0172
+      },
+      "Cell volume [m3]": {
+        "kind": "float",
+        "value": 1.52e-06
+      },
+      "Contact resistance [Ohm]": {
+        "kind": "int",
+        "value": 0
+      },
+      "Current function [A]": {
+        "kind": "float",
+        "value": 0.15652
+      },
+      "Dead lithium decay constant [s-1]": {
+        "kind": "float",
+        "value": 1e-06
+      },
+      "Dead lithium decay rate [s-1]": {
+        "kind": "callable",
+        "name": "SEI_limited_dead_lithium_OKane2022",
+        "module": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell",
+        "source_file": "/home/zjh/miniforge3/envs/pybamm/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Ecker2015_graphite_halfcell.py"
+      },
+      "EC diffusivity [m2.s-1]": {
+        "kind": "float",
+        "value": 2e-18
+      },
+      "EC initial concentration in electrolyte [mol.m-3]": {
+        "kind": "float",
+        "value": 4541.0
+      },
+      "Edge heat transfer coefficient [W.m-2.K-1]": {
+        "kind": "float",
+        "value": 10.0
+      },
+      "Electrolyte conductivity [S.m-1]": {
+        "kind": "callable",
+        "name": "electrolyte_conductivity_Ecker2015",
+        "module": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell",
+        "source_file": "/home/zjh/miniforge3/envs/pybamm/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Ecker2015_graphite_halfcell.py"
+      },
+      "Electrolyte diffusivity [m2.s-1]": {
+        "kind": "callable",
+        "name": "electrolyte_diffusivity_Ecker2015",
+        "module": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell",
+        "source_file": "/home/zjh/miniforge3/envs/pybamm/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Ecker2015_graphite_halfcell.py"
+      },
+      "Exchange-current density for lithium metal electrode [A.m-2]": {
+        "kind": "callable",
+        "name": "li_metal_electrolyte_exchange_current_density_Xu2019",
+        "module": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell",
+        "source_file": "/home/zjh/miniforge3/envs/pybamm/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Ecker2015_graphite_halfcell.py"
+      },
+      "Exchange-current density for plating [A.m-2]": {
+        "kind": "callable",
+        "name": "plating_exchange_current_density_OKane2020",
+        "module": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell",
+        "source_file": "/home/zjh/miniforge3/envs/pybamm/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Ecker2015_graphite_halfcell.py"
+      },
+      "Exchange-current density for stripping [A.m-2]": {
+        "kind": "callable",
+        "name": "stripping_exchange_current_density_OKane2020",
+        "module": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell",
+        "source_file": "/home/zjh/miniforge3/envs/pybamm/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Ecker2015_graphite_halfcell.py"
+      },
+      "Initial SEI thickness [m]": {
+        "kind": "float",
+        "value": 5e-09
+      },
+      "Initial concentration in electrolyte [mol.m-3]": {
+        "kind": "float",
+        "value": 1000.0
+      },
+      "Initial concentration in positive electrode [mol.m-3]": {
+        "kind": "float",
+        "value": 26120.05
+      },
+      "Initial plated lithium concentration [mol.m-3]": {
+        "kind": "float",
+        "value": 0.0
+      },
+      "Lithium interstitial reference concentration [mol.m-3]": {
+        "kind": "float",
+        "value": 15.0
+      },
+      "Lithium metal partial molar volume [m3.mol-1]": {
+        "kind": "float",
+        "value": 1.3e-05
+      },
+      "Lithium plating kinetic rate constant [m.s-1]": {
+        "kind": "float",
+        "value": 1e-10
+      },
+      "Lithium plating transfer coefficient": {
+        "kind": "float",
+        "value": 0.5
+      },
+      "Maximum concentration in positive electrode [mol.m-3]": {
+        "kind": "float",
+        "value": 31920.0
+      },
+      "Negative current collector thickness [m]": {
+        "kind": "float",
+        "value": 1.4e-05
+      },
+      "Nominal cell capacity [A.h]": {
+        "kind": "float",
+        "value": 0.15625
+      },
+      "Number of cells connected in series to make a battery": {
+        "kind": "float",
+        "value": 1.0
+      },
+      "Number of electrodes connected in parallel to make a cell": {
+        "kind": "float",
+        "value": 1.0
+      },
+      "Open-circuit voltage at 0% SOC [V]": {
+        "kind": "int",
+        "value": 0
+      },
+      "Open-circuit voltage at 100% SOC [V]": {
+        "kind": "float",
+        "value": 1.5
+      },
+      "Positive current collector conductivity [S.m-1]": {
+        "kind": "float",
+        "value": 58411000.0
+      },
+      "Positive current collector density [kg.m-3]": {
+        "kind": "float",
+        "value": 8933.0
+      },
+      "Positive current collector specific heat capacity [J.kg-1.K-1]": {
+        "kind": "float",
+        "value": 385.0
+      },
+      "Positive current collector surface heat transfer coefficient [W.m-2.K-1]": {
+        "kind": "float",
+        "value": 10.0
+      },
+      "Positive current collector thermal conductivity [W.m-1.K-1]": {
+        "kind": "float",
+        "value": 398.0
+      },
+      "Positive current collector thickness [m]": {
+        "kind": "float",
+        "value": 1.4e-05
+      },
+      "Positive electrode Bruggeman coefficient (electrode)": {
+        "kind": "float",
+        "value": 0.0
+      },
+      "Positive electrode Bruggeman coefficient (electrolyte)": {
+        "kind": "float",
+        "value": 1.6372789338386007
+      },
+      "Positive electrode OCP [V]": {
+        "kind": "callable",
+        "name": "graphite_ocp_Ecker2015",
+        "module": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell",
+        "source_file": "/home/zjh/miniforge3/envs/pybamm/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Ecker2015_graphite_halfcell.py"
+      },
+      "Positive electrode OCP entropic change [V.K-1]": {
+        "kind": "float",
+        "value": 0.0
+      },
+      "Positive electrode active material volume fraction": {
+        "kind": "float",
+        "value": 0.372403
+      },
+      "Positive electrode conductivity [S.m-1]": {
+        "kind": "float",
+        "value": 14.0
+      },
+      "Positive electrode density [kg.m-3]": {
+        "kind": "float",
+        "value": 1555.0
+      },
+      "Positive electrode exchange-current density [A.m-2]": {
+        "kind": "callable",
+        "name": "graphite_electrolyte_exchange_current_density_Ecker2015",
+        "module": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell",
+        "source_file": "/home/zjh/miniforge3/envs/pybamm/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Ecker2015_graphite_halfcell.py"
+      },
+      "Positive electrode porosity": {
+        "kind": "float",
+        "value": 0.329
+      },
+      "Positive electrode reaction-driven LAM factor [m3.mol-1]": {
+        "kind": "float",
+        "value": 0.0
+      },
+      "Positive electrode specific heat capacity [J.kg-1.K-1]": {
+        "kind": "float",
+        "value": 1437.0
+      },
+      "Positive electrode thermal conductivity [W.m-1.K-1]": {
+        "kind": "float",
+        "value": 1.58
+      },
+      "Positive electrode thickness [m]": {
+        "kind": "float",
+        "value": 7.4e-05
+      },
+      "Positive particle diffusivity [m2.s-1]": {
+        "kind": "callable",
+        "name": "graphite_diffusivity_Ecker2015",
+        "module": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell",
+        "source_file": "/home/zjh/miniforge3/envs/pybamm/lib/python3.11/site-packages/pybamm/input/parameters/lithium_ion/Ecker2015_graphite_halfcell.py"
+      },
+      "Positive particle radius [m]": {
+        "kind": "float",
+        "value": 1.37e-05
+      },
+      "Positive tab centre y-coordinate [m]": {
+        "kind": "float",
+        "value": 0.0045
+      },
+      "Positive tab centre z-coordinate [m]": {
+        "kind": "float",
+        "value": 0.101
+      },
+      "Positive tab heat transfer coefficient [W.m-2.K-1]": {
+        "kind": "float",
+        "value": 10.0
+      },
+      "Positive tab width [m]": {
+        "kind": "float",
+        "value": 0.007
+      },
+      "Ratio of lithium moles to SEI moles": {
+        "kind": "float",
+        "value": 2.0
+      },
+      "Reference temperature [K]": {
+        "kind": "float",
+        "value": 296.15
+      },
+      "SEI electron conductivity [S.m-1]": {
+        "kind": "float",
+        "value": 8.95e-14
+      },
+      "SEI growth activation energy [J.mol-1]": {
+        "kind": "float",
+        "value": 0.0
+      },
+      "SEI kinetic rate constant [m.s-1]": {
+        "kind": "float",
+        "value": 1e-12
+      },
+      "SEI lithium interstitial diffusivity [m2.s-1]": {
+        "kind": "float",
+        "value": 1e-20
+      },
+      "SEI open-circuit potential [V]": {
+        "kind": "float",
+        "value": 0.4
+      },
+      "SEI partial molar volume [m3.mol-1]": {
+        "kind": "float",
+        "value": 9.585e-05
+      },
+      "SEI reaction exchange current density [A.m-2]": {
+        "kind": "float",
+        "value": 1.5e-07
+      },
+      "SEI resistivity [Ohm.m]": {
+        "kind": "float",
+        "value": 200000.0
+      },
+      "SEI solvent diffusivity [m2.s-1]": {
+        "kind": "float",
+        "value": 2.5e-22
+      },
+      "Separator density [kg.m-3]": {
+        "kind": "float",
+        "value": 1017.0
+      },
+      "Separator specific heat capacity [J.kg-1.K-1]": {
+        "kind": "float",
+        "value": 1978.0
+      },
+      "Separator thermal conductivity [W.m-1.K-1]": {
+        "kind": "float",
+        "value": 0.34
+      },
+      "Thermodynamic factor": {
+        "kind": "float",
+        "value": 1.0
+      },
+      "Total heat transfer coefficient [W.m-2.K-1]": {
+        "kind": "float",
+        "value": 10.0
+      },
+      "Typical plated lithium concentration [mol.m-3]": {
+        "kind": "float",
+        "value": 1000.0
+      },
+      "citations": {
+        "kind": "list",
+        "value": [
+          "Ecker2015i",
+          "Ecker2015ii",
+          "Zhao2018",
+          "Hales2019",
+          "Xu2019",
+          "Richardson2020",
+          "OKane2020"
+        ]
+      }
+    }
+  },
+  "note": "values only; NO provenance is claimed here. Every row still has to be traced to a measurement / paper / fit / assumption"
+}

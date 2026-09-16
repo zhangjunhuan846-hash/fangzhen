@@ -100,7 +100,7 @@ G5 参数辨识 / 可信性      IN PROGRESS   — G5.0 PASS；G5.1 IN PROGRESS
   ══ Chen2020 方法学分支到此封存 ══
 G6 graphite‖Li 实验约束模型                   IN PROGRESS
   G6.0 graphite 参数 provenance 审计            IN PROGRESS — 见下
-  G6.1 graphite baseline 复现                   NOT STARTED
+  G6.1a 函数型 D_s(x) 数值活性门                BLOCKED — SINTEF 无脉冲序列，见下
   G6.2 graphite identifiability                 NOT STARTED
   G6.3 独立 protocol 验证                       NOT STARTED
 G6 held-out 预测         NOT DONE
@@ -290,6 +290,63 @@ $$\beta=\frac{d\log D_s^*}{d\log R_p}$$
 
 ---
 
+### G6.1a 函数型 $D_s(x)$ 数值活性门 — **BLOCKED**（2026-09-16）
+
+完整审计 `docs/g6.1a_gitt_protocol_audit.md`。7 个探针脚本在 `scripts/graphite/`。
+
+**门的目标**：确认函数型参数覆盖（`Positive particle diffusivity` 是 $f(sto,T)$ 而非标量）
+能真正进入 PyBaMM 并**改变轨迹**。
+```text
+pOCV (C/50)            → 应基本不敏感   → negative control
+GITT pulse (扩散受限)  → 瞬态必须明显变化 → positive control
+```
+
+**负对照已完成**：整条 $D_s$ 曲线 ×10，RMSE 只动 **0.018 mV / 150 mV（0.012 %）** ✓
+（不是 bug，是准平衡窗口本来就不激发固相扩散）
+
+**正对照被阻断 —— SINTEF `gitt`/`gitthold` 不含脉冲序列**：
+
+| 证据 | 事实 |
+|---|---|
+| step 数目 | 每循环只有 **9 个** step（真 GITT 应 ~40 个脉冲+静置对） |
+| 相位性质 | step 4/10 为 **C/50 恒流**；step 7/13 为**恒压保持**（V 钉在截止、I 衰减 33×/6 h） |
+| 倍率 | 4.4155e-05 A ÷ 1.942466 mAh = **C/44 ≈ C/50** |
+| 行序 | **每个 parquet batch 都含 >1 个 step**（347/347）；每个时间桶同时有 **3 个 step** 在记录 |
+| 采样率 | 三通道不同：**8.14 Hz / 0.076 Hz / 0.163 Hz** |
+| 通道不同源 | 同一时刻 step 8 V=0.09019、step 10 V=0.10605 → **不是重复记录** |
+
+由此按 `(cycle, step)` 分组（**adapter 的做法**）会得到三个物理不可能的结果：
+`I` 精确为 0 却移动 2 V 电压（cycle 1/2 step 2）、同一 step 电流积分 0.0136 Ah
+而容量列只累积 0.002293 Ah（**差 6 倍**）。
+
+→ **`(cycle, step)` 不是该文件的物理分段；不能照 p-ocv 老路换名就跑。**
+
+**找到替代：`data/DLR__LiGrHydra0b__20221114__GITT__25degC__Basytec.txt` 是真 GITT。**
+
+| 项 | 值 |
+|---|---|
+| Command 组 | **Discharge 240 段 / Charge 238 段 / Pause 478 段** |
+| 脉冲 | **149.94 s**（放电）/ 149.65 s（充电） |
+| 电流 | **−6.552e-04 A**（水平高度一致：30,221 行 @ −6.552198e-04） |
+| 温度 | **24.85–26.25 °C 实测通道**（SINTEF 无温度通道） |
+| 电压 / 时长 | 0.00973–1.51486 V / 25.62 天 |
+| 可用 pulse-rest 三元组 | **239 个**（排除截止削顶） |
+
+**为什么 150 s 正是需要的**：$\tau_d=R^2/D_s\sim10^4$ s → $t_{\rm pulse}/\tau_d\approx0.015\ll1$
+→ 处在**半无限扩散（Sand）区**，瞬态由固相扩散主导 —— 这正是 pOCV 给不出的。
+
+**推荐窗口**：三元组 **#120**（$V\approx0.116$ V 石墨平台区）
+静置 5472 s → 脉冲 150 s @ −6.5098e-04 A（**ΔV = −17.5 mV**）→ 静置 7293 s；
+脉冲段采样 ~1 Hz（~154 点），窗口内温度 26.05–26.08 °C（无温度混杂）。
+备选 #4（$V$ 0.93→0.65，ΔV −279 mV）、#6（ΔV −121 mV）用于更大信噪。
+
+**阻断原因**：DLR 文件**尚未纳入平台治理**（无 adapter、无 `dataset_role`），
+需要先新建 Basytec adapter 才能"暴露成可 replay 的 protocol"。
+三个已记录的坑：① 编码是 **Latin-1**；② 相位靠 `Command` 列；
+③ **符号** —— 本文件 Discharge 电流为负（Basytec 惯例），平台 canonical 是 discharge = +，须翻转。
+
+**未采用**：造人工 1C（导师明确排除）；假设存在 rate-capability 文件（inventory 里确实没有）。
+
 ### G6.0 graphite 参数 provenance 审计 — **IN PROGRESS**（2026-09-16）
 
 完整文档 `docs/g6.0_graphite_parameter_provenance.md`。
@@ -320,7 +377,7 @@ Bruggeman(electrolyte) **1.6372789…**（非整数 → 拟合/推导）· Conta
 说明两套 OCP（Ecker2015 内置 vs 平台从 p-OCV 派生）的关系；
 **定义 $D_s(x)$ 的有限维表示**。
 
-### G5.5 测量 → 模型尺度映射 — **IN PROGRESS**（2026-09-16）
+### G5.5 测量 → 模型尺度映射 — **PASS ｜ FROZEN**（2026-09-16）
 
 完整报告 `docs/g5.5_measurement_to_model_scale.md`。
 
@@ -347,7 +404,10 @@ D_s = 4e-15    ← GITT + Sand 方程（apparent 值、假设单一粒径）
 τ_d = R_p²/D_s  ← 这个组合没有任何一个实验直接测过它
 ```
 
-→ 电压曲线主要约束 $	au_d$，而 $	au_d$ 恰是这份参数集里**最没有实验依据**的量。
+→ 电压曲线所约束的主要是 $\tau_d$，而 $\tau_d$ 是一个**由两套独立测量拼出来的派生量**
+   （derived quantity），**不是任何实验直接给出的可观测量**。
+   ⚠️ 初稿写"最没有实验依据的量"**过强，已更正** —— $R_p$ 与 $D_s$ 各自都有实验来源，
+   缺的是它们的**组合**从未被独立测量或联合校验。
 → G5.4 里"独立 $R_p$ 约束能打破退化"，正因为它**唯一直接锚定了这个比值里的一个因子**。
 
 **下一步（主体）**：先做**不确定度传递**而非立刻建映射 ——
@@ -571,6 +631,11 @@ representable → accepted → resolved → numerically_active → identifiable
 ### G6 / G7 / G8 — 未完成
 
 `G6` 依赖 G5；`G7` 依赖回收石墨数据到位；`G8` 依赖 G5+G6。
+
+**G6.1a 卡点（2026-09-16）**：SINTEF 石墨线**没有任何扩散受限的真实协议** ——
+p-ocv 是 C/50，`gitt`/`gitthold` 实为 C/50 CC–CV 且多通道交错。
+唯一真实的脉冲数据是 **DLR LiGrHydra0b GITT**（尚未纳入治理）。
+**这是数据受阻，不是能力受阻。**
 
 ---
 
