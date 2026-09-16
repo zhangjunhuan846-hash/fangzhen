@@ -46,6 +46,102 @@ from battery_sim.simulation.baseline import _json_safe, _run_one_replay
 #: one, nor be mistaken for one when the outputs are read back.
 OUTPUT_MODE = "protocol"
 
+#: How a replay handles the scale-alignment precondition.
+#:   "check"  (default) refuse to run when the model is not on the cell's
+#:            scale -- the gate.  Silent scale mismatch reads as parameter
+#:            inertness, and that mistake has been made twice already.
+#:   "align"  apply the footprint recipe that puts Q_model on Q_measured.
+#:   "assume" proceed without checking, for replays whose scale is right
+#:            BY CONSTRUCTION (e.g. the parameter set is the cell's own).
+#:            Recorded as such, so the assumption is auditable.
+SCALE_ALIGNMENT_MODES = ("check", "align", "assume")
+
+
+def _apply_scale_alignment(
+    adapter,
+    cell: str,
+    protocol_id: str,
+    mode: Optional[str],
+    parameter_overrides: Optional[dict],
+    parameter_override_sources: Optional[dict],
+):
+    """Enforce / apply the scale-alignment precondition (see governance).
+
+    Returns ``{"record", "parameter_overrides", "parameter_override_sources"}``.
+    """
+    from governance.scale_alignment import (
+        ScaleMisalignment,
+        alignment_overrides,
+        audit,
+    )
+
+    mode = "check" if mode is None else str(mode)
+    if mode not in SCALE_ALIGNMENT_MODES:
+        raise ValueError(
+            f"scale_alignment must be one of {SCALE_ALIGNMENT_MODES}, "
+            f"got {mode!r}"
+        )
+    overrides = dict(parameter_overrides or {})
+    sources = dict(parameter_override_sources or {})
+
+    if mode == "assume":
+        return {
+            "record": {
+                "stage": "capacity_alignment",
+                "verdict": "assumed_by_caller",
+                "note": (
+                    "the caller declared the model to be on the cell's "
+                    "scale; no audit was performed, so this replay carries "
+                    "no evidence that it is"
+                ),
+            },
+            "parameter_overrides": overrides or None,
+            "parameter_override_sources": sources or None,
+        }
+
+    rec = audit(adapter, protocol_id, cell)
+
+    if mode == "check":
+        if rec["verdict"] != "aligned":
+            raise ScaleMisalignment(
+                f"{rec['dataset_id']} / {rec['protocol_id']}: model is "
+                f"{rec['model_capacity_Ah'] * 1e3:.3f} mAh, record passed "
+                f"{rec['measured_charge_Ah'] * 1e3:.4f} mAh "
+                f"(x{rec['capacity_ratio_model_over_measured']:.1f}). "
+                f"Re-run with scale_alignment='align' to apply the "
+                f"footprint recipe, or 'assume' to state explicitly that "
+                f"the scale is right.  Running as-is would put a window "
+                f"read at C/{1.0 / rec['c_rate_on_cell']:.0f} at "
+                f"C/{1.0 / rec['c_rate_on_model_unscaled']:.0f}."
+            )
+        return {
+            "record": rec,
+            "parameter_overrides": overrides or None,
+            "parameter_override_sources": sources or None,
+        }
+
+    # mode == "align"
+    al = alignment_overrides(adapter, protocol_id, cell)
+    clash = sorted(set(al["overrides"]) & set(overrides))
+    if clash:
+        raise ValueError(
+            f"scale_alignment='align' would overwrite caller-supplied "
+            f"override(s) {clash}; pass them out of parameter_overrides or "
+            f"use scale_alignment='assume' and align them yourself"
+        )
+    return {
+        "record": {
+            **rec,
+            "mode": "align",
+            "applied": True,
+            "footprint_scale_area": al["footprint_scale_area"],
+            "footprint_scale_linear": al["footprint_scale_linear"],
+            "overrides_applied": sorted(al["overrides"]),
+        },
+        "parameter_overrides": {**al["overrides"], **overrides},
+        "parameter_override_sources": {**al["source"], **sources},
+    }
+
 
 def protocol_slug(protocol_id: str) -> str:
     """Filesystem-safe name for a protocol id."""
@@ -127,7 +223,7 @@ def capacity_consistency_overrides(
     WHY THIS IS NEEDED.  A parameter set describes ONE cell.  Applied to a
     different cell, the same amperes are a different C-rate, and a
     protocol that is genuinely diffusion-limited on the real cell can be
-    numerically inerte on the model -- not because the model is wrong
+    numerically inert on the model -- not because the model is wrong
     about the physics, but because it is the wrong SIZE.  Measured here:
     Ecker2015_graphite_halfcell is an 86 cm2, 202 mAh cell, while the DLR
     record passes 6.55 mAh over its discharge sweep, so the C/10 GITT
@@ -137,12 +233,12 @@ def capacity_consistency_overrides(
     is exactly the conclusion an activity gate is trying to reach.  So
     the gate has to remove it first.
 
-    HOW.  The recorded protocol states how much charge it actually passed;
-    that is a measurement, not a datasheet claim.  The footprint is scaled
-    so the model's capacity equals it, which is the same Q_model == Q_ref
-    precondition the graphite line already applies elsewhere.  Both knobs
-    are scaled by sqrt(scale) so the electrode's aspect ratio is kept --
-    the least arbitrary choice available without a geometry datasheet.
+    This is now a thin adapter over ``governance.scale_alignment``, which
+    is where the concept lives (``docs/scale_alignment_gate.md``): the
+    capacity arithmetic exists in exactly one place, so the gate, this
+    helper and any future caller cannot drift apart.  ``scale`` here is
+    the AREA factor; the governance record also carries the linear factor
+    and the C-rate the model would have been at without it.
 
     Returns ``{"overrides", "source", "scale", "model_capacity_Ah",
     "measured_charge_Ah"}``; ``overrides`` plugs straight into
@@ -150,93 +246,23 @@ def capacity_consistency_overrides(
     ``parameter_override_sources=...`` so the scaling is as auditable as
     any other override.
     """
-    from battery_sim.models.pybamm_factory import load_parameter_values
+    from governance.scale_alignment import alignment_overrides
 
-    if cell is None:
-        cells = list(adapter.list_cells())
-        if not cells:
-            raise ValueError("dataset declares no cells")
-        cell = str(cells[0])
-    if parameter_set is None:
-        parameter_set = adapter.config.parameter_set
-
-    # WHICH charge is "the cell's capacity" is a dataset-level fact, not a
-    # property of the window being replayed.  A single GITT triplet passes
-    # only its own pulse (0.027 mAh here), and treating that as the cell
-    # capacity scales the model down by ~7400x -- which drives it straight
-    # into the voltage cut-off and produces NaN transients.  A dataset can
-    # therefore declare a reference protocol whose recorded charge IS the
-    # accessible capacity; failing that, the window itself is used, which
-    # is right when the window is a full sweep.
-    ref_id = charge_reference
-    if ref_id is None:
-        getter = getattr(adapter, "capacity_reference_protocol", None)
-        if callable(getter):
-            ref_id = getter()
-    if ref_id is None:
-        ref_id = protocol_id
-
-    # NOTE: ``hasattr(adapter, "load_processed_protocol")`` is always True,
-    # because the base class DEFINES it (raising NotImplementedError) so
-    # the capability is declared rather than accidental.  The test has to
-    # be whether the subclass actually overrides it.
-    from battery_sim.datasets.base import BatteryDatasetAdapter
-
-    has_protocols = (
-        type(adapter).load_processed_protocol
-        is not BatteryDatasetAdapter.load_processed_protocol
+    rec = alignment_overrides(
+        adapter,
+        str(protocol_id),
+        cell,
+        parameter_set=parameter_set,
+        charge_reference=charge_reference,
+        knobs=tuple(knobs),
     )
-    df = (adapter.load_processed_protocol(str(cell), str(ref_id))
-          if has_protocols
-          else adapter.load_processed_discharge(str(cell), str(ref_id)))
-    t = df["time_s"].to_numpy(float)
-    I = df["current_A"].to_numpy(float)
-    measured_Ah = float(np.sum(0.5 * (I[1:] + I[:-1]) * np.diff(t))) / 3600.0
-    measured_Ah = abs(measured_Ah)
-    if measured_Ah <= 0:
-        raise ValueError(
-            f"protocol '{protocol_id}' passed no net charge; capacity "
-            f"consistency is undefined for it"
-        )
-
-    pv = load_parameter_values(parameter_set)
-    missing = [k for k in knobs if k not in pv]
-    if missing:
-        raise KeyError(
-            f"capacity consistency: knob(s) absent from parameter set "
-            f"'{parameter_set}': {missing}"
-        )
-    eps = float(pv["Positive electrode active material volume fraction"])
-    thick = float(pv["Positive electrode thickness [m]"])
-    cmax = float(pv["Maximum concentration in positive electrode [mol.m-3]"])
-    area = float(pv["Electrode height [m]"]) * float(pv["Electrode width [m]"])
-    model_Ah = eps * area * thick * cmax * 96485.33212 / 3600.0
-    if model_Ah <= 0:
-        raise ValueError("model capacity computed as non-positive")
-
-    scale = measured_Ah / model_Ah
-    root = float(np.sqrt(scale))
-    overrides = {str(k): float(pv[k]) * root for k in knobs}
-    source = {
-        "source": "CAPACITY CONSISTENCY (Q_model == Q_measured)",
-        "method": "identification/G6.1a capacity-consistency override",
-        "basis": (
-            f"the recorded charge over '{ref_id}' is "
-            f"{measured_Ah * 1e3:.4f} mAh; parameter set "
-            f"'{parameter_set}' describes a {model_Ah * 1e3:.3f} mAh cell; "
-            f"the footprint is scaled by {root:.6f} so the two agree"
-        ),
-        "charge_reference": str(ref_id),
-        "params_scaled": list(knobs),
-        "scale_factor_area": scale,
-    }
     return {
-        "overrides": overrides,
-        "source": {str(k): dict(source) for k in knobs},
-        "scale": scale,
-        "charge_reference": str(ref_id),
-        "model_capacity_Ah": model_Ah,
-        "measured_charge_Ah": measured_Ah,
+        "overrides": rec["overrides"],
+        "source": rec["source"],
+        "scale": rec["footprint_scale_area"],
+        "charge_reference": rec["charge_reference"],
+        "model_capacity_Ah": rec["model_capacity_Ah"],
+        "measured_charge_Ah": rec["measured_charge_Ah"],
     }
 
 
@@ -248,6 +274,7 @@ def run_protocol_replay(
     parameter_set: Optional[str] = None,
     parameter_overrides: Optional[dict] = None,
     parameter_override_sources: Optional[dict] = None,
+    scale_alignment: Optional[str] = None,
     plot: bool = False,
     quiet: bool = False,
 ) -> dict:
@@ -261,6 +288,14 @@ def run_protocol_replay(
     parameter set raises ``KeyError``, and the before/after pair plus the
     caller-declared source are recorded per window.  That is what makes a
     function-valued override auditable here as well.
+
+    ``scale_alignment`` is the precondition gate (see
+    ``governance/scale_alignment.py`` and ``docs/scale_alignment_gate.md``):
+    ``None``/``"check"`` refuses to replay a window whose scale does not
+    match the parameter set, ``"align"`` applies the footprint recipe,
+    ``"assume"`` takes the caller's word for it and records that it did.
+    The default is ``check`` because a silent scale mismatch is
+    indistinguishable from parameter inertness in the results.
     """
     from battery_sim.datasets.base import BatteryDatasetAdapter
 
@@ -285,6 +320,15 @@ def run_protocol_replay(
         parameter_set = adapter.config.parameter_set
 
     model_options = resolve_model_options(adapter)
+
+    # the precondition runs BEFORE the window is even loaded, so a
+    # misaligned replay cannot produce a number that looks meaningful
+    al = _apply_scale_alignment(
+        adapter, cell, protocol_id, scale_alignment,
+        parameter_overrides, parameter_override_sources,
+    )
+    parameter_overrides = al["parameter_overrides"]
+    parameter_override_sources = al["parameter_override_sources"]
 
     df = adapter.load_processed_protocol(cell, protocol_id)
     protocol = adapter.load_protocol(protocol_id)
@@ -392,6 +436,7 @@ def run_protocol_replay(
         "output_mode": OUTPUT_MODE,
         "protocol": protocol.as_dict(),
         "protocol_window": df.attrs.get("protocol", {}),
+        "scale_alignment": _json_safe(al["record"]),
         "n_points_replayed": int(len(res["_t_common"])),
         "runtime_s": runtime_s,
         "parameter_overrides_requested": _json_safe(
@@ -438,6 +483,7 @@ def run_protocol_replay(
 
 __all__ = [
     "OUTPUT_MODE",
+    "SCALE_ALIGNMENT_MODES",
     "capacity_consistency_overrides",
     "protocol_slug",
     "run_protocol_replay",
