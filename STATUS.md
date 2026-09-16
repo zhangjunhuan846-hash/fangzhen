@@ -12,7 +12,8 @@
 
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
-Last verified commit:   f957128  (2026-09-16, 平台冻结包：接入模板 + 模式治理 + 自动报告)
+Last verified commit:   27bf413  (2026-09-16, G6.2a 表示接口门 + 平台冻结点标记)
+Tag:                    v0.1.0-platform  (**平台开发阶段冻结**；接新数据不再是开发任务)
 origin/main:            **与本地同链，已 push**（2026-09-16；33 个 commit 积压已清零）
 Working tree:           见「已知限制 #1」
 STATUS.md last updated: 2026-09-16
@@ -105,6 +106,7 @@ G6 graphite‖Li 实验约束模型                   IN PROGRESS
   ══ 尺度对齐门（scale alignment gate）═         已提升为一级概念 —— 2026-09-16，见下
   G6.1c GITT 激励地图（476 窗口，双向）         放电 **FAIL(M1/M2)**｜充电 **PASS(6/6)** — 见下
   G6.1b-2 3-region basis                        落脚点**存在但很窄**（3 个窗口；先测方向独立性）
+  G6.2a D_s(x) 表示接口门                       **接口 PASS / 判据 9/11**（2 条窗口类 FAIL）— 见下
   G6.2 graphite identifiability                 NOT STARTED
   G6.3 独立 protocol 验证                       NOT STARTED
   ══ 平台冻结包（productization freeze）═         完成 —— 2026-09-16，见下
@@ -616,6 +618,52 @@ $x_0\approx0.015$ 处 **5.1×**。更深一点（$x_0\approx0.021$）**反号**�
 只有 SPM / 单电芯 / 26 °C / 150 s 脉冲；§7.3 的"方向效应"是**实测现象**、机制解释只是**假设**；
 **不是对 Ecker2015 的验证**。
 
+### G6.2a D_s(x) 表示接口门 — **接口 PASS / 判据 9/11**（2026-09-16）
+
+完整报告 `docs/g6.2a_representation_interface.md`。
+复现：`python scripts/graphite/g6_2a_representations.py`（**246 次仿真，45.0 s**）
+
+三种形状（RMS 归一化：$\phi_0=1$、$\phi_1=\sqrt3(2x-1)$、$\phi_2=(1,-2,1)/\sqrt2$）
+各扫 ±1 dex（0.05 dex 网格），两个窗口：`GITT-charge#t475` + 对照 `GITT-discharge#t120`。
+
+| 判据 | 结果 |
+|---|---|
+| **A1 API 通**（callable 覆盖真的到达模型） | **PASS**（峰值 model-to-model RMSE 1.05–64.80 mV） |
+| A1_order / N2_coverage | **t475 FAIL**（该窗口贴电压下限，G6.1c 已记录其 2/41 探针不可达）｜**t120 全过** |
+| **A2 溯源通** | **PASS**（`run_metadata.json` 里 D_s 是 `{__callable__, __module__, __qualname__}` 描述符，来源含 shape/amplitude_dex/phi_rms） |
+| **A3 报告通** | **PASS**（首次在真实产物上走到 `bounded` 分支） |
+| N1 amp=0 与"不改参数"逐位相同 | **PASS**（三个形状） |
+
+**跨阶段逐位复现（本轮最有分量的核对）**：`constant` 就是 $\phi_0=1$，由**另一条构造代码**
+（`representations.shape_override`，不是 `replay_scan.build_multiplier_override`）产生，
+却给出 `#t475` **0.0988** dex（= G6.1c）与 `#t120` **0.8966** dex（G6.1c 0.89663）
+⇒ 新表示层与已发布的路等价，估计器只有一份。
+
+**五个实测结果**：
+1. 接口三项全过，且溯源是可复核的描述符而不是字符串；
+2. 上一条逐位复现；
+3. **哪个形状"看得见"是窗口的函数**：t475 → linear 63.48 mV（可见）/ three_region 0.90 mV（不可分辨）；
+   t120 反过来 → 0.54 mV（不可分辨）/ 2.86 mV（可见）。同族于 G6.1c 的"方向是变量"，
+   但这次是从**形状**侧独立测出的：**"更复杂的形状"不是普遍更优**。
+4. **不可达探针点会把带宽量窄**：`cost` 对不可达返回 inf，`band_width` 丢弃这些点后把剩下的当相邻
+   ⇒ `linear@t475`（10/41 不可达）的 0.0359 dex **只能是上限**。报告 JSON 用
+   `bands_measured_with_unreachable_amps` 单独列出这些行 ⇒ **`N2` 不是形式主义**。
+5. t120 上 `linear` 判定 **`bounded`**（1.9594 dex，右侧截断）——那条"one-sided sensitivity region"
+   的规范措辞被报告生成器自动带上，**不许报点估计**。
+
+**四条接口事实（写代码前不知道，全是实测）**：① pybamm 把函数型参数的实参以**符号**传入
+（`Maximum(...)`），不是浮点数；② `pybamm.Heaviside` 在 26.8 **不存在**，且
+`EqualHeaviside(left, right)` 在 `left <= right` 时返回 1（与直觉相反）；
+③ 形状对**标量**必须返回 Python `float`，0 维 ndarray 会让 `symbol * 0d-array` 在域合并时崩；
+④ 参考 $D_s$ 本身是 pybamm 符号（`ref(x,T)` 返回 `Multiplication`）⇒ 两个符号之间的 `==`
+不是数值比较，测试必须 `.evaluate()` 取数或换成浮点 fixture。
+
+**决策**：不进 3-region / smooth basis。回收石墨需要的是 $D_s$、$k_0$、$R_{ct}$、Q 这些**标量**，
+而标量路径（`#t475`，B = 0.0988 dex）已经是可辨识的 ⇒ 下一步是 Phase 1/2 接真实样品数据。
+
+**边界**：只验接口，不做辨识、不做优化、不拟合测量；只两个窗口、单电芯、26 °C、SPM；
+数据集是公开 benchmark（`dlr_gitt`），**不是任何回收石墨样品**。
+
 ### G6.0 graphite 参数 provenance 审计 — **IN PROGRESS**（2026-09-16）
 
 完整文档 `docs/g6.0_graphite_parameter_provenance.md`。
@@ -926,9 +974,9 @@ p-ocv 是 C/50，`gitt`/`gitthold` 实为 C/50 CC–CV 且多通道交错。
 ## 测试状态
 
 ```text
-pytest:        448 passed, 5 warnings
+pytest:        466 passed, 5 warnings
 failures:      0
-duration:      115.40s
+duration:      117.04s
 last run date: 2026-09-16  (提交前复跑)
 command:       python -m pytest -q   (WSL, conda env pybamm)
 ```
@@ -937,16 +985,17 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 
 | 文件 | 写的数 | 实际 |
 |---|---|---|
-| `README.md` | 293 | **448** |
-| `HANDOFF.md` | 88 | **448** |
+| `README.md` | 293 | **466** |
+| `HANDOFF.md` | 88 | **466** |
 
 两个数字互不相同，且都与实际不符。已改为指向本文件，不再写死数字。
-**引用测试数时只引用本文件的 448。**
+**引用测试数时只引用本文件的 466。**
 （2026-09-16 的增量：329 → 356 是 G6.1a 的 28 项 `test_dlr_gitt.py`；
 356 → 374 是尺度对齐门的 18 项 `test_scale_alignment.py`；
 374 → 392 是 G6.1c 的 18 项 `test_recovery_stats.py`；
 392 → **448** 是平台冻结包的 56 项：`test_dataset_template.py` +
-`test_analysis_mode.py` + `test_parameter_report.py`。）
+`test_analysis_mode.py` + `test_parameter_report.py`；
+448 → **466** 是 G6.2a 的 18 项 `test_representations.py`。）
 
 ---
 

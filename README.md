@@ -13,6 +13,28 @@ A reproducible framework connecting battery experimental data, electrochemical m
 
 ---
 
+## 🔒 已冻结版本 `v0.1.0-platform`（2026-09-16）
+
+**状态**：平台开发阶段结束，进入「冻结 → 接真实材料」。
+**唯一可信状态页**：[`STATUS.md`](STATUS.md)（版本、判据、测试数、已知限制）。
+**Tag**：`v0.1.0-platform`。**备份**：`../_git_bundles/fangzhen_platform_freeze_pushed.bundle`。
+
+冻结的含义是：**接一份新数据不再是开发任务**。
+
+```
+实验数据 → dataset adapter → protocol 解析 → scale alignment → PyBaMM replay
+        → identifiability 判定 → 参数报告
+```
+
+- 接新数据：读 [`docs/adding_a_dataset.md`](docs/adding_a_dataset.md)（4 步 + 必答的 10 个格式问题），
+  自检 `python -m battery_sim.datasets.template --check <dataset_id>`
+- 出报告：`python -m identification.parameter_report --windows <逐窗口表> ...`
+- 真实材料分析必须用 `analysis_mode="material"`（synthetic truth 会被代码拒绝）
+- **尺度对齐是所有参数结论的前提**：`docs/scale_alignment_gate.md`（Q_model == Q_measured）
+- 设计与历史决策：`docs/architecture/`
+
+---
+
 ## 📌 Overview
 
 电池研究中，实验数据、物理模型和分析流程通常相互独立，导致：
