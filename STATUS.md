@@ -12,9 +12,9 @@
 
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
-Last verified commit:   8a3050e  (2026-09-16, "feat: make capacity alignment a gate,
-                                    and scan the global D_s multiplier")
-origin/main:            ee45d62  (本地领先 28 个 commit，**尚未 push**)
+Last verified commit:   33775c7  (2026-09-16, G6.1c 激励地图 + G6.1b-1 措辞修正；
+                                    代码侧为 24df9ea)
+origin/main:            ee45d62  (本地领先 30 个 commit，**尚未 push**)
 Working tree:           见「已知限制 #1」
 STATUS.md last updated: 2026-09-16
 ```
