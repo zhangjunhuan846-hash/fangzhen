@@ -152,6 +152,43 @@ def build_model_options(
     return opts
 
 
+def resolve_model_options(adapter) -> Optional[dict]:
+    """Model options implied by a dataset's own datasets.yaml entry.
+
+    Extracted from ``baseline.run_baseline_cell`` so that a second replay
+    entry (``simulation.protocol_replay``) applies the SAME half-cell
+    translation instead of growing a second copy of it.  Two copies of
+    this rule is how a half cell ends up silently replayed as a full cell
+    in one path and not the other -- a failure this platform has already
+    had once.
+
+    Reads the half-cell first-class block:
+      ``cell_configuration``, ``working_electrode``, ``model_options``.
+    A ``full_cell`` dataset (or one that declares nothing) gets ``None``,
+    which is the exact v0.1-v0.4 model construction.
+    """
+    extra = getattr(getattr(adapter, "config", None), "extra", None) or {}
+    cell_configuration = str(extra.get("cell_configuration") or "full_cell")
+    if cell_configuration.strip() in ("", "full_cell"):
+        return None
+
+    working_electrode = str(extra.get("working_electrode") or "").strip()
+    if working_electrode not in ("positive", "negative"):
+        dataset_id = getattr(getattr(adapter, "config", None),
+                             "dataset_id", "<unknown>")
+        raise ValueError(
+            f"dataset '{dataset_id}': "
+            f"cell_configuration='{cell_configuration}' requires "
+            f"working_electrode in {{positive, negative}} "
+            f"(configs/datasets.yaml)"
+        )
+    return build_model_options(
+        cell_configuration=f"half_cell_{working_electrode}",
+        working_electrode=working_electrode,
+        extra_model_options=extra.get("model_options"),
+    )
+
+
 def load_parameter_values(parameter_set: str) -> pybamm.ParameterValues:
     """
     Load a pybamm parameter set by name, e.g. 'Chen2020'.

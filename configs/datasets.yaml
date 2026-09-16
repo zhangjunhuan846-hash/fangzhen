@@ -610,3 +610,86 @@ sintef_graphite:
       ARTEFACT, reported for chain validation only - never as model
       error, never as validation.  Geometry-matched parameters are
       Phase C work.
+
+dlr_gitt:
+  name: "DLR Hydra.0b Li||graphite GITT (25 degC, Basytec export)"
+  ion: "Li"
+  chemistry: "Graphite_LiMetal"
+
+  # 用途治理（见 governance/dataset_roles.py）。
+  # 这份数据只用于**评估类**活动：把 Ecker2015 参数化的模型回放到一个
+  # 真实脉冲协议上，看轨迹**是否对该参数有响应**（能力探针）。
+  # 它**不是**对任何参数集的验证：
+  #   - 不同电芯（DLR Hydra.0b，不是 SINTEF R2032 的 Gr-AQ-1）
+  #   - 不同实验室、不同电极制备、不同 OCP
+  # 参数集不是为它标定的 -> 按治理定义只能是 benchmark。
+  # 严禁把这里的任何数字写成 validation，也严禁用它标定参数
+  # （governance 会在 calibrate 用途上报错）。
+  dataset_role: "benchmark"
+  dataset_role_note: "能力探针：真实的脉冲-弛豫激发，用于检验函数型 D_s(x) 的数值活性。参数集非为本数据集标定 -> 只能是 benchmark，不构成 validation。"
+
+  raw_dir: "data"
+
+  adapter: "dlr_gitt"
+  protocol: "dlr_basytec_gitt"
+
+  # ---- half-cell first-class configuration (physical vs slot) ----
+  # Ecker2015_graphite_halfcell 把石墨放正极槽位（与 sintef_graphite 一致）。
+  cell_configuration: "half_cell"
+  working_electrode: "positive"
+  physical_working_electrode: "graphite_negative"
+  counter_electrode: "lithium_metal"
+  model_options: {}
+
+  # ---- parameter set: PyBaMM built-in zero-fit reference ----
+  parameter_set: "Ecker2015_graphite_halfcell"
+
+  # ---- raw file (Basytec text export, LATIN-1 encoded) ----
+  raw_file: "DLR__LiGrHydra0b__20221114__GITT__25degC__Basytec.txt"
+
+  # ---- window selection ----
+  # 默认窗口按**电压**选，不按三元组序号选：序号是文件里的位置，
+  # 电压才是这个窗口探测的电化学状态（可复核）。
+  # discharge 半程 = 石墨锂化（canonical 正电流，V 下降）。
+  default_sweep: "discharge"
+  default_v_target_V: 0.1165
+
+  # 容量一致化的基准：**一个三元组窗口的电荷只是一个脉冲，不是电芯容量**。
+  # 用它做基准会把模型缩到 1/7400，直接触截止 —— 看起来像"参数惰性"。
+  # 扫程的电荷才是这颗电芯的可及容量（实测 6.553 mAh）。
+  capacity_reference_protocol: "GITT-discharge"
+
+  # initialisation: measured pre-pulse rest OCV inverted on the
+  # vendored graphite OCP table (the same table PyBaMM interpolates)
+  initialisation_method: "inverse_ocp"
+  initialisation_ocp_file_rel: "external/pybamm-input-data/graphite_ocp_Ecker2015.csv"
+
+  cell_ids:
+    - "Hydra.0b_A"
+
+  # ---- dataset-declared protocol/window table ----
+  # 在这份数据上，一个 "rate" 选的是一段**回放窗口**（一个 pulse-relax
+  # 三元组），不是倍率：脉冲电流在整份记录里是恒定的。
+  # c_rate 由**实测**扫程电荷导出（见下），不是数据手册容量：
+  #   脉冲 6.552e-4 A x 150.01 s x 240 次 = 6.553e-3 Ah
+  #   -> c_rate = 6.552e-4 / 6.553e-3 = 0.100
+  # 数据手册容量未知（未取得），所以这里明确写成"由实测导出"。
+  rates_meta:
+    GITT-pulse:
+      programme: "gitt"
+      branch: "lithiation"
+      c_rate: 0.1
+      rate_label: "GITT pulse 150 s at C/10 (discharge sweep)"
+      rate_slug: "gittPulse"
+      legacy_rate: "gittPulse"
+
+  supported_models:
+    - "SPM"
+    - "SPMe"
+    - "DFN"
+
+  cells:
+    - "Hydra.0b_A"
+
+  rates:
+    - "GITT-pulse"

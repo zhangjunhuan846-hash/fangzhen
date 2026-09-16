@@ -94,3 +94,34 @@ class BatteryDatasetAdapter:
     def get_ambient_temperature(self, cell) -> float:
         """Ambient temperature in degrees Celsius."""
         raise NotImplementedError
+
+    # ------------------------------------------------------------------
+    # Recorded-protocol capability (OPTIONAL, additive)
+    #
+    # A dataset whose source is a RECORDED open-loop excitation -- a
+    # pulse-relax GITT, a quasi-equilibrium p-OCV sweep, a cycling log --
+    # can describe it with the schema in ``battery_sim.excitation``
+    # instead of flattening it into canonical columns immediately.  The
+    # reason to bother is that the DIFFERENCES that matter scientifically
+    # (does this protocol excite solid diffusion at all?) then survive as
+    # data rather than being lost in file-parsing details.
+    #
+    # Nothing in the core calls these, and the defaults below keep every
+    # existing adapter working untouched.  A dataset that has no such
+    # source simply leaves them alone.
+    # ------------------------------------------------------------------
+    def list_protocols(self):
+        """Protocol ids this dataset can replay ([] when unsupported)."""
+        return []
+
+    def load_protocol(self, protocol_id):
+        """Resolve ``protocol_id`` to a ``battery_sim.excitation.Protocol``."""
+        raise NotImplementedError(
+            f"{type(self).__name__} does not expose recorded protocols"
+        )
+
+    def load_processed_protocol(self, cell, protocol_id):
+        """Canonical columns for one recorded-protocol window."""
+        raise NotImplementedError(
+            f"{type(self).__name__} does not expose recorded protocols"
+        )

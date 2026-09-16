@@ -46,9 +46,9 @@ from battery_sim.evaluation.plotting import save_time_voltage_plot
 from battery_sim.models import parameter_sources
 from battery_sim.models.pybamm_factory import (
     build_model,
-    build_model_options,
     get_solver_config,
     load_parameter_values,
+    resolve_model_options,
 )
 from battery_sim.paths import (
     ensure_dir,
@@ -570,26 +570,27 @@ def run_baseline_cell(
     # datasets.yaml half-cell first-class block into pybamm model
     # options.  full_cell keeps model_options=None -> the exact
     # v0.1-v0.4 model construction.
+    #
+    # The translation itself now lives in
+    # ``pybamm_factory.resolve_model_options`` so that a SECOND replay
+    # entry (simulation.protocol_replay) applies the same rule instead of
+    # growing a copy of it.  Behaviour is unchanged: same inputs, same
+    # ValueError, same None for full cells.
+    model_options = resolve_model_options(adapter)
+
+    # These three names are read further down by the metrics row and by
+    # the run metadata, so they are rebuilt here with the SAME values the
+    # old inline branch produced: an absent or empty cell_configuration
+    # still means "full_cell", and a full cell still reports an empty
+    # working_electrode.
     extra = adapter.config.extra or {}
-    cell_configuration = str(extra.get("cell_configuration") or "full_cell")
-    if cell_configuration.strip() in ("", "full_cell"):
-        cell_configuration = "full_cell"
-        working_electrode = ""
-        model_options = None
-    else:
-        working_electrode = str(extra.get("working_electrode") or "").strip()
-        if working_electrode not in ("positive", "negative"):
-            raise ValueError(
-                f"dataset '{adapter.config.dataset_id}': "
-                f"cell_configuration='{cell_configuration}' requires "
-                f"working_electrode in {{positive, negative}} "
-                f"(configs/datasets.yaml)"
-            )
-        model_options = build_model_options(
-            cell_configuration=f"half_cell_{working_electrode}",
-            working_electrode=working_electrode,
-            extra_model_options=extra.get("model_options"),
-        )
+    cell_configuration = str(
+        extra.get("cell_configuration") or "full_cell"
+    ).strip() or "full_cell"
+    working_electrode = (
+        str(extra.get("working_electrode") or "").strip()
+        if model_options is not None else ""
+    )
 
     solver_cfg = get_solver_config()
 
@@ -707,6 +708,9 @@ def run_baseline_cell(
         # metrics row ONLY when it is not the default full cell, so
         # the four frozen datasets keep byte-identical outputs.
         if model_options is not None:
+            # these now come from the block defined next to
+            # resolve_model_options, so both the metrics row and the run
+            # metadata read one source of truth
             row["cell_configuration"] = cell_configuration
             row["working_electrode"] = working_electrode
         rows.append(row)
