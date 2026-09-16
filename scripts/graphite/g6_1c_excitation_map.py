@@ -453,39 +453,57 @@ def main() -> int:
                     out / f"g6_1c_window_map_{sweep}.partial.csv", index=False)
 
         # ---- negative control inside the same sweep ------------------
+        # Guarded like the sweep loop: on the charge sweep the first
+        # windows sit at the fully lithiated end of the record, where the
+        # recorded rest OCV is below the model's minimum-voltage event --
+        # the same state-range failure that removes 9 discharge windows.
+        # A control that cannot be run must be REPORTED, not crash the map.
         neg_rows = []
         for k in idx[:NEGATIVE_WINDOWS]:
             pid = f"GITT-{sweep}#t{k}"
-            df = adapter.load_processed_protocol(cell, pid)
-            protocol = adapter.load_protocol(pid)
-            scan = MultiplierScan(adapter, cell, pid, df, protocol, ps,
-                                  model_options, align, zero_current=True)
-            r = summarise_window(scan, grid)
-            recs = [scan.evaluate(float(a)) for a in grid]
-            ref = recs[0]["V_ref"]
-            dev = 0.0
-            for rr in recs[1:]:
-                m = np.isfinite(ref) & np.isfinite(rr["V_ref"])
-                if m.any():
-                    dev = max(dev, float(np.max(np.abs(ref[m] - rr["V_ref"][m]))) * 1e3)
-            neg_rows.append({
-                "protocol_id": pid,
-                "triplet": int(k),
-                "max_abs_dV_across_a_mV": dev,
-                "band_width_dex": r["band"]["width_dex"],
-                "truncated_left": r["band"]["truncated_left"],
-                "truncated_right": r["band"]["truncated_right"],
-                "flat": bool(dev == 0.0),
-                "n_simulations": int(scan.n_sim),
-            })
-            log(f"    negative {pid}: max|dV| {dev:.3e} mV, "
-                f"band {r['band']['width_dex']}, "
-                f"trunc L/R {r['band']['truncated_left']}/{r['band']['truncated_right']}")
+            try:
+                df = adapter.load_processed_protocol(cell, pid)
+                protocol = adapter.load_protocol(pid)
+                scan = MultiplierScan(adapter, cell, pid, df, protocol, ps,
+                                      model_options, align, zero_current=True)
+                r = summarise_window(scan, grid)
+                recs = [scan.evaluate(float(a)) for a in grid]
+                ref = recs[0]["V_ref"]
+                dev = 0.0
+                for rr in recs[1:]:
+                    m = np.isfinite(ref) & np.isfinite(rr["V_ref"])
+                    if m.any():
+                        dev = max(dev, float(np.max(np.abs(ref[m] - rr["V_ref"][m]))) * 1e3)
+                neg_rows.append({
+                    "protocol_id": pid,
+                    "triplet": int(k),
+                    "max_abs_dV_across_a_mV": dev,
+                    "band_width_dex": r["band"]["width_dex"],
+                    "truncated_left": r["band"]["truncated_left"],
+                    "truncated_right": r["band"]["truncated_right"],
+                    "flat": bool(dev == 0.0),
+                    "n_simulations": int(scan.n_sim),
+                })
+                log(f"    negative {pid}: max|dV| {dev:.3e} mV, "
+                    f"band {r['band']['width_dex']}, "
+                    f"trunc L/R {r['band']['truncated_left']}/{r['band']['truncated_right']}")
+            except Exception as exc:                    # noqa: BLE001
+                log(f"    negative {pid}: FAILED {type(exc).__name__}: {exc}")
+                neg_rows.append({
+                    "protocol_id": pid, "triplet": int(k),
+                    "error": f"{type(exc).__name__}: {exc}",
+                    "flat": None, "n_simulations": 0,
+                    "truncated_left": None, "truncated_right": None,
+                    "band_width_dex": None,
+                })
         report["negative_control"][sweep] = {
             "windows": neg_rows,
-            "all_flat": bool(all(x["flat"] for x in neg_rows)),
+            "n_ran": int(sum(1 for x in neg_rows if x.get("flat") is not None)),
+            "all_flat": bool(all(x["flat"] for x in neg_rows
+                                 if x.get("flat") is not None)),
             "all_both_sides_truncated": bool(all(
                 x["truncated_left"] and x["truncated_right"] for x in neg_rows
+                if x.get("truncated_left") is not None
             )),
             "n_simulations": int(sum(x["n_simulations"] for x in neg_rows)),
         }
@@ -700,7 +718,7 @@ def main() -> int:
         )
         n = report["negative_control"][sweep]
         crit[f"N1_negative[{sweep}]"] = bool(
-            n["all_flat"] and n["all_both_sides_truncated"]
+            n["n_ran"] >= 1 and n["all_flat"] and n["all_both_sides_truncated"]
         )
         neg_sims += int(n.get("n_simulations", 0))
     report["verdict"] = {
@@ -729,11 +747,21 @@ def main() -> int:
     log(f"  runtime      : {report['verdict']['runtime_s']:.1f} s")
     log("=" * 92)
 
+    # a single-sweep run overwrites the shared report with HALF the map, so
+    # the report says which sweeps it holds, and it also gets its own name
+    report["sweeps_in_this_report"] = sorted(report["sweeps"].keys())
     (out / "g6_1c_report.json").write_text(
         json.dumps(report, indent=2, ensure_ascii=False, default=str),
         encoding="utf-8",
     )
-    log(f"\nwrote {out / 'g6_1c_report.json'}")
+    if args.sweep != "both":
+        (out / f"g6_1c_report_{args.sweep}.json").write_text(
+            json.dumps(report, indent=2, ensure_ascii=False, default=str),
+            encoding="utf-8",
+        )
+        log(f"wrote {out / ('g6_1c_report_' + args.sweep + '.json')}")
+    log(f"\nwrote {out / 'g6_1c_report.json'} "
+        f"(contains: {report['sweeps_in_this_report']})")
     return 0
 
 
