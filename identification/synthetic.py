@@ -71,6 +71,57 @@ def generate(
     return obs
 
 
+def add_noise(
+    obs: Observation,
+    sigma_mV: float,
+    seed: int,
+    kind: str = "gaussian",
+) -> Observation:
+    """Return a copy of ``obs`` with measurement noise added.
+
+    Why this is the next gate after plain synthetic recovery: a noiseless
+    recovery is an inverse crime -- the same model, structure and parameter
+    definition generate the data and invert it -- so it can only show the
+    implementation is not broken.  Adding noise is the cheapest way to start
+    asking the scientific question instead:
+
+        is D_s still identifiable when the data are not exactly
+        reproducible?
+
+    Noise is added to the OBSERVATION only.  The forward model is untouched,
+    so any deviation of the recovered value from the truth is attributable to
+    the noise and to how strongly the observable constrains the parameter --
+    not to a change in the model.
+    """
+    if kind != "gaussian":
+        raise ValueError(f"unsupported noise kind {kind!r}")
+    if sigma_mV < 0:
+        raise ValueError("sigma_mV must be non-negative")
+
+    rng = np.random.default_rng(int(seed))
+    sigma_V = float(sigma_mV) / 1000.0
+    noisy = np.asarray(obs.voltage_V, dtype=float) + rng.normal(
+        0.0, sigma_V, size=np.asarray(obs.voltage_V).shape
+    )
+
+    meta = dict(obs.meta)
+    meta["noise"] = {
+        "kind": kind,
+        "sigma_mV": float(sigma_mV),
+        "sigma_V": sigma_V,
+        "seed": int(seed),
+        "note": ("noise added to the observation only; the forward model is "
+                 "unchanged"),
+    }
+    return Observation(
+        time_s=np.asarray(obs.time_s, dtype=float).copy(),
+        voltage_V=noisy,
+        ds_true=obs.ds_true,
+        case=obs.case,
+        meta=meta,
+    )
+
+
 def verify_truth_is_reproducible(
     obs: Observation, output_root: Path, rtol: float = 1e-9
 ) -> bool:
