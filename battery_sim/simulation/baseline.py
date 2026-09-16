@@ -92,6 +92,40 @@ def _filter_and_downsample(t_exp, I_exp, V_exp):
 # ------------------------------------------------------------------
 # One (cell, rate): open-loop replay of the measured current trace
 # ------------------------------------------------------------------
+def _json_safe(value):
+    """Make an override value safe for the run-metadata JSON.
+
+    The override API was written for SCALARS, and the record it writes into
+    ``_applied_overrides`` holds the before/after values verbatim.  A scalar
+    survives that round trip; a FUNCTION does not, and ``json.dumps`` raises
+    ``TypeError: Object of type function is not JSON serializable`` -- which
+    fails the WHOLE run, not just the record.
+
+    G6 needs function-valued overrides (a diffusivity that depends on
+    stoichiometry), so the record now stores a DESCRIPTOR for anything that
+    cannot be serialised directly.  Auditability is preserved: the descriptor
+    names the function and its module, so a finished run still says exactly
+    which callable was used.  Scalars are returned unchanged, so the existing
+    ``old``/``new`` contract and its tests are untouched.
+    """
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, dict):
+        return {k: _json_safe(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(v) for v in value]
+    if callable(value):
+        return {
+            "__callable__": getattr(value, "__name__", repr(value)),
+            "__qualname__": getattr(value, "__qualname__", None),
+            "__module__": getattr(value, "__module__", None),
+        }
+    try:                      # pybamm Symbol and friends
+        return str(value)
+    except Exception:         # noqa: BLE001
+        return f"<unserialisable {type(value).__name__}>"
+
+
 def _run_one_replay(
     df: pd.DataFrame,
     model_name: str,
@@ -186,12 +220,12 @@ def _run_one_replay(
                     # loaded set, never copied from the request -- a
                     # request-sourced ``old`` would make the audit
                     # trail say ``old == new`` for every override.
-                    "old": old_value,
-                    "new": params[key],
+                    "old": _json_safe(old_value),
+                    "new": _json_safe(params[key]),
                     # WHERE the value came from.  Not every caller
                     # supplies one, and absence is recorded as None
                     # rather than invented.
-                    "source": sources.get(key),
+                    "source": _json_safe(sources.get(key)),
                 }
             )
     # ---------------- end additive (v0.6) -------------------------
@@ -643,16 +677,21 @@ def run_baseline_cell(
                 [
                     {
                         "key": e["key"],
+                        # Numbers keep the exact float() contract the
+                        # existing tests check.  Anything else (a pybamm
+                        # Symbol, a function) goes through _json_safe, which
+                        # previously raised "Object of type function is not
+                        # JSON serializable" and failed the WHOLE run.
                         "old": float(e["old"])
                         if isinstance(e["old"], (int, float))
-                        else e["old"],
+                        else _json_safe(e["old"]),
                         "new": float(e["new"])
                         if isinstance(e["new"], (int, float))
-                        else e["new"],
+                        else _json_safe(e["new"]),
                         # additive (v0.7): where the value came from.
                         # ``None`` when the caller supplied no source,
                         # which is recorded rather than invented.
-                        "source": e.get("source"),
+                        "source": _json_safe(e.get("source")),
                     }
                     for e in applied
                 ],
@@ -792,8 +831,11 @@ def run_baseline_cell(
                 # must read ``parameter_overrides_applied`` below.
                 # Conflating the two is what makes an audit trail say
                 # ``old == new`` for every override.
+                # _json_safe: a scalar request serialises unchanged, but a
+                # FUNCTION-valued override (G6) is not JSON-serialisable and
+                # would fail the metadata write -- and with it the whole run.
                 "parameter_overrides_requested": (
-                    dict(parameter_overrides)
+                    _json_safe(dict(parameter_overrides))
                     if parameter_overrides
                     else None
                 ),
@@ -803,7 +845,7 @@ def run_baseline_cell(
                 # Same list that produced the per-rate metrics column,
                 # so the two cannot disagree.
                 "parameter_overrides_applied": (
-                    applied_all if applied_all else None
+                    _json_safe(applied_all) if applied_all else None
                 ),
                 # additive (v0.7): where each value came from, or null.
                 # Separate from ``requested`` because provenance is a
