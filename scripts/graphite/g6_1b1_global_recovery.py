@@ -105,6 +105,10 @@ from governance.scale_alignment import (  # noqa: E402
     alignment_overrides,
     audit,
 )
+from identification.replay_scan import (  # noqa: E402
+    MultiplierScan as WindowReplay,
+    build_multiplier_override as build_ds_override,
+)
 
 #: The function-valued parameter under test.
 DS_KEY = "Positive particle diffusivity [m2.s-1]"
@@ -175,237 +179,24 @@ def log(msg: str = "") -> None:
     print(msg, flush=True)
 
 
-def build_ds_override(parameter_set: str, a_dex: float):
-    """Wrap the parameter set's own D_s(x,T) by 10**a_dex.
-
-    The result is a CALLABLE, not a number, so the shape of D_s(x) is
-    preserved and only its level moves.  A scalar override here would be
-    testing a different capability -- and would in fact be rejected for
-    this parameter set, where D_s is a function.
-    """
-    pv = load_parameter_values(parameter_set)
-    if DS_KEY not in pv:
-        raise KeyError(f"{parameter_set}: no {DS_KEY!r}")
-    ref = pv[DS_KEY]
-    if not callable(ref):
-        raise TypeError(
-            f"{parameter_set}: {DS_KEY!r} is {type(ref).__name__}, not a "
-            f"function; the scalar-versus-function distinction is the whole "
-            f"point of this gate"
-        )
-    mult = float(10.0 ** float(a_dex))
-
-    def scaled(*args, _m=mult, _ref=ref):
-        return _m * _ref(*args)
-
-    scaled.__name__ = f"graphite_diffusivity_10p{a_dex:+.4f}"
-    return scaled
-
-
-class WindowReplay:
-    """One protocol window, evaluated as a function of the multiplier a.
-
-    Everything downstream goes through :meth:`cost`, so the cost definition
-    exists in exactly one place, and every result is cached by ``a``.  That
-    cache is what makes a ~40-point scan affordable: the synthetic
-    observation for truth a_0 is literally the a_0 point of the same scan.
-    The sharing is deliberate and IS the inverse crime named in the module
-    docstring -- reported, not hidden.
-    """
-
-    def __init__(self, adapter, cell, protocol_id, df, protocol,
-                 parameter_set, model_options, alignment, zero_current=False):
-        self.adapter = adapter
-        self.cell = cell
-        self.protocol_id = protocol_id
-        self.protocol = protocol
-        self.parameter_set = parameter_set
-        self.model_options = model_options
-        self.alignment = alignment
-        self.zero_current = bool(zero_current)
-
-        frame = df
-        if self.zero_current:
-            frame = df.copy()
-            frame["current_A"] = np.zeros(len(frame), dtype=float)
-        # the reference grid _run_one_replay itself uses: strictly
-        # increasing time, capped at 2000 points.  Reproducing it here
-        # keeps every run index-aligned, so a truncated run becomes a NaN
-        # tail rather than a silently different axis.
-        t_ref, _, _ = _filter_and_downsample(
-            frame["time_s"].to_numpy(dtype=float),
-            frame["current_A"].to_numpy(dtype=float),
-            frame["voltage_V"].to_numpy(dtype=float),
-        )
-        self.frame = frame
-        self.t_ref = t_ref
-        self.n_ref = int(t_ref.size)
-        self._cache: Dict[float, Dict[str, Any]] = {}
-        self.n_sim = 0
-        self.runtime_s = 0.0
-
-    # --------------------------------------------------------------
-    def evaluate(self, a_dex: float, *, force: bool = False) -> Dict[str, Any]:
-        key = round(float(a_dex), 6)
-        if not force and key in self._cache:
-            return self._cache[key]
-
-        V_ref = np.full(self.n_ref, np.nan, dtype=float)
-        tic = time.perf_counter()
-        res = _run_one_replay(
-            self.frame,
-            model_name="SPM",
-            parameter_set=self.parameter_set,
-            model_options=self.model_options,
-            parameter_overrides={
-                DS_KEY: build_ds_override(self.parameter_set, key),
-                **self.alignment["overrides"],
-            },
-            parameter_override_sources={
-                DS_KEY: {
-                    "source": "G6.1b-1 global log-multiplier",
-                    "method": "log10 D_s(x) = log10 D_ref(x) + a0",
-                    "a0_dex": key,
-                    "multiplier": float(10.0 ** key),
-                },
-                **self.alignment["source"],
-            },
-        )
-        self.runtime_s += time.perf_counter() - tic
-        self.n_sim += 1
-
-        t_common = np.asarray(res["_t_common"], dtype=float)
-        V_sim = np.asarray(res["_V_sim_common"], dtype=float)
-        n_common = int(t_common.size)
-        # t_common is a prefix of t_ref (same filter, same cap), so this is
-        # an assignment, not an interpolation: no extra error is injected
-        # between the simulated trace and the reference axis.
-        if n_common > 0:
-            V_ref[:n_common] = V_sim
-
-        tr = transient_metrics(self.protocol, t_common, V_sim)
-        pre = self.protocol.segments[0] if self.protocol.segments else None
-        rec = {
-            "a_dex": key,
-            "V_ref": V_ref,
-            "coverage_fraction": n_common / self.n_ref,
-            "n_common": n_common,
-            "n_applied": len(res.get("_applied_overrides") or []),
-            "rmse_vs_measured_mV": float(res["rmse_time_aligned_mV"]),
-            "dv_pulse_mV": tr.get("dv_pulse_mV"),
-            "dv_relax_mV": tr.get("dv_relax_mV"),
-            "v_span_mV": tr.get("v_span_mV"),
-            "pre_pulse_stop_s": float(pre.t_stop_s) if pre is not None else None,
-        }
-        self._cache[key] = rec
-        return rec
-
-    # --------------------------------------------------------------
-    def reachable(self, rec: Dict[str, Any]) -> bool:
-        return bool(rec["coverage_fraction"] >= MIN_COVERAGE)
-
-    def cost(self, a_dex: float, a_truth_dex: float) -> float:
-        """J(a | a_0) = mean squared model-to-model voltage difference, mV^2.
-
-        The difference is confined to the pulse and the relaxation: during
-        the pre-pulse rest both runs sit at the same state and D_s cannot
-        matter.  :meth:`pre_pulse_leak_mV` measures exactly that.
-        """
-        ra = self.evaluate(a_dex)
-        rb = self.evaluate(a_truth_dex)
-        if not (self.reachable(ra) and self.reachable(rb)):
-            return float("inf")
-        m = np.isfinite(ra["V_ref"]) & np.isfinite(rb["V_ref"])
-        if m.sum() < MIN_COVERAGE * self.n_ref:
-            return float("inf")
-        d = (ra["V_ref"][m] - rb["V_ref"][m]) * 1e3
-        return float(np.mean(d ** 2))
-
-    def compare(self, a_dex: float, a_truth_dex: float) -> Dict[str, float]:
-        ra = self.evaluate(a_dex)
-        rb = self.evaluate(a_truth_dex)
-        m = np.isfinite(ra["V_ref"]) & np.isfinite(rb["V_ref"])
-        d = (ra["V_ref"][m] - rb["V_ref"][m]) * 1e3
-        if not d.size:
-            return {"rmse_mV": float("nan"), "max_abs_mV": float("nan")}
-        return {
-            "rmse_mV": float(np.sqrt(np.mean(d ** 2))),
-            "max_abs_mV": float(np.max(np.abs(d))),
-        }
-
-    def pre_pulse_leak_mV(self, a_dex: float) -> float:
-        """How far the override moved the trace BEFORE the pulse.
-
-        Must be ~0: both runs rest at the same state.  A larger number
-        would mean the comparison is contaminated outside the excitation,
-        i.e. that the cost surface is not a clean function of D_s.
-        """
-        ra = self.evaluate(a_dex)
-        r0 = self.evaluate(0.0)
-        stop = ra.get("pre_pulse_stop_s")
-        if stop is None:
-            return float("nan")
-        n = int(np.searchsorted(self.t_ref, stop, side="right"))
-        if n <= 0:
-            return float("nan")
-        d = (ra["V_ref"][:n] - r0["V_ref"][:n]) * 1e3
-        d = d[np.isfinite(d)]
-        return float(np.max(np.abs(d))) if d.size else float("nan")
+# ``build_multiplier_override`` and ``WindowReplay`` live in
+# identification/replay_scan.py: G6.1c scans 239 windows with exactly the
+# same object, and two copies of the cost definition would drift silently.
+# The names are imported above, so the body of this script is unchanged.
 
 
 def _band(grid: np.ndarray, J: np.ndarray, a_hat: float,
           level_mV2: float) -> Dict[str, Any]:
-    """Width of the {J <= level} component containing the argmin, in dex.
+    """The {J <= level} band around ``a_hat``.
 
-    The crossing is interpolated between two MEASURED points that straddle
-    the level, and their spacing is reported as the resolution actually
-    achieved.  The minimum itself is never interpolated: ``a_hat`` is a
-    measured grid point.
+    The estimator lives in ``identification/recovery_stats.py`` because
+    G6.1c measures the same thing 239 times; two copies would drift
+    invisibly.  This name is kept so the call sites and the report keys do
+    not change.
     """
-    order = np.argsort(grid)
-    g, j = grid[order], J[order]
-    finite = np.isfinite(j)
-    g, j = g[finite], j[finite]
-    if g.size == 0 or not np.isfinite(j).any():
-        return {"width_dex": float("nan"), "left_dex": float("nan"),
-                "right_dex": float("nan"), "truncated": True,
-                "resolution_dex": float("nan")}
+    from identification.recovery_stats import band_width
 
-    i_hat = int(np.argmin(np.abs(g - a_hat)))
-    if not (j[i_hat] <= level_mV2):
-        return {"width_dex": 0.0, "left_dex": 0.0, "right_dex": 0.0,
-                "truncated": False, "resolution_dex": float("nan")}
-
-    def _cross(i_in: int, i_out: int):
-        g0, g1 = float(g[i_in]), float(g[i_out])
-        j0, j1 = float(j[i_in]), float(j[i_out])
-        if not np.isfinite(j1) or j1 == j0:
-            return g1, abs(g1 - g0)
-        frac = min(max((level_mV2 - j0) / (j1 - j0), 0.0), 1.0)
-        return g0 + frac * (g1 - g0), abs(g1 - g0)
-
-    left, left_res, trunc_l = float(g[0]), float("nan"), True
-    for i in range(i_hat, 0, -1):
-        if not (j[i - 1] <= level_mV2):
-            left, left_res = _cross(i, i - 1)
-            trunc_l = False
-            break
-    right, right_res, trunc_r = float(g[-1]), float("nan"), True
-    for i in range(i_hat, g.size - 1):
-        if not (j[i + 1] <= level_mV2):
-            right, right_res = _cross(i, i + 1)
-            trunc_r = False
-            break
-
-    res = np.array([left_res, right_res], dtype=float)
-    return {
-        "left_dex": abs(float(a_hat) - left),
-        "right_dex": abs(right - float(a_hat)),
-        "width_dex": abs(right - left),
-        "truncated": bool(trunc_l or trunc_r),
-        "resolution_dex": float(np.nanmax(res)) if np.isfinite(res).any()
-        else float("nan"),
-    }
+    return band_width(grid, J, a_hat, level_mV2)
 
 
 def _fit_brent(win: WindowReplay, a_truth: float) -> Dict[str, Any]:
