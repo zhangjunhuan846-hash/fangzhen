@@ -1017,6 +1017,14 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
    `outputs/` 有 418 个文件在版本控制内。一次 baseline 会改 6 个文件。
    实测差异内容：`timestamp`、`runtime_s`，以及 schema 新增的
    `parameter_overrides_requested` / `parameter_overrides_applied` / `parameter_override_sources`。
+
+   ⚠️ **另一半事实（2026-09-16 补）**：`outputs/fitting/`、`outputs/validation/`、
+   `outputs/audit/`、`outputs/sensitivity/` 被 `.gitignore` **刻意排除**
+   （注释写的是"只留冻结的小数值表"）⇒ **G5/G6 的全部辨识产物（逐窗口 CSV、report.json）
+   从未进版本控制**。文档里引用的每个数字因此只能靠**重跑命令**复核
+   （G6.2a 246 次仿真 45 s；G6.1c 10009 次仿真 25 min），不能靠 clone 后的文件。
+   这是**已知且接受**的取舍（每个 gate 都能单命令复现），代价是复核要花算力。
+   要改成随版本发布，需要单独决定 `.gitignore` 策略与体积预算。
    **数值结果逐位不变**（`150.05925543689233` / `875.752828973872` 完全一致）——
    即**结果可复现，但产物不可复现（含时间戳）**。
    → 长期建议：`outputs/` 不入 git，只保留少数 golden regression artifacts。
