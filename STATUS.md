@@ -12,8 +12,8 @@
 
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
-Last verified commit:   1e0876c  (2026-09-16, G6.1c 双向激励地图 + 充电扫程复制检验)
-origin/main:            ee45d62  (本地领先 32 个 commit，**尚未 push**)
+Last verified commit:   f957128  (2026-09-16, 平台冻结包：接入模板 + 模式治理 + 自动报告)
+origin/main:            ee45d62  (本地领先 33 个 commit，**尚未 push**)
 Working tree:           见「已知限制 #1」
 STATUS.md last updated: 2026-09-16
 ```
@@ -107,10 +107,53 @@ G6 graphite‖Li 实验约束模型                   IN PROGRESS
   G6.1b-2 3-region basis                        落脚点**存在但很窄**（3 个窗口；先测方向独立性）
   G6.2 graphite identifiability                 NOT STARTED
   G6.3 独立 protocol 验证                       NOT STARTED
+  ══ 平台冻结包（productization freeze）═         完成 —— 2026-09-16，见下
 G6 held-out 预测         NOT DONE
 G7 再生状态泛化          NOT STARTED
 G8 优化闭环              NOT DONE
 ```
+
+### 平台冻结包 — **完成**（2026-09-16）
+
+导师定的"产品化冻结"五项全部落地，**纯 additive**（`run_pipeline.py` / runner / evaluator /
+factory / registry / `rates.py` / `paths.py` **一行未改**）。目标状态：
+`实验数据 → dataset adapter → protocol 解析 → scale alignment → PyBaMM replay →
+identifiability → 参数报告`；"接入新数据集"从写一份 20 KB adapter 变成**填 5 个 hook + 一份 metadata**。
+
+| # | 交付物 | 位置 | 实测 |
+|---|---|---|---|
+| 1 | 数据集接入模板 + 契约自检 | `battery_sim/datasets/template.py` | `--check dlr_gitt` → **PASS(0 err / 3 warn)** |
+| 2 | 新数据接入 README | `docs/adding_a_dataset.md` | 4 步 + 写代码前必答的 10 个格式问题 |
+| 3 | material identification mode | `governance/analysis_mode.py` | material 模式下 truth 字段 → `ModeViolation` |
+| 4 | 自动报告生成 | `identification/parameter_report.py` | 双向报告已生成，见下 |
+| 5 | 回收石墨空模板 | `templates/recycled_graphite/` | 元数据不完整 → **构造即失败** |
+
+**判定词汇只有五个**（`governance.analysis_mode.ALLOWED_VERDICTS`）：
+`identifiable` / `not identifiable` / `bounded` / `unconstrained` / `not_measured`。
+**只有 `identifiable` 允许引用数值；`bounded` 只报界；另两个不许报数。**
+判据（水平 1 mV、上限 0.30 dex、扫描 ±1 dex、网格分辨率 0.05 dex）必须与判定一起写。
+`bounded` 的方向写清了：左截断 → 可报上界；右截断 → 可报下界（G6.1c 实测那一侧是下界）。
+
+**已生成的报告**（由产物直接生成，**未手抄**）：
+
+| 报告 | 判定 | 依据窗口 | 带宽 |
+|---|---|---|---|
+| `outputs/reports/dlr_gitt_charge_identifiability.md` | `identifiable` | `GITT-charge#t475` | 0.0988 dex |
+| `outputs/reports/dlr_gitt_discharge_identifiability.md` | `not identifiable` | `GITT-discharge#t224` | 0.3261 dex |
+
+两份报告里 `k0` / `Rct` 都写 **`not_measured`**（本条记录没有 EIS）——
+这正是新治理层要防的："没测"不许被写成"不显著"。
+两份报告都自动带上 `dataset_role: benchmark` 的提示：**不构成对该材料参数集的验证**。
+
+**契约自检在真实 adapter 上暴露的三个警告**（照实记，未改阈值）：
+① 协议型数据集没有额定放电（`load_discharge` 未实现，属预期）；
+② 没声明 `nominal_capacity_Ah`（尺度对齐门只能从参数集反推模型容量）；
+③ **`list_protocols()` 广告的扫程级 id `GITT-charge` 不可整流回放**（只有 `#tN` 窗口 id 可，
+   因为充电半程在记录里是交错的）——D62 级别的接口不一致，**不影响 G6.1c**（它一直用窗口 id），
+   但新接入的 adapter 必须让 `list_protocols()` 只返回 `load_protocol` 能接受的 id。
+
+**顺带补上的 provenance**：`configs/datasets.yaml` 的 `dlr_gitt` 块补了 `source:` 字段
+（平台的来源字段此前缺失，而"实验数据必须留来源"是红线）。
 
 **G5 的判据已重新定义**：从"优化器能不能找到真值？"改为
 
@@ -883,9 +926,9 @@ p-ocv 是 C/50，`gitt`/`gitthold` 实为 C/50 CC–CV 且多通道交错。
 ## 测试状态
 
 ```text
-pytest:        392 passed, 5 warnings
+pytest:        448 passed, 5 warnings
 failures:      0
-duration:      108.74s
+duration:      115.40s
 last run date: 2026-09-16  (提交前复跑)
 command:       python -m pytest -q   (WSL, conda env pybamm)
 ```
@@ -894,14 +937,16 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 
 | 文件 | 写的数 | 实际 |
 |---|---|---|
-| `README.md` | 293 | **392** |
-| `HANDOFF.md` | 88 | **392** |
+| `README.md` | 293 | **448** |
+| `HANDOFF.md` | 88 | **448** |
 
 两个数字互不相同，且都与实际不符。已改为指向本文件，不再写死数字。
-**引用测试数时只引用本文件的 392。**
+**引用测试数时只引用本文件的 448。**
 （2026-09-16 的增量：329 → 356 是 G6.1a 的 28 项 `test_dlr_gitt.py`；
 356 → 374 是尺度对齐门的 18 项 `test_scale_alignment.py`；
-374 → 392 是 G6.1c 的 18 项 `test_recovery_stats.py`。）
+374 → 392 是 G6.1c 的 18 项 `test_recovery_stats.py`；
+392 → **448** 是平台冻结包的 56 项：`test_dataset_template.py` +
+`test_analysis_mode.py` + `test_parameter_report.py`。）
 
 ---
 
@@ -911,10 +956,10 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
    当前 48.36 mV 是公共接口的诚实结果。闭合需要把初值策略放进 request
    （与"顶层只有四个字段"冲突），属独立设计任务。
 
-2. **本地领先远端 28 个 commit，尚未 push。**
+2. **本地领先远端 33 个 commit，尚未 push。**
    `origin/main` 还停在 `ee45d62`（2026-09-15 之前）。
-   → **任何人 clone 远程仓库看不到覆盖 API、G6.1a 的协议层、尺度对齐门与 G6.1b-1。**
-   需要 push 才对导师可见。
+   → **任何人 clone 远程仓库看不到覆盖 API、G6.1a 的协议层、尺度对齐门、G6.1b-1、
+   G6.1c 与整个平台冻结包。** 需要 push 才对导师可见。
 
 3. **跑一次 pipeline 会改动被 git 跟踪的产物文件。**
    `outputs/` 有 418 个文件在版本控制内。一次 baseline 会改 6 个文件。
