@@ -1,0 +1,61 @@
+# ============================================================
+# configs/datasets.yaml 追加片段 —— 商用石墨热处理梯度
+#
+# ⚠️ 数据到位前**不要**合进 configs/datasets.yaml：
+#    空数据集会让 pipeline 在解析阶段就报错，而这条梯度还没数据。
+#    合入时机 = 第 0 天三件事全绿（见 templates/commercial_graphite_ht/README.md）。
+#
+# 为什么是 4 个条目而不是 1 个数据集 + 4 个 cell：
+#   平台的 dataset_role 是**数据集级**的，没有 cell 这一维。
+#   4 组塞进一个条目，就无法声明"谁是参照系、谁只做验证"。
+# ============================================================
+
+graphite_ht_cg_ar:
+  adapter: "graphite_ht"
+  raw_dir: "data/raw/graphite_ht/CG-AR"
+  parameter_set: "Ecker2015_graphite_halfcell"
+  dataset_role: "identification"
+  dataset_role_note: "as-received 商用石墨参照系；辨识集（0.1C / 0.2C / GITT / OCP）"
+
+graphite_ht_cg_600:
+  adapter: "graphite_ht"
+  raw_dir: "data/raw/graphite_ht/CG-600"
+  parameter_set: "Ecker2015_graphite_halfcell"
+  dataset_role: "identification"
+  dataset_role_note: "600 °C 惰性热处理；辨识集（0.1C / 0.2C / GITT / OCP）"
+
+graphite_ht_cg_800:
+  adapter: "graphite_ht"
+  raw_dir: "data/raw/graphite_ht/CG-800"
+  parameter_set: "Ecker2015_graphite_halfcell"
+  dataset_role: "identification"
+  dataset_role_note: "800 °C 惰性热处理；辨识集（0.1C / 0.2C / GITT / OCP）"
+
+graphite_ht_cg_900:
+  adapter: "graphite_ht"
+  raw_dir: "data/raw/graphite_ht/CG-900"
+  parameter_set: "Ecker2015_graphite_halfcell"
+  dataset_role: "identification"
+  dataset_role_note: "900 °C 惰性热处理；辨识集（0.1C / 0.2C / GITT / OCP）"
+
+# ------------------------------------------------------------------
+# Level 4 的留出集：把 1C 曲线单独放一个目录，才会被**平台的**门看住
+#
+# 角色分离写在两处，机制不同，别混：
+#   · metadata 的 measurements[].role: validation
+#       → 声明层面（每个样品的 rate_1C.csv 那样登记）
+#   · 下面这个数据集条目的 dataset_role: validation
+#       → 平台层面：governance/dataset_roles.py 会在拿它标定时直接报错
+#   想要第二道门，就把 1C 的导出复制/软链到这里（4 个文件），
+#   目录名固定，便于复核：
+#       data/raw/graphite_ht/_holdout_1C/CG-AR_rate_1C.csv
+#       data/raw/graphite_ht/_holdout_1C/CG-600_rate_1C.csv
+#       data/raw/graphite_ht/_holdout_1C/CG-800_rate_1C.csv
+#       data/raw/graphite_ht/_holdout_1C/CG-900_rate_1C.csv
+# ------------------------------------------------------------------
+graphite_ht_rate_holdout:
+  adapter: "graphite_ht"
+  raw_dir: "data/raw/graphite_ht/_holdout_1C"
+  parameter_set: "Ecker2015_graphite_halfcell"
+  dataset_role: "validation"
+  dataset_role_note: "1C 留出集（四个样品）：只用于预测检验，禁止进入任何拟合"

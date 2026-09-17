@@ -226,6 +226,82 @@ OXIDATIVE_HINTS = ("air", "o2", "oxygen", "空气", "氧")
 OXIDATIVE_ALERT_ABOVE_C = 500.0
 
 
+# ---------------------------------------------------------------
+# 通用工艺史（process history）
+#
+# 为什么不能复用 recycling
+#   recycling 回答的是"这个材料从哪来"（退役电池 → 再生），它的必填性挂在
+#   material_class 上。而"对它做了什么"是**另一个维度**：热处理梯度实验里
+#   600/800/900 °C 就是**自变量本身**，与材料是不是回收料无关。
+#   把两者挤进一个块，会让"未回收但被热处理"的样品无处记录工艺 ——
+#   而这批样品的全部结论都由工艺决定。
+#
+# 形状刻意与 structure 块同构（applied / not_applied_reason）：
+#   · applied: true  → 方法/温度/时长/气氛四项必填，键是**闭集**
+#   · applied: false → 必须写 not_applied_reason
+#   「没处理」与「忘了写」在下游完全一样，所以两种都要有说法。
+#
+# 逐份文件里它是**可选**的（单份接入不被卡住）；但一条梯度里它是**必须**的，
+# 由 validate_series 强制 —— 否则「600」与「800」只差 sample_id 里一个字符串。
+# ---------------------------------------------------------------
+PROCESSING_REQUIRED_FIELDS = ("method", "temperature_C", "duration_h",
+                              "atmosphere")
+
+#: 可选、但必须**按名字**写。加键要改这里：闭集是有意的，自由键会让
+#: "这批样品到底怎么处理的"半年后无法回答。
+PROCESSING_OPTIONAL_FIELDS = (
+    "ramp_rate_C_per_min",    # 升温速率：决定实际热历史，不只是峰值温度
+    "cooling",                # 降温方式（炉冷 / 随炉 / 快冷）
+    "atmosphere_flow_sccm",   # 气氛流量
+    "crucible",               # 坩埚与装样方式
+    "mass_before_mg",         # 处理前质量
+    "mass_after_mg",          # 处理后质量 → 失重率（去除 SEI/官能团的第一手证据）
+    "batch",                  # 同炉次（同炉样品共享热历史）
+    "notes",
+)
+
+PROCESSING_FIELDS = (("applied", "not_applied_reason")
+                     + PROCESSING_REQUIRED_FIELDS
+                     + PROCESSING_OPTIONAL_FIELDS)
+
+#: 必须为正的数值字段
+PROCESSING_POSITIVE = ("temperature_C", "duration_h", "ramp_rate_C_per_min",
+                       "atmosphere_flow_sccm", "mass_before_mg",
+                       "mass_after_mg")
+
+PROCESSING_FIELD_HELP = {
+    "method": "处理方法（例：管式炉热处理 / 真空干燥 / 酸洗）",
+    "temperature_C": "处理温度（°C）；氧化性气氛下高温会烧损石墨",
+    "duration_H": "保温时长（h）",
+    "duration_h": "保温时长（h）",
+    "atmosphere": "气氛（例：Ar / N2 / Ar-H2 / 真空）—— 它常常比温度更决定结论",
+    "ramp_rate_C_per_min": "升温速率（°C/min）",
+    "cooling": "降温方式（炉冷 / 随炉 / 快冷）",
+    "atmosphere_flow_sccm": "气氛流量（sccm）",
+    "crucible": "坩埚 / 装样方式",
+    "mass_before_mg": "处理前质量（mg）",
+    "mass_after_mg": "处理后质量（mg）",
+    "batch": "同炉次编号（同炉样品共享热历史）",
+}
+
+
+def _oxidative_warning(temperature: float, atmosphere: str,
+                       where: str) -> Optional[str]:
+    """氧化性气氛 + 高温 = 石墨会被烧掉。返回警告文本，或 None。
+
+    只 warn 不判死：气氛写法可能是实验室内部的缩写，先让人确认写法与单位，
+    再让他解释容量损失。
+    """
+    if temperature > OXIDATIVE_ALERT_ABOVE_C and any(
+            h in str(atmosphere).lower() for h in OXIDATIVE_HINTS):
+        return (
+            f"{where}: 处理气氛写作 '{atmosphere}' 且温度 {temperature} °C —— "
+            f"石墨在氧化性气氛下 >{OXIDATIVE_ALERT_ABOVE_C:g} °C 会烧损，"
+            f"先确认气氛写法（Ar / N2 / 真空？）再解释容量损失"
+        )
+    return None
+
+
 def validate_recycling(meta: Dict[str, Any]) -> Dict[str, List[str]]:
     """校验 ``recycling:`` 块。返回 ``{errors, warnings, missing}``。"""
     errors: List[str] = []
@@ -277,14 +353,12 @@ def validate_recycling(meta: Dict[str, Any]) -> Dict[str, List[str]]:
             if temp < 0:
                 errors.append(f"recycling.treatment.temperature_C = {temp} 为负")
             else:
-                atmo = str(treatment.get("atmosphere") or "")
-                if (temp > OXIDATIVE_ALERT_ABOVE_C
-                        and any(h in atmo.lower() for h in OXIDATIVE_HINTS)):
-                    warnings.append(
-                        f"处理气氛写作 '{atmo}' 且温度 {temp} °C —— "
-                        f"石墨在氧化性气氛下 >{OXIDATIVE_ALERT_ABOVE_C:g} °C 会烧损，"
-                        f"先确认气氛写法（Ar / N2 / 真空？）再解释容量损失"
-                    )
+                warn = _oxidative_warning(
+                    temp, str(treatment.get("atmosphere") or ""),
+                    "recycling.treatment",
+                )
+                if warn:
+                    warnings.append(warn)
         except (TypeError, ValueError):
             errors.append(
                 f"recycling.treatment.temperature_C = "
@@ -302,6 +376,294 @@ def validate_recycling(meta: Dict[str, Any]) -> Dict[str, List[str]]:
             )
 
     return {"errors": errors, "warnings": warnings, "missing": missing}
+
+
+def validate_processing(meta: Dict[str, Any]) -> Dict[str, List[str]]:
+    """校验 ``processing:`` 块。返回 ``{errors, warnings, pending}``。
+
+    ``applied`` 是**必需**的：不写它就无法区分"没处理"与"忘了写"，
+    而那正是这个块存在的理由。
+    """
+    errors: List[str] = []
+    warnings: List[str] = []
+    pending: List[str] = []
+
+    raw = meta.get("processing")
+    if raw is None:
+        # 单份文件可以没有（由 validate_series 在梯度层面强制）
+        return {"errors": errors, "warnings": warnings, "pending": pending}
+    if not isinstance(raw, dict):
+        errors.append("processing 必须是 mapping（applied / method / "
+                      "temperature_C / duration_h / atmosphere / ...）")
+        return {"errors": errors, "warnings": warnings, "pending": pending}
+
+    unknown = [k for k in raw if k not in PROCESSING_FIELDS]
+    if unknown:
+        errors.append(
+            f"processing 里有未知键 {unknown}；允许 {list(PROCESSING_FIELDS)}"
+        )
+
+    if "applied" not in raw:
+        errors.append("processing.applied 必填（true/false）")
+        return {"errors": errors, "warnings": warnings, "pending": pending}
+    applied = raw["applied"]
+    if not isinstance(applied, bool):
+        errors.append(f"processing.applied 必须是布尔值，得到 {applied!r}")
+        return {"errors": errors, "warnings": warnings, "pending": pending}
+
+    if not applied:
+        reason = str(raw.get("not_applied_reason") or "").strip()
+        if not reason:
+            errors.append(
+                "processing.applied=false 必须写 not_applied_reason"
+                "（为什么什么都没做 —— 「没处理」也要有说法）"
+            )
+        else:
+            pending.append(f"processing: 未处理（{reason}）")
+        for key in PROCESSING_REQUIRED_FIELDS + ("mass_before_mg",
+                                                 "mass_after_mg"):
+            if _filled(raw.get(key)):
+                warnings.append(
+                    f"processing.applied=false 却填了 {key} —— 自相矛盾"
+                )
+        return {"errors": errors, "warnings": warnings, "pending": pending}
+
+    for key in PROCESSING_REQUIRED_FIELDS:
+        if not _filled(raw.get(key)):
+            errors.append(
+                f"processing.{key} 必填（applied=true 就要给出完整工艺；"
+                f"{PROCESSING_FIELD_HELP.get(key, '')}）"
+            )
+
+    for key in PROCESSING_POSITIVE:
+        if key not in raw or raw[key] in (None, ""):
+            continue
+        try:
+            num = float(raw[key])
+        except (TypeError, ValueError):
+            errors.append(f"processing.{key} = {raw[key]!r} 不是数字")
+            continue
+        if not num > 0:
+            errors.append(f"processing.{key} = {num} 必须为正")
+
+    if _filled(raw.get("temperature_C")) and _filled(raw.get("atmosphere")):
+        try:
+            warn = _oxidative_warning(
+                float(raw["temperature_C"]), str(raw["atmosphere"]),
+                "processing",
+            )
+            if warn:
+                warnings.append(warn)
+        except (TypeError, ValueError):
+            pass
+
+    before, after = raw.get("mass_before_mg"), raw.get("mass_after_mg")
+    if _filled(before) and _filled(after):
+        try:
+            if float(after) > float(before):
+                warnings.append(
+                    f"processing: 处理后质量 {after} mg > 处理前 {before} mg "
+                    f"—— 只可能来自称量误差或装样残留，确认一下"
+                )
+        except (TypeError, ValueError):
+            pass
+
+    return {"errors": errors, "warnings": warnings, "pending": pending}
+
+
+def mass_loss_pct(meta: Dict[str, Any]) -> Optional[float]:
+    """处理失重率 %（处理前/后质量都在时才有值）。除去的是 SEI、无定形碳、
+    表面官能团 —— 这是"500 与 800 差在哪"最便宜的一条第一手证据。"""
+    raw = meta.get("processing") or {}
+    if not isinstance(raw, dict):
+        return None
+    try:
+        before = float(raw["mass_before_mg"])
+        after = float(raw["mass_after_mg"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    if before <= 0:
+        return None
+    return (before - after) / before * 100.0
+
+
+def processing_summary(meta: Dict[str, Any]) -> str:
+    """一行工艺摘要。没有 processing 块时**明说没有**，不留白。"""
+    raw = meta.get("processing")
+    if not isinstance(raw, dict):
+        return "processing: 未声明（梯度实验里工艺是自变量，必须声明）"
+    if raw.get("applied") is False:
+        return f"processing: 未处理（{raw.get('not_applied_reason') or '无原因'}）"
+    if raw.get("applied") is True:
+        text = (f"{raw.get('method')} @ {raw.get('temperature_C')} °C"
+                f" × {raw.get('duration_h')} h in {raw.get('atmosphere')}")
+        loss = mass_loss_pct(meta)
+        if loss is not None:
+            text += f"；失重 {loss:.2f} %"
+        ramp = raw.get("ramp_rate_C_per_min")
+        if _filled(ramp):
+            text += f"；升温 {ramp} °C/min"
+        return "processing: " + text
+    return "processing: 未声明 applied（true/false）"
+
+
+def series_table(metas) -> str:
+    """一行一样品的梯度表：sample_id | material_class | 工艺 | 失重。"""
+    rows = []
+    for meta in metas:
+        loss = mass_loss_pct(meta)
+        raw = meta.get("processing")
+        if isinstance(raw, dict) and raw.get("applied") is True:
+            treat = (f"{raw.get('method') or '?'} @ {raw.get('temperature_C')} °C"
+                     f" × {raw.get('duration_h')} h"
+                     f" in {raw.get('atmosphere') or '?'}")
+        elif isinstance(raw, dict) and raw.get("applied") is False:
+            treat = "未处理"
+        else:
+            treat = "工艺未声明"
+        rows.append([
+            str(meta.get("sample_id") or "?"),
+            str(meta.get("material_class") or "?"),
+            treat,
+            "-" if loss is None else f"{loss:.2f} %",
+        ])
+    header = ["sample_id", "material_class", "processing", "mass_loss"]
+    width = [max(len(header[i]), *(len(r[i]) for r in rows)) if rows
+             else len(header[i]) for i in range(4)]
+    out = ["  " + " | ".join(h.ljust(width[i]) for i, h in enumerate(header))]
+    for row in rows:
+        out.append("  " + " | ".join(v.ljust(width[i])
+                                     for i, v in enumerate(row)))
+    return "\n".join(out)
+
+
+def validate_series(metas, *, require_processing: bool = True,
+                    geometry_tolerance_pct: float = 10.0
+                    ) -> Dict[str, List[str]]:
+    """一组样品（同一条梯度）的**系列级**校验。
+
+    每份文件各自合法 ≠ 它们构成一条可比较的梯度。这里查四件事：
+      1. **sample_id 唯一** —— 不同处理必须是不同编号；
+      2. **工艺史都声明了** —— 缺了它，「600」与「800」只差 sample_id 里
+         一个字符串，样品身份不可追踪（与 recycling 块同一个理由）；
+      3. **工艺至少有一样不同** —— 全都相同就不是梯度；同条件下的重复
+         属于同一 sample 的多颗电芯，不该占两个 sample_id；
+      4. **电极几何一致** —— 材料对比时电极差异会混进参数差异，
+         结论只能退到「当前电极工艺下的综合差异」（phase1 方案 §3.2）。
+    """
+    metas = [m for m in metas if isinstance(m, dict)]
+    errors: List[str] = []
+    warnings: List[str] = []
+
+    ids = [str(m.get("sample_id") or "") for m in metas]
+    dup = sorted({i for i in ids if i and ids.count(i) > 1})
+    if dup:
+        errors.append(f"sample_id 重复：{dup} —— 不同处理的样品必须是不同编号")
+
+    if require_processing:
+        for meta in metas:
+            if not isinstance(meta.get("processing"), dict):
+                errors.append(
+                    f"样品 '{meta.get('sample_id') or '?'}' 没有 processing 块 "
+                    f"—— 这条梯度里工艺就是自变量，缺了它样品身份不可追踪"
+                )
+
+    treatments = []
+    for meta in metas:
+        raw = meta.get("processing")
+        if isinstance(raw, dict) and raw.get("applied") is True:
+            treatments.append((
+                str(meta.get("sample_id") or "?"),
+                tuple(str(raw.get(k)) for k in PROCESSING_REQUIRED_FIELDS),
+            ))
+    if len(treatments) >= 2:
+        bucket: Dict[Any, List[str]] = {}
+        for name, key in treatments:
+            bucket.setdefault(key, []).append(name)
+        same = [v for v in bucket.values() if len(v) > 1]
+        if len(bucket) == 1:
+            errors.append(
+                "所有样品的工艺完全相同 —— 这不是一条梯度；"
+                "同条件下的重复属于同一 sample 的多颗电芯"
+            )
+        else:
+            for group in same:
+                warnings.append(
+                    f"样品 {'/'.join(group)} 的工艺完全相同 —— "
+                    f"确认它们是平行批还是同一个处理（后者应合并为一个 sample）"
+                )
+
+    for path in ("electrode.mass_loading_mg_cm2",
+                 "electrode.coating_thickness_um",
+                 "electrode.area_cm2"):
+        vals = []
+        for meta in metas:
+            value = _dig(meta, path)
+            try:
+                vals.append(float(value))
+            except (TypeError, ValueError):
+                continue
+        if len(vals) < 2:
+            continue
+        lo, hi = min(vals), max(vals)
+        if lo > 0 and (hi - lo) / lo * 100.0 > geometry_tolerance_pct:
+            warnings.append(
+                f"{path} 在样品间相差 {(hi - lo) / lo * 100.0:.1f} % "
+                f"（{lo:g} → {hi:g}）—— 材料对比时电极差异会混进参数差异，"
+                f"结论只能写「当前电极工艺下的综合差异」"
+            )
+
+    return {"errors": errors, "warnings": warnings}
+
+
+def _main(argv=None) -> int:
+    """``python -m battery_sim.datasets.material_metadata --series <dir>``
+
+    一个目录 = 一条梯度：逐份校验 + 系列级校验。填完 metadata 先跑这个，
+    再看报告 —— 错误为零才谈分析。
+    """
+    import argparse
+    from pathlib import Path as _Path
+
+    parser = argparse.ArgumentParser(
+        description="材料元数据校验（单份 / 一条梯度）")
+    parser.add_argument("--series", metavar="DIR",
+                        help="目录里每个 *.yaml 是一个样品，并做系列级校验")
+    parser.add_argument("--file", action="append", default=[], metavar="PATH")
+    args = parser.parse_args(argv)
+
+    paths = [_Path(p) for p in args.file]
+    if args.series:
+        paths += sorted(_Path(args.series).glob("*.yaml"))
+    if not paths:
+        parser.error("至少给 --series DIR 或 --file PATH")
+
+    metas: List[Dict[str, Any]] = []
+    bad = 0
+    for path in paths:
+        meta = load_metadata(path)
+        metas.append(meta)
+        result = validate(meta)
+        print(f"\n=== {path} ===")
+        print(render(meta, result))
+        print(f"  {processing_summary(meta)}")
+        for item in result.get("pending", []):
+            print(f"  PENDING  {item}")
+        bad += len(result["errors"])
+
+    if len(metas) > 1:
+        series = validate_series(metas)
+        print("\n=== 系列级（同一条梯度）===")
+        print(series_table(metas))
+        for err in series["errors"]:
+            print(f"  ERROR  {err}")
+            bad += 1
+        for warn in series["warnings"]:
+            print(f"  WARN   {warn}")
+
+    print(f"\n{'FAIL' if bad else 'PASS'}：{bad} 个错误 / "
+          f"{len(metas)} 份元数据")
+    return 1 if bad else 0
 
 
 #: 逐字段的"为什么问这个"
@@ -659,6 +1021,12 @@ def validate(meta: Dict[str, Any]) -> Dict[str, List[str]]:
     warnings.extend(recycling["warnings"])
     missing.extend(recycling["missing"])
 
+    # 通用工艺史：与 recycling 是两个维度（从哪来 vs 做了什么）
+    processing = validate_processing(meta)
+    errors.extend(processing["errors"])
+    warnings.extend(processing["warnings"])
+    pending.extend(processing["pending"])
+
     return {"errors": errors, "warnings": warnings, "missing": missing,
             "pending": pending}
 
@@ -715,6 +1083,7 @@ def render(meta: Optional[Dict[str, Any]],
         f"cell            : 对电极 {_dig(meta, 'cell.counter_electrode')} | "
         f"电解液 {_dig(meta, 'cell.electrolyte')}"
     )
+    lines.append(f"processing      : {processing_summary(meta)[12:]}")
     tech = techniques(meta)
     lines.append(f"measurements    : {tech if tech else '(未声明)'}")
 
@@ -750,13 +1119,25 @@ __all__ = [
     "MaterialMetadataError",
     "PARAMETER_EVIDENCE",
     "PARAMETER_SOURCE_VOCAB",
+    "PROCESSING_FIELDS",
+    "PROCESSING_OPTIONAL_FIELDS",
+    "PROCESSING_REQUIRED_FIELDS",
     "REGENERATION_REQUIRED_FOR",
     "REQUIRED_FIELDS",
     "TECHNIQUE_VOCAB",
     "load_metadata",
+    "mass_loss_pct",
     "missing_fields",
+    "processing_summary",
     "render",
+    "series_table",
     "techniques",
     "validate",
     "validate_parameter_source",
+    "validate_processing",
+    "validate_series",
 ]
+
+
+if __name__ == "__main__":       # pragma: no cover
+    raise SystemExit(_main())

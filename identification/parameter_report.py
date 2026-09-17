@@ -302,16 +302,31 @@ def unmeasured_probes(
     for name in parameters:
         needed = PARAMETER_EVIDENCE.get(name, ())
         missing = [t for t in needed if t not in have]
-        out.append(ParameterProbe(
-            parameter=name,
-            verdict=VERDICT_NOT_MEASURED,
-            rationale=(
+        if needed and not missing:
+            # **第三种状态**：数据在手，但平台没有从这个激励拟合该参数的通路。
+            # 沿用"没有 EIS 测量"那句话在有 EIS 时是**假的**，而下一批实验
+            # 就会带 EIS 进来 —— 报告会当场说谎。所以分开写；判定词仍然是
+            # not_measured（没有估计值就是没有），但理由必须指向通路而不是数据。
+            rationale = (
+                f"{'/'.join(needed)} 已测，但平台当前没有从它拟合 {name} 的通路"
+                f"⇒ 这与「没测」是两件事，但同样**不能**给判定；"
+                f"要出 {name} 必须先把通路建起来"
+            )
+            note = "measured_but_no_fitting_pathway"
+        else:
+            rationale = (
                 f"本数据集没有 {'/'.join(needed)} 测量"
                 + (f"（缺 {'/'.join(missing)}）" if missing else "")
                 if needed else "本数据集没有该参数所需激励"
-            ),
+            )
+            note = ""
+        out.append(ParameterProbe(
+            parameter=name,
+            verdict=VERDICT_NOT_MEASURED,
+            rationale=rationale,
             evidence=tuple(needed),
             source="not_measured",
+            note=note,
         ))
     return out
 

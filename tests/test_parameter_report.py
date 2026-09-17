@@ -131,9 +131,19 @@ def test_unmeasured_probe_is_a_string_and_names_what_is_missing():
 
 
 def test_unmeasured_probe_clears_when_the_technique_is_present():
+    """EIS 在手 != 能出 k0。这里是**第三种状态**：测了，但没有拟合通路。
+
+    这条原来只断言"理由里没有『缺』"——那就允许它写"本数据集没有 EIS 测量"，
+    而那句话在有 EIS 时是**假的**。下一批实验带 EIS 进来时报告会当场说谎，
+    所以理由必须指向通路，而不是数据。
+    """
     probes = unmeasured_probes(("k0",), available_techniques=("GITT", "EIS"))
     assert probes[0].verdict == VERDICT_NOT_MEASURED
     assert "缺" not in probes[0].rationale
+    assert "没有 EIS 测量" not in probes[0].rationale
+    assert "通路" in probes[0].rationale
+    assert probes[0].note == "measured_but_no_fitting_pathway"
+    assert probes[0].source == "not_measured"
 
 
 # ------------------------------------------------------------------

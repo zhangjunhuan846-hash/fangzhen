@@ -16,7 +16,7 @@ Last verified commit:   b16f5ef  (2026-09-17, 结构表征契约 + 回收石墨 
 Tag:                    v0.1.0-platform  (**平台开发阶段冻结**；接新数据不再是开发任务)
 origin/main:            **与本地同链，已 push**（2026-09-16；33 个 commit 积压已清零）
 Working tree:           见「已知限制 #1」
-STATUS.md last updated: 2026-09-16
+STATUS.md last updated: 2026-09-17
 ```
 
 ---
@@ -108,6 +108,8 @@ G6 graphite‖Li 实验约束模型                   IN PROGRESS
   G6.1b-2 3-region basis                        落脚点**存在但很窄**（3 个窗口；先测方向独立性）
   G6.2a D_s(x) 表示接口门                       **接口 PASS / 判据 9/11**（2 条窗口类 FAIL）— 见下
   ══ 结构表征契约 + 回收石墨 adapter 骨架 ═      完成 —— 2026-09-17，见下
+  ══ 商用石墨热处理梯度（材料侧，第一线）═      设计 v2 + 4 份样品元数据 —— 见下
+  ══ 生产一批数据（实验）═                      **下一步就是它**（不是写代码）
   G6.2 graphite identifiability                 NOT STARTED
   G6.3 独立 protocol 验证                       NOT STARTED
   ══ 平台冻结包（productization freeze）═         完成 —— 2026-09-16，见下
@@ -648,6 +650,74 @@ $x_0\approx0.015$ 处 **5.1×**。更深一点（$x_0\approx0.021$）**反号**�
 - **`examples/frozen_results/`**：只放 summary.json + report.md + 一张图（**209 KB**），
   **不放全部 CSV**；`outputs/fitting/` 继续 gitignore（复核靠重跑命令）。
 
+### 商用石墨热处理梯度：设计 v2 + 工艺史契约 — **完成**（2026-09-17）
+
+导师定的下一步是**停止开发平台功能、进入真实材料验证**，具体两件事：
+600/800/900 °C 商业石墨的实验设计，和三个样品（含 baseline）的 metadata 模板。
+两件都做完，并顺带修掉一处**会当场说谎**的报告措辞。
+
+**① 实验设计 v2** —— `docs/graphite_heat_treatment_test_plan.md`（重写 v1）
+
+| 项 | v1 | **v2** | 依据 |
+|---|---|---|---|
+| 样品 | 干燥 / 500 / 800 °C | **CG-AR / 600 / 800 / 900 °C** | 处理温度是本批**自变量** |
+| GITT | ❌ 不做（估 4 个月/颗） | ✅ **做，且是重点**（40 h/颗/方向） | 4 个月来自**另一个协议**：1800 s 脉冲 + 9000 s 静置 × ~1000 脉冲（0.1 %/步）。按导师的 10 min/30 min、60 脉冲（1.67 %/步），机时 **3000 h → 40 h（约 75×）** |
+| EIS | 可选、含糊 | ✅ 必测（100 kHz–10 mHz × 10/50/90 % SOC） | 不测就分不清"扩散变慢"与"界面变差" |
+| 结构 | D10/D50/D90 + BET | **+ SEM 取 R_p** | 平台里 **D ∝ R²**：粒径不测，D_s 的差异无法归因 |
+
+**② 一处新算出来的量化判据（v1 没有，而它决定"哪里能反演"）**
+
+GITT 的无量纲时间 τ = D·t/R²。用参考参数集 `Ecker2015_graphite_halfcell`
+（R_p = **13.70 µm**）算 600 s 脉冲：x = 0.02 → **τ = 2.37**；x = 0.10 → **0.98**；
+x ≥ 0.30 → 0.128 → 0.029。
+⇒ **稀相端（x ≲ 0.15）形式上不满足半无限扩散**（那里 D_s 大 80 倍，颗粒在脉冲内
+已被平衡），**该区间不报 Sand 反演结果**。这同时解释了 G6.1c 的反直觉现象：
+"唯一可辨识"的窗口正好落在最脱锂端 —— **可辨识区与模型有效域边界重合**。
+
+口径：参数集自带 `R_p = 13.70 µm` 与实测 D50/2 = 8.79 µm 相差 **1.56×**，
+对应 D_s 相差约 **2.4×** ⇒ 报告必须写明用的是哪一个 R。
+
+**③ 工艺史契约** `processing`（`battery_sim/datasets/material_metadata.py`）
+
+`recycling` 回答"材料从哪来"，`processing` 回答"对它做了什么"——后者是这条
+梯度的**自变量**，只写进 sample_id 字符串没人能复核。形状与 structure 块同构：
+`applied: true` → 方法/温度/时长/气氛四项 + **闭集键**；`applied: false` →
+必须写 `not_applied_reason`。含 `mass_before_mg`/`mass_after_mg` → **失重率**
+（"去掉了多少 SEI / 官能团 / 无定形碳"最便宜的第一手证据）；
+氧化性气氛 + >500 °C 与 recycling **共用同一条 warn**（一个实现，两个入口）。
+
+**系列级校验** `validate_series` + CLI `python -m battery_sim.datasets.material_metadata --series <dir>`：
+sample_id 唯一；每份都声明工艺；工艺**至少有一样不同**（全同 = 不是梯度）；
+电极几何一致（否则"材料差异"与"电极差异"混在一起，结论只能退到
+「当前电极工艺下的综合差异」）。
+
+**④ 四份样品模板** `templates/commercial_graphite_ht/`（+ 数据集条目片段）
+
+预填**设计决定**（编号 / 工艺条件 / 测量清单与角色 / 电极与电芯规格）；
+**故意留空恰好 7 个只有人能填的实测量**：`source`、载量、厚度、面积、
+`particle.d50_um`、对电极、电解液。留空而不是预填"看起来合理"的数，因为
+预填值会安静地进入容量尺度换算，而 **D ∝ R²**：粒径错一倍 = D_s 差 4 倍。
+实测：四份各报 **7 个错误**、系列级 **0 错误**（测试钉住）。
+
+角色**预先登记**（做完不能改口径）：0.1C / 0.2C = identification；
+0.5C / 1C / 2C = validation；**1C 是 Level 4 留出集**。
+数据集条目 = 4 个样品 + 1 个 `_holdout_1C`（平台层 validation 门），
+目录 `data/raw/graphite_ht/<SAMPLE>/`（`data/` 全在 gitignore 内）。
+
+**⑤ 验收阶梯 L1–L4**（判据明确**不是** RMSE 低）
+L1 数据进入（元数据错误 = 0）→ L2 模型复现（只**记录** RMSE 与残差形状，
+不作判据）→ L3 参数辨识（五个判定词；`D_s` 只有 `identifiable` 才报数值，
+`bounded` 只报界）→ L4 用 0.1C 辨识的参数**前向预测 1C**，参数一个都不许回改。
+
+**⑥ 修掉一处会当场说谎的报告措辞**
+
+`unmeasured_probes` 在**"测了但平台没有拟合通路"**时，原来输出
+「本数据集没有 EIS 测量」—— 下一批数据带 EIS 进来时，这句话是**假的**。
+现在它是明确的**第三种状态**：「EIS 已测，但平台没有从它拟合 k0 的通路」，
+判定词仍是 `not_measured`（没有估计值就是没有），但理由指向**通路**而不是数据。
+测试同步收紧：原来只查"理由里没有『缺』"，现在**禁止**出现"没有 EIS 测量"
+且**要求**出现"通路"。
+
 ### G6.2a D_s(x) 表示接口门 — **接口 PASS / 判据 9/11**（2026-09-16）
 
 完整报告 `docs/g6.2a_representation_interface.md`。
@@ -1004,10 +1074,10 @@ p-ocv 是 C/50，`gitt`/`gitthold` 实为 C/50 CC–CV 且多通道交错。
 ## 测试状态
 
 ```text
-pytest:        504 passed, 5 warnings
+pytest:        549 passed, 5 warnings
 failures:      0
-duration:      113.75s
-last run date: 2026-09-16  (提交前复跑)
+duration:      111.70s
+last run date: 2026-09-17  (提交前复跑)
 command:       python -m pytest -q   (WSL, conda env pybamm)
 ```
 
@@ -1019,7 +1089,7 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 | `HANDOFF.md` | 88 | **504** |
 
 两个数字互不相同，且都与实际不符。已改为指向本文件，不再写死数字。
-**引用测试数时只引用本文件的 504。**
+**引用测试数时只引用本文件的 549。**
 （2026-09-16 的增量：329 → 356 是 G6.1a 的 28 项 `test_dlr_gitt.py`；
 356 → 374 是尺度对齐门的 18 项 `test_scale_alignment.py`；
 374 → 392 是 G6.1c 的 18 项 `test_recovery_stats.py`；
@@ -1027,7 +1097,11 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 `test_analysis_mode.py` + `test_parameter_report.py`；
 448 → **466** 是 G6.2a 的 18 项 `test_representations.py`；
 466 → **504** 是结构契约与 adapter 的 38 项：`test_material_structure.py`
-+ `test_recycled_graphite.py`。）
++ `test_recycled_graphite.py`。
+⚠️ **更正**：上一版把 504 写成"当前值"，但同一轮后来实测是 **517**
+（`test_recycled_graphite.py` 在契约变更后又有增/改写），504 是过期数。
+→ 517 + **32** = **549**：`test_material_processing.py`（20 项）+
+`test_ht_templates.py`（12 项），本轮新增。）
 
 ---
 

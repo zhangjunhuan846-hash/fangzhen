@@ -32,6 +32,11 @@ A reproducible framework connecting battery experimental data, electrochemical m
 - 真实材料分析必须用 `analysis_mode="material"`（synthetic truth 会被代码拒绝）
 - **尺度对齐是所有参数结论的前提**：`docs/scale_alignment_gate.md`（Q_model == Q_measured）
 - 回收石墨（数据未到位也能自检契约）：`python -m battery_sim.datasets.recycled_graphite --validate`
+- **第一线：商用石墨热处理梯度**（CG-AR / 600 / 800 / 900 °C）——
+  实验设计与验收阶梯 L1–L4：`docs/graphite_heat_treatment_test_plan.md`；
+  四份样品元数据模板与目录约定：`templates/commercial_graphite_ht/`
+  （跑 `python -m battery_sim.datasets.material_metadata --series templates/commercial_graphite_ht/metadata`
+  → 它只报**恰好 7 个只有人能填的实测量**）
 - 冻结产物样例（少量：summary + 报告 + 图）：`examples/frozen_results/`
 - 设计与历史决策：`docs/architecture/`
 

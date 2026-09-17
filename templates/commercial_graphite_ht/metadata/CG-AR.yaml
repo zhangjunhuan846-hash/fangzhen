@@ -1,0 +1,160 @@
+# ============================================================
+# CG-AR —— 商用石墨参照系（as-received，未做任何处理）
+#
+# 它是石墨热处理梯度（CG-AR → 600 → 800 → 900）里的对照组。
+# 为什么必须有它：「处理有没有用」从来不是靠处理组之间比出来的，而是靠
+# **处理组 vs 未处理对照**。规格书数值不能替代它 —— 那是厂商在别人的设备、
+# 别人的装配工艺下测的。
+#
+# 数据根目录：data/raw/graphite_ht/CG-AR/
+#
+# 校验（填完先跑；错误为零才谈分析）：
+#   python -m battery_sim.datasets.material_metadata --series templates/commercial_graphite_ht/metadata
+# ============================================================
+
+sample_id: "CG-AR"
+
+# material_class 描述**材料从哪来**（原生石墨，不是回收料）；
+# 「对它做了什么处理」是另一个维度，写在下面的 processing 块里。
+# 两者混成一个词，正是这份契约要避免的事。
+material_class: "pristine"
+
+# 必填：本实验室哪一批 / 谁做的 / 日期
+# 例："本实验室 2026-09 批次；<姓名>；基料＝商用石墨规格书批次"
+source: null
+
+electrode:
+  mass_loading_mg_cm2: null      # 实测。辨识用极片设计区间 1.5–2.0 mg/cm²
+  coating_thickness_um: null     # 实测（不是标称）
+  area_cm2: null                 # 几何面积（φ12 mm 片 ≈ 1.13 cm²）
+  binder: null                   # 配方，例 "PVDF:SuperP:active = 8:1:91"
+  porosity: null                 # eps = 1 - rho_electrode/rho_true（不要用振实密度）
+
+particle:
+  # 规格书 D50 = 17.58 µm 是**处理前**的粉；每个样品都要重测。
+  # D ∝ R²：粒径错一倍 = D_s 差 4 倍（见 docs/scale_alignment_gate.md）
+  d50_um: null
+
+cell:
+  format: "CR2032"
+  counter_electrode: null        # 例 "Li 片 φ15.6 mm × 0.45 mm（过量）"
+  electrolyte: null              # 例 "1 M LiPF6 in EC:DEC = 1:1"
+  separator: null                # 例 "Celgard 2400"
+  assembly_environment: null     # 手套箱水氧值（装配变量会混进参数差异）
+
+# ============================================================
+# 工艺史（processing）—— 这条梯度里工艺就是**自变量**
+#
+# 形状与 structure 块同构：applied: true 要完整工艺，applied: false 要原因。
+# 「没处理」与「忘了写」在下游完全一样，所以两种都要有说法。
+# 键是闭集（见 material_metadata.PROCESSING_FIELDS）。
+# ============================================================
+processing:
+  applied: false
+  not_applied_reason: "未处理：作为这条梯度的参照系（as-received 商用石墨）"
+
+# ============================================================
+# 测了什么。technique 只能取：
+#   GITT | pOCV | CC_charge_discharge | rate_capability | EIS | cycling
+# role 只能取：identification | validation | exploration
+#
+# 角色是**预先登记**的，做完不能改口径：
+#   0.1C / 0.2C        → identification（允许进入拟合）
+#   0.5C / 1C / 2C     → validation（任何阶段不得进入拟合）
+#   1C                 → Level 4 留出集：用 0.1C 辨识出的参数去**预测**它
+#
+# 下面是**约定路径**（文件还没到）。数据到手放到这些位置即可；
+# 放错了 `--require-data` 会报出来。
+# ============================================================
+measurements:
+  - technique: cycling
+    file: "data/raw/graphite_ht/CG-AR/raw/electrochemistry/formation_gcd.csv"
+    role: exploration
+    notes: "化成 C/20 × 2 圈；产出首圈容量与首效（ICE）"
+  - technique: pOCV
+    file: "data/raw/graphite_ht/CG-AR/raw/electrochemistry/ocp_c20.csv"
+    role: identification
+    notes: "C/20 充 + C/20 放，双支分别保存（OCP 提取用）"
+  - technique: GITT
+    file: "data/raw/graphite_ht/CG-AR/raw/electrochemistry/gitt.csv"
+    role: identification
+    notes: "C/10，10 min 脉冲 + 30 min 静置；充放双向各一轮；约 60 脉冲/方向"
+  - technique: CC_charge_discharge
+    file: "data/raw/graphite_ht/CG-AR/raw/electrochemistry/gcd_0p1C.csv"
+    role: identification
+    notes: "0.1C 恒流充放电；提供容量基准（Q_model == Q_measured）"
+  - technique: rate_capability
+    file: "data/raw/graphite_ht/CG-AR/raw/electrochemistry/rate_0p2C.csv"
+    role: identification
+    notes: "0.2C 放电"
+  - technique: rate_capability
+    file: "data/raw/graphite_ht/CG-AR/raw/electrochemistry/rate_0p5C.csv"
+    role: validation
+    notes: "0.5C；不参与拟合"
+  - technique: rate_capability
+    file: "data/raw/graphite_ht/CG-AR/raw/electrochemistry/rate_1C.csv"
+    role: validation
+    notes: "1C —— Level 4 留出集，只用于预测检验，绝不回改参数"
+  - technique: rate_capability
+    file: "data/raw/graphite_ht/CG-AR/raw/electrochemistry/rate_2C.csv"
+    role: validation
+    notes: "2C；不参与拟合"
+  - technique: EIS
+    file: "data/raw/graphite_ht/CG-AR/raw/electrochemistry/eis.csv"
+    role: exploration
+    notes: "100 kHz–10 mHz，10/50/90 % SOC；注意平台目前没有 EIS→k0/Rct 的拟合通路，本轮 k0/Rct 只能是 not_measured（报告写明「已测但无通路」）"
+
+# 审稿人一定会问「这个参数怎么来的」。答案必须落在词表里
+# （gitt_fitting | eis_fitting | ocv_derived | literature_prior | inferred |
+#   parameter_set_default | user_override | not_measured），不许写"拟合得到"。
+parameter_sources:
+  Ds: null
+  k0: null
+  Rct: null
+
+# ============================================================
+# 结构表征：只填**测量量**，不填解释
+#   `id_ig: 1.02` 对；`defect_level: high` 错（那是分析层的结论）
+# 每个块都要 source（谁测的 / 哪台仪器 / 哪一天），否则这个数不能进论文。
+# 单位写在字段名里（_nm / _cm1 / _m2_g / _cm3_g），不做换算。
+# ============================================================
+structure:
+
+  xrd:
+    available: false
+    not_available_reason: "计划 2026-09 送测（样品已留样）"
+    file: null
+    role: null
+    wavelength_nm: null          # 例 0.15406（Cu Kα1）
+    d002_nm: null                # 石墨 ≈ 0.336 nm
+    lc_nm: null
+    la_nm: null
+    crystallite_method: null     # 例 Scherrer；写明用哪个
+    source: {type: null, instrument: null, operator: null, date: null}
+
+  raman:
+    available: false
+    not_available_reason: "计划 2026-09 送测（样品已留样）"
+    file: null
+    role: null
+    laser_wavelength_nm: null    # 例 532
+    id_ig: null
+    g_band_cm1: null
+    d_band_cm1: null
+    source: {type: null, instrument: null, operator: null, date: null}
+
+  bet:
+    available: false
+    not_available_reason: "计划 2026-09 送测（样品已留样）"
+    file: null
+    role: null
+    adsorption_gas: null         # 例 "N2"；微孔要用 CO2
+    surface_area_m2_g: null
+    pore_volume_cm3_g: null      # 不要只留面积：孔结构同样影响 ICE
+    pore_size_distribution: null
+    model: null                  # BET / BJH / DFT / HK
+    source: {type: null, instrument: null, operator: null, date: null}
+
+# SEM 不在 structure 白名单里（契约只有 xrd/raman/bet），但它决定 R_p，
+# 而 D ∝ R²。粒径写进上面的 particle.d50_um；仪器与日期建议一并记进
+# source 或实验记录，别只留在聊天记录中。

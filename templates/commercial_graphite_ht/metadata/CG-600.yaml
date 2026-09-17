@@ -1,0 +1,149 @@
+# ============================================================
+# CG-600 —— 商用石墨，600 °C 惰性气氛热处理
+#
+# 梯度里的第 1 个处理组（CG-AR → **600** → 800 → 900）。
+# ⚠️ 600 与 800 的结论**几乎完全由气氛决定**：惰性下主要是去表面官能团与
+#    无定形残碳；含微量 O2 就开始氧化烧失。所以 atmosphere 不是可选项。
+#
+# 数据根目录：data/raw/graphite_ht/CG-600/
+#
+# 校验：
+#   python -m battery_sim.datasets.material_metadata --series templates/commercial_graphite_ht/metadata
+# ============================================================
+
+sample_id: "CG-600"
+
+material_class: "pristine"       # 原生石墨（非回收料）；「做了什么处理」见 processing
+
+# 必填：本实验室哪一批 / 谁做的 / 日期
+source: null
+
+electrode:
+  mass_loading_mg_cm2: null      # 实测。辨识用极片设计区间 1.5–2.0 mg/cm²
+  coating_thickness_um: null     # 实测（不是标称）
+  area_cm2: null                 # 几何面积（φ12 mm 片 ≈ 1.13 cm²）
+  binder: null                   # 配方，例 "PVDF:SuperP:active = 8:1:91"
+  porosity: null                 # eps = 1 - rho_electrode/rho_true
+
+particle:
+  # **处理后会破碎/失重，粒径必须重测**（规格书 17.58 µm 是处理前的粉）。
+  # D ∝ R²：粒径变小会被直接读成"扩散变好"，这是本项目踩过的坑。
+  d50_um: null
+
+cell:
+  format: "CR2032"
+  counter_electrode: null        # 例 "Li 片 φ15.6 mm × 0.45 mm（过量）"
+  electrolyte: null              # 例 "1 M LiPF6 in EC:DEC = 1:1"
+  separator: null                # 例 "Celgard 2400"
+  assembly_environment: null     # 手套箱水氧值
+
+# ============================================================
+# 工艺史 —— 这条梯度里工艺就是**自变量**，所以它必须是结构化的：
+# 「两个都叫 600 °C」的样品（一个 Ar、一个空气）不是同一个材料，
+# 只写进 sample_id 字符串的话无人能复核。
+#
+# ⚠️ 下面填的是**设计值**。做完必须逐项对照管式炉运行记录核实，
+#    以运行记录为准（尤其 atmosphere 与 ramp_rate）。
+# ============================================================
+processing:
+  applied: true
+  method: "管式炉热处理"
+  temperature_C: 600             # 设计值
+  duration_h: 2                  # 设计值（保温时长）
+  atmosphere: "Ar"               # 设计值：惰性。核实实际气氛再解释结论
+  ramp_rate_C_per_min: 5         # 设计值：决定实际热历史，不只是峰值温度
+  cooling: "随炉冷却"             # 设计值
+  crucible: null                 # 例 "氧化铝坩埚，敞口"
+  mass_before_mg: null           # 处理前质量 → 失重率（第一手证据）
+  mass_after_mg: null            # 处理后质量
+  batch: null                    # 同炉次编号（同炉样品共享热历史）
+
+# ============================================================
+# 测了什么。technique / role 词表见 README 与 CG-AR.yaml。
+# 角色预先登记：0.1C/0.2C → identification；0.5C/1C/2C → validation；
+# 1C 是 Level 4 留出集（只用于预测检验）。
+# ============================================================
+measurements:
+  - technique: cycling
+    file: "data/raw/graphite_ht/CG-600/raw/electrochemistry/formation_gcd.csv"
+    role: exploration
+    notes: "化成 C/20 × 2 圈；产出首圈容量与首效（ICE）"
+  - technique: pOCV
+    file: "data/raw/graphite_ht/CG-600/raw/electrochemistry/ocp_c20.csv"
+    role: identification
+    notes: "C/20 充 + C/20 放，双支分别保存（OCP 提取用）"
+  - technique: GITT
+    file: "data/raw/graphite_ht/CG-600/raw/electrochemistry/gitt.csv"
+    role: identification
+    notes: "C/10，10 min 脉冲 + 30 min 静置；充放双向各一轮；约 60 脉冲/方向"
+  - technique: CC_charge_discharge
+    file: "data/raw/graphite_ht/CG-600/raw/electrochemistry/gcd_0p1C.csv"
+    role: identification
+    notes: "0.1C 恒流充放电；提供容量基准（Q_model == Q_measured）"
+  - technique: rate_capability
+    file: "data/raw/graphite_ht/CG-600/raw/electrochemistry/rate_0p2C.csv"
+    role: identification
+    notes: "0.2C 放电"
+  - technique: rate_capability
+    file: "data/raw/graphite_ht/CG-600/raw/electrochemistry/rate_0p5C.csv"
+    role: validation
+    notes: "0.5C；不参与拟合"
+  - technique: rate_capability
+    file: "data/raw/graphite_ht/CG-600/raw/electrochemistry/rate_1C.csv"
+    role: validation
+    notes: "1C —— Level 4 留出集，只用于预测检验，绝不回改参数"
+  - technique: rate_capability
+    file: "data/raw/graphite_ht/CG-600/raw/electrochemistry/rate_2C.csv"
+    role: validation
+    notes: "2C；不参与拟合"
+  - technique: EIS
+    file: "data/raw/graphite_ht/CG-600/raw/electrochemistry/eis.csv"
+    role: exploration
+    notes: "100 kHz–10 mHz，10/50/90 % SOC；注意平台目前没有 EIS→k0/Rct 的拟合通路，本轮 k0/Rct 只能是 not_measured（报告写明「已测但无通路」）"
+
+parameter_sources:
+  Ds: null
+  k0: null
+  Rct: null
+
+# ============================================================
+# 结构表征：只填测量量（解释留在分析层）
+# 预期方向（**假设**，不是结论）：d002 略降、ID/IG 降低、比表面积下降；
+# 真实数值以实测为准，契约不接受任何"看起来合理"的预填。
+# ============================================================
+structure:
+
+  xrd:
+    available: false
+    not_available_reason: "计划 2026-09 送测（样品已留样）"
+    file: null
+    role: null
+    wavelength_nm: null
+    d002_nm: null
+    lc_nm: null
+    la_nm: null
+    crystallite_method: null
+    source: {type: null, instrument: null, operator: null, date: null}
+
+  raman:
+    available: false
+    not_available_reason: "计划 2026-09 送测（样品已留样）"
+    file: null
+    role: null
+    laser_wavelength_nm: null
+    id_ig: null
+    g_band_cm1: null
+    d_band_cm1: null
+    source: {type: null, instrument: null, operator: null, date: null}
+
+  bet:
+    available: false
+    not_available_reason: "计划 2026-09 送测（样品已留样）"
+    file: null
+    role: null
+    adsorption_gas: null
+    surface_area_m2_g: null
+    pore_volume_cm3_g: null
+    pore_size_distribution: null
+    model: null
+    source: {type: null, instrument: null, operator: null, date: null}
