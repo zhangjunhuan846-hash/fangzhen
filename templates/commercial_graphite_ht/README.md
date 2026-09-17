@@ -79,6 +79,14 @@ electrode.area_cm2 / particle.d50_um / cell.counter_electrode / cell.electrolyte
 它会安静地进入容量的尺度换算（`Q_model == Q_measured`），
 而 **D ∝ R²**，粒径错一倍 = D_s 差 4 倍。
 
+`cell:` 里另有三项**已预填、且不要清空**的锚定声明：`working_electrode_material`
+（`graphite`）、`counter_electrode_type`（`lithium_metal`）、`voltage_window_V`
+（`[0.005, 1.5]`）。它们不是测量值而是**设计决定**：平台靠它们把"这个体系该用哪个
+电压窗口"锚定住（规则表见 `docs/chemistry_windows_and_gitt_qc.md`）。
+清空不会报错，只会让窗口检查**被跳过** —— 而「跳过 ≠ 通过」。
+⚠️ 顺带记住：`cell.counter_electrode`（自由文本，写给人和审稿人看）与
+`cell.counter_electrode_type`（闭集，写给规则表看）**是两个字段，必须都填**。
+
 已预填的是**设计决定**（不是测量值）：样品编号、工艺条件、测量清单与角色、
 电极与电芯规格。⚠️ 工艺条件（温度/气氛/时长/升温速率/降温）填的是**设计值**，
 做完必须逐项对照管式炉运行记录核实，**以运行记录为准**。

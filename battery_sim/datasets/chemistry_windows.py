@@ -139,6 +139,30 @@ _LI_METAL_ALIASES = frozenset({
     "li片",
 })
 
+# ------------------------------------------------------------------
+# 声明词表（**唯一来源**）
+#
+# 这两张表被三个入口共用：自服务导入表（`user_tools/spec.py`）、
+# 材料元数据（`battery_sim/datasets/material_metadata.py`）、以及材料侧
+# 系列校验。放在这里而不是各写一份，是因为"两个入口两套标准"正是
+# 规则表这种代码最容易长出来的病（加一条新体系时只改了一半）。
+# ------------------------------------------------------------------
+WORKING_ELECTRODE_MATERIALS = (
+    "graphite",
+    "nmc",
+    "lfp",
+    "lco",
+    "lithium_metal",
+    "silicon_c",
+    "other",
+)
+
+COUNTER_ELECTRODE_TYPES = (
+    "lithium_metal",
+    "graphite",
+    "other",
+)
+
 _NMC_TOKENS = ("nmc", "ncm", "nicomn", "ncm_li", "nmc_graphite", "ncm_graphite")
 _LCO_TOKENS = ("lco", "licoo2", "lco_graphite")
 _LFP_TOKENS = ("lfp", "lifepo4", "lfp_graphite")
@@ -187,26 +211,40 @@ def resolve_system(
 
     禁止推断的部分：本函数不会因为 ``cell_configuration=half_cell`` 就假定
     工作电极是石墨，也不会从 ``chemistry`` 反推负极材料。
+
+    ``cell_configuration`` 可以留空：**「工作电极 = 石墨 且 对电极 = 锂金属」
+    这一对声明本身就唯一确定了半电池**（全电池不存在锂金属对电极）。
+    这不是推断，是读两条显式声明；正因如此，如果两者同时给出却互相矛盾
+    （写成 full_cell 却有锂金属对电极），本函数会返回 ``None`` 并说明矛盾，
+    而不是挑一个信。
     """
     cfg = _norm(cell_configuration)
     chem = _norm(chemistry)
     counter = _norm(counter_electrode)
-    we = _norm(working_electrode)
+    graphite = _is_graphite_working_electrode(
+        working_electrode_material, physical_working_electrode
+    )
+    li_counter = counter in _LI_METAL_ALIASES
 
-    is_half = cfg in ("half_cell", "halfcell")
+    is_half = cfg in ("half_cell", "halfcell") or (not cfg and graphite
+                                                   and li_counter)
     is_full = cfg in ("full_cell", "fullcell")
 
-    if not cfg:
+    if is_full and li_counter:
         return None, (
-            "未声明 cell_configuration（full_cell / half_cell），"
-            "无法判断该用哪个体系的电压窗口"
+            "声明自相矛盾：cell_configuration=full_cell 但对电极写作 "
+            f"'{counter_electrode}'。全电池没有锂金属对电极 —— "
+            "先确认构型，再谈窗口"
+        )
+
+    if not cfg and not (graphite and li_counter):
+        return None, (
+            "未声明 cell_configuration，且工作电极/对电极这一对也不足以"
+            "确定构型（需要 working_electrode_material=graphite 且 "
+            "counter_electrode=lithium_metal）。无法判断该用哪个体系的电压窗口"
         )
 
     if is_half:
-        graphite = _is_graphite_working_electrode(
-            working_electrode_material, physical_working_electrode
-        )
-        li_counter = counter in _LI_METAL_ALIASES
         if graphite and li_counter:
             return WINDOWS[SYS_GRAPHITE_HALFCELL_LI], ""
         missing: List[str] = []

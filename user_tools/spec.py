@@ -18,6 +18,10 @@
 from __future__ import annotations
 
 from governance.dataset_roles import ALLOWED_DECLARED_ROLES
+from battery_sim.datasets.chemistry_windows import (
+    COUNTER_ELECTRODE_TYPES,
+    WORKING_ELECTRODE_MATERIALS,
+)
 
 # ------------------------------------------------------------------
 # canonical 字段（用户在 column_mapping 里填的就是这些）
@@ -100,17 +104,11 @@ ALLOWED_WORKING_ELECTRODE = ["positive", "negative", ""]
 # 窗口"从数据里 anchor 住（见 battery_sim/datasets/chemistry_windows.py）。
 # `chemistry` 那一栏在平台里装的是**正极**化学体系，装不下"负极是石墨"，
 # 而半电池的窗口恰恰由工作电极决定。留空 = 无法锚定 = 该项检查跳过（不猜）。
-ALLOWED_WORKING_ELECTRODE_MATERIAL = [
-    "graphite",
-    "nmc",
-    "lfp",
-    "lco",
-    "lithium_metal",
-    "silicon_c",
-    "other",
-    "",
-]
-ALLOWED_COUNTER_ELECTRODE = ["lithium_metal", "graphite", "other", ""]
+# 词表**只有一份**（chemistry_windows.py），材料元数据入口共用同一张表；
+# 这里只额外允许空串（下拉可留空）。
+ALLOWED_WORKING_ELECTRODE_MATERIAL = [*WORKING_ELECTRODE_MATERIALS, ""]
+# 对电极类型同样只有一份来源（chemistry_windows.py），这里只额外允许空串。
+ALLOWED_COUNTER_ELECTRODE = [*COUNTER_ELECTRODE_TYPES, ""]
 ALLOWED_CURRENT_SIGN = ["discharge_positive", "discharge_negative"]
 # 协议类型（**闭集**）。它决定 QC 的严厉程度：
 #   脉冲型协议（GITT / PITT）里，采样间断会把脉冲时长与弛豫完整度算错，

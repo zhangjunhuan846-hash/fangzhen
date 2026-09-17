@@ -22,6 +22,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from battery_sim.datasets.chemistry_windows import (
+    COUNTER_ELECTRODE_TYPES,
+    WORKING_ELECTRODE_MATERIALS,
+    check_declared_window,
+    resolve_system,
+)
+
 #: 逗号分隔的点路径；子路径取值必须是数字（除注明外）
 REQUIRED_FIELDS = (
     "sample_id",
@@ -67,6 +74,14 @@ PARAMETER_EVIDENCE = {
     "Rct": ("EIS",),
 }
 
+#: 可选但**机器可读**的构型声明。为什么需要它们（而不是从下面那两个自由文本
+#: 字段里解析）：`cell.counter_electrode` / `cell.electrolyte` 是人写的描述
+#: （例：「Li 片 φ15.6 mm × 0.45 mm（过量）」），规则表不该去猜自由文本。
+#: 词表本身只有一份，在 `chemistry_windows.py`（两个入口共用，避免两套标准）。
+VOLTAGE_WINDOW_PATH = "cell.voltage_window_V"
+WORKING_ELECTRODE_MATERIAL_PATH = "cell.working_electrode_material"
+COUNTER_ELECTRODE_TYPE_PATH = "cell.counter_electrode_type"
+
 FIELD_HELP = {
     "sample_id": "样品编号（同一批料的不同处理各一个）",
     "material_class": f"材料类别，取值 {list(MATERIAL_CLASSES)}",
@@ -76,7 +91,20 @@ FIELD_HELP = {
     "electrode.coating_thickness_um": "涂层厚度 (µm)，实测不是标称",
     "electrode.area_cm2": "电极几何面积 (cm²)",
     "particle.d50_um": "粒径中位 D50 (µm)。D ∝ R²，这个数错一倍 = D_s 错 4 倍",
-    "cell.counter_electrode": "对电极（Li 片？规格与厚度）",
+    "cell.counter_electrode": "对电极（Li 片？规格与厚度）—— 人读的描述",
+    "cell.counter_electrode_type": (
+        "对电极类型（闭集，给规则表用）：lithium_metal / graphite / other。"
+        "自由文本写上面那栏，机器判断只认这一栏"
+    ),
+    "cell.working_electrode_material": (
+        "工作电极材料（闭集，给规则表用）：graphite / nmc / lfp / lco / "
+        "lithium_metal / silicon_c / other。"
+        "石墨样品填 graphite —— 电压窗口规则靠它锚定"
+    ),
+    "cell.voltage_window_V": (
+        "实际使用的电压窗口 [下限, 上限]（V）。填了才会与体系参考窗口对账；"
+        "石墨半电池是 [0.005, 1.5]"
+    ),
     "cell.electrolyte": "电解液（配方、浓度、添加剂）",
     "measurements": "测了哪些电化学（technique + file），technique 取 TECHNIQUE_VOCAB",
 }
@@ -505,6 +533,94 @@ def processing_summary(meta: Dict[str, Any]) -> str:
             text += f"；升温 {ramp} °C/min"
         return "processing: " + text
     return "processing: 未声明 applied（true/false）"
+
+
+def validate_voltage_window(meta: Dict[str, Any]) -> Dict[str, List[str]]:
+    """核对 ``cell.voltage_window_V`` 与体系参考窗口。
+
+    规则**只有一份**（``battery_sim/datasets/chemistry_windows.py``）。
+    user_tools 的自服务导入通道和这里共用同一张表 —— 否则会出现
+    「demo 数据很严格、自己的实验数据反而绕过」或者「加一条新体系时只改了
+    一边」这两种病（导师 2026-09-17 明确点过这一条）。
+
+    与自服务通道同一条口径：
+
+    * 没声明必要事实 -> **WARN 说明检查被跳过**（跳过 ≠ 通过），不猜；
+    * 声明窗口越出体系 `hard` 界 -> error；越出 `nominal` 但仍在 `hard` 内 -> warning。
+    """
+    errors: List[str] = []
+    warnings: List[str] = []
+
+    window_raw = _dig(meta, VOLTAGE_WINDOW_PATH)
+    we_material = _dig(meta, WORKING_ELECTRODE_MATERIAL_PATH)
+    counter_type = _dig(meta, COUNTER_ELECTRODE_TYPE_PATH)
+
+    if not _filled(we_material) and not _filled(counter_type):
+        return {
+            "errors": [],
+            "warnings": [
+                f"未声明 {WORKING_ELECTRODE_MATERIAL_PATH} / "
+                f"{COUNTER_ELECTRODE_TYPE_PATH}，体系锚定的电压窗口检查被跳过"
+                f"（跳过 ≠ 通过）。石墨半电池请写 graphite + lithium_metal"
+            ],
+            "missing": [],
+        }
+
+    # 闭集校验（词表与自服务通道共用同一个来源）
+    if _filled(we_material) and str(we_material).strip() not in (
+        WORKING_ELECTRODE_MATERIALS
+    ):
+        errors.append(
+            f"{WORKING_ELECTRODE_MATERIAL_PATH}="
+            f"{we_material!r} 不在词表 "
+            f"{list(WORKING_ELECTRODE_MATERIALS)} 内（不许自造：规则表靠它锚定）"
+        )
+    if _filled(counter_type) and str(counter_type).strip() not in (
+        COUNTER_ELECTRODE_TYPES
+    ):
+        errors.append(
+            f"{COUNTER_ELECTRODE_TYPE_PATH}={counter_type!r} 不在词表 "
+            f"{list(COUNTER_ELECTRODE_TYPES)} 内"
+        )
+    if errors:
+        return {"errors": errors, "warnings": warnings, "missing": []}
+
+    window, why = resolve_system(
+        working_electrode_material=str(we_material or ""),
+        counter_electrode=str(counter_type or ""),
+    )
+    if window is None:
+        warnings.append(
+            f"没有与该体系匹配的参考窗口，电压窗口检查被跳过：{why}。"
+            f"跳过不等于通过"
+        )
+        return {"errors": errors, "warnings": warnings, "missing": []}
+
+    if not _filled(window_raw) or window_raw is None:
+        warnings.append(
+            f"未声明 {VOLTAGE_WINDOW_PATH}（该体系参考窗口："
+            f"{window.nominal[0]:g}–{window.nominal[1]:g} V），"
+            f"没有可对账的声明窗口"
+        )
+        return {"errors": errors, "warnings": warnings, "missing": []}
+
+    pair = None
+    if isinstance(window_raw, (list, tuple)) and len(window_raw) == 2:
+        pair = (window_raw[0], window_raw[1])
+    elif isinstance(window_raw, dict):
+        pair = (window_raw.get("lower_V", window_raw.get("lower")),
+                window_raw.get("upper_V", window_raw.get("upper")))
+    if pair is None or pair[0] is None or pair[1] is None:
+        errors.append(
+            f"{VOLTAGE_WINDOW_PATH} 必须是 [下限, 上限] 两个数，"
+            f"得到 {window_raw!r}"
+        )
+        return {"errors": errors, "warnings": warnings, "missing": []}
+
+    errs, warns = check_declared_window(window, pair[0], pair[1])
+    errors.extend(f"{VOLTAGE_WINDOW_PATH}: {e}" for e in errs)
+    warnings.extend(f"{VOLTAGE_WINDOW_PATH}: {w}" for w in warns)
+    return {"errors": errors, "warnings": warnings, "missing": []}
 
 
 def series_table(metas) -> str:
@@ -1026,6 +1142,12 @@ def validate(meta: Dict[str, Any]) -> Dict[str, List[str]]:
     errors.extend(processing["errors"])
     warnings.extend(processing["warnings"])
     pending.extend(processing["pending"])
+
+    # 体系锚定的电压窗口：规则**只有一份**（chemistry_windows.py），
+    # 自服务导入通道与本路径共用。缺声明只 WARN（跳过 ≠ 通过）。
+    window_check = validate_voltage_window(meta)
+    errors.extend(window_check["errors"])
+    warnings.extend(window_check["warnings"])
 
     return {"errors": errors, "warnings": warnings, "missing": missing,
             "pending": pending}

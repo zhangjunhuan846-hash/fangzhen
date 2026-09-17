@@ -270,9 +270,29 @@ electrode.area_cm2 / particle.d50_um / cell.counter_electrode / cell.electrolyte
 | **倍率前向预测（L4）** | ✅ **已就位**（2026-09-17）：`python -m identification.rate_prediction`，带角色门 / 尺度门 / 覆盖率门 / 初值接线门；合成倍率梯夹具实测真值 3.27 mV vs 零拟合负对照 20.09 mV（`docs/l4_rate_prediction.md`） |
 | **体系锚定电压窗 + 脉冲协议 QC** | ✅ **已就位**（2026-09-17）：石墨半电池 0.005–1.5 V 硬约束进 `user_tools/validate.py`；`protocol_type=GITT` 时采样间断与脉冲时长不一致直接 FAIL（`docs/chemistry_windows_and_gitt_qc.md`） |
 | **半电池 GCD 回放的初值** | ✅ **已修**（2026-09-17）：`RecycledGraphiteAdapter.load_processed_discharge` 原先没挂 `attrs['initialisation']`，回放从参数集默认初值出发（实测起点偏 708 mV）。修前/修后同一夹具 59.89 → 3.27 mV |
-| **EIS → k0 / Rct** | ❌ **完全没有**（无拟合通路）。测量照做（数据有价值），但本轮 `k0`/`Rct` 在报告里是 **`not_measured`**，且理由写明是**「已测但无通路」**，不是「没测」 |
+| **EIS → k0 / Rct** | ❌ **本轮明确不做**（2026-09-17 决定，见下）。测量照做（数据有价值），但本轮 `k0`/`Rct` 在报告里是 **`not_measured`**，且理由写明是**「已测但无通路」**，不是「没测」 |
 | 降解量 / 锂库存损失输出 | ❌ runner 不输出 SOC/浓度/降解量 |
 | 回收石墨专用 adapter | ⚠️ 骨架已就位（`battery_sim/datasets/recycled_graphite.py`），真实仪器格式待接 |
+
+### 10.1 EIS → k0/Rct：本轮明确不做（2026-09-17 决定，记录在案）
+
+**决定**：EIS 照测、数据照存、报告里照写，但**本轮不建 EIS→k0/Rct 的拟合通路**；
+`k0`/`Rct` 一律 `not_measured`，理由写「已测但无通路」（不是「没测」）。
+
+**理由（三条，缺一条都还值得做）**：
+
+1. **论文主线不用它。** 主线是「热处理 → 结构 → 参数(D_s/容量/极化) → 倍率预测」，
+   EIS 只在解释异常时作辅助观察（例如 600 °C 的 D_s 降而 Rct 降），不是判据。
+2. **等效电路模型的选择本身会决定 Rct。** `Rs-(Rct‖Cdl)-W` 与 `Rs-(Rct‖CPE)-W`
+   给不同的 Rct；在没有独立证据选定电路之前，报出来的 Rct 是"某个电路下的拟合值"，
+   不是材料性质。这类"看起来是参数、其实是模型选择"的量正是平台红线要挡的东西
+   （`apparent/effective ≠ 本征材料常数`）。
+3. **Rct → k0 需要真实反应面积。** `Rct = RT/(nF i0)` 把面积藏在 `i0` 里，
+   而半电池的活性面积/粗糙度我们并没有独立测量 ⇒ 换算出来的 k0 是**假参数**。
+   宁可 `not_measured`，也不要在论文里多一个无法归因的数。
+
+**什么时候再考虑**：第一篇跑完 L1–L4 之后，如果真实数据出现「D_s 与倍率预测不一致」
+且 EIS 是唯一能解释它的证据，再单开一轮（那时也需要先定电路模型与面积口径）。
 
 ---
 

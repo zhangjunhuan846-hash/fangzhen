@@ -98,6 +98,46 @@ cycle_life / EIS / other）。自由文本的 `protocol` 字段保留原样（�
   -> 13 项检查 / 严重 0 / 警告 3（新增的那条 WARN 就是"体系窗口检查被跳过"，
   理由写的是缺哪条声明）。**导入仍然 PASS**：新增门没有把正常数据变成错误。
 
+## 两个入口，一份规则（2026-09-17 晚补齐）
+
+**原来只有一个入口**：规则接在自服务导入通道上，而真实样品走的是材料元数据路径
+（`metadata/*.yaml` → adapter）—— 结果是「demo 数据很严格、自己的实验数据反而绕过」。
+真实商业石墨四个样品全走第二条，所以这条必须补。
+
+补法是**共用同一张表，不复制规则**：
+
+```text
+battery_sim/datasets/chemistry_windows.py      <- 唯一规则源 + 唯一词表
+        ├── user_tools/validate.py              -> VOLTAGE_WINDOW_SYSTEM / VOLTAGE_SYSTEM_RANGE
+        └── material_metadata.validate_voltage_window()   -> 由 validate() 调用
+                （因此 `--series` 与 adapter 的 `--validate` 都经过它）
+```
+
+材料元数据新增三个**可选**键（都在 `cell:` 下，模板已预填）：
+
+| 键 | 闭集 | 作用 |
+| --- | --- | --- |
+| `cell.working_electrode_material` | graphite / nmc / lfp / lco / lithium_metal / silicon_c / other | 规则靠它锚定；石墨样品填 `graphite` |
+| `cell.counter_electrode_type` | lithium_metal / graphite / other | 机器可读的对电极类型 |
+| `cell.voltage_window_V` | `[下限, 上限]` V | 与体系参考窗口对账 |
+
+**为什么还要一个"类型"字段**：`cell.counter_electrode` 与 `cell.electrolyte` 是人写的描述
+（例「Li 片 φ15.6 mm × 0.45 mm（过量）」、`<1 ppm H2O/O2`），规则表不该去解析自由文本。
+这与 configs 里 `working_electrode`（PyBaMM 槽位）vs `physical_working_electrode`（物理含义）
+是同一套做法：**给人看的写自由文本，给代码看的写闭集**。
+
+两个口径与自服务通道完全一致：缺声明 → WARN 说明检查被跳过（跳过 ≠ 通过）；
+越 `hard` 界 → error；越 `nominal` 界 → warning。
+
+**唯一性由测试钉住**：`tests/test_material_voltage_window.py::test_vocabularies_have_a_single_source`
+断言两个入口的词表都来自 `chemistry_windows.py`（加一条新体系时只改一处）；
+`tests/test_material_voltage_window.py::test_templates_declare_the_anchor_fields` 断言
+四个石墨模板都自带锚定声明 —— 否则四个真实样品会一起掉进"检查被跳过"。
+
+**`cell_configuration` 可以不声明**：「工作电极 = 石墨 且 对电极 = 锂金属」这一对声明
+本身就唯一确定了半电池（全电池不存在锂金属对电极）。这不是推断，是读两条显式声明；
+正因如此，如果同时声明 `full_cell` 却给了锂金属对电极，解析器报**「自相矛盾」**而不是挑一个信。
+
 ## 与导师清单的差异（记录，免得被问）
 
 1. 清单写石墨下限 **0.01 V**，平台设计口径是 **0.005 V**

@@ -32,7 +32,10 @@ particle:
 
 cell:
   format: "CR2032"
-  counter_electrode: null        # 例 "Li 片 φ15.6 mm × 0.45 mm（过量）"
+  counter_electrode: null        # 例 "Li 片 φ15.6 mm × 0.45 mm（过量）" —— 人读的描述
+  counter_electrode_type: "lithium_metal"   # 闭集，给规则表用（自由文本写上面那栏）
+  working_electrode_material: "graphite"    # 闭集：体系锚定电压窗口靠它锚定
+  voltage_window_V: [0.005, 1.5]            # 设计窗口；做完必须对照循环仪记录核实
   electrolyte: null              # 例 "1 M LiPF6 in EC:DEC = 1:1"
   separator: null                # 例 "Celgard 2400"
   assembly_environment: null     # 手套箱水氧值
