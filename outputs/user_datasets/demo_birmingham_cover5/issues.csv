@@ -8,6 +8,7 @@ CURRENT_SIGN_CONFLICT,PASS,电流符号与声明自洽（discharge_negative）�
 VOLTAGE_RANGE,WARN,有 2 个点（0.3%）在声明窗口之外,"measured V range [2.5, 4.193] V"
 CURRENT_RANGE,PASS,电流幅值在合理范围,max|I| = 0.000687998 A（约 0.22 C，按标称容量 0.003112 Ah）
 CAPACITY_CONSISTENCY,PASS,容量列与电流积分一致,"dQ_col=0.00298761 Ah, integral=0.00298761 Ah, rel diff 0.0%"
-SAMPLING_INTERVAL,PASS,采样间隔统计已记录,"median dt=3.544 s, max dt=120 s, duration=1.75e+04 s"
+SAMPLING_INTERVAL,PASS,采样间隔统计已记录,"median dt=3.544 s, max dt=120 s, protocol_type=未声明, duration=1.75e+04 s"
 SAMPLING_INTERVAL_GAP,WARN,存在明显采样间断（最大间隔是中位数间隔的 34 倍）,median 3.544 s vs max 120 s
+VOLTAGE_WINDOW_SYSTEM,WARN,没有与该体系匹配的参考窗口，这项检查被跳过：半电池但这套声明没有对应的参考窗口：工作电极材料不是石墨（working_electrode_material / physical_working_electrode 未写或不在别名表内）。当前表内只有 graphite || Li metal 一条半电池规则。跳过不等于通过 —— 请补声明，或确认该体系确实不在规则表内,半电池但这套声明没有对应的参考窗口：工作电极材料不是石墨（working_electrode_material / physical_working_electrode 未写或不在别名表内）。当前表内只有 graphite || Li metal 一条半电池规则
 AMBIENT_TEMPERATURE,PASS,使用你填写的环境温度 25 C,user declared

@@ -12,8 +12,8 @@
 
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
-Last verified commit:   2f1895b  (2026-09-17, 商用石墨热处理梯度设计 v2 + 工艺史契约
-                                    + 四份样品元数据模板；平台本体仍未改动)
+Last verified commit:   280ca81  (2026-09-17 晚，L4 倍率预测验收 + 体系锚定电压窗
+                                    + 脉冲协议 QC 分级 + GCD 路径初值接线修复)
 Tag:                    v0.1.0-platform  (**平台开发阶段冻结**；接新数据不再是开发任务)
 origin/main:            **与本地同链，已 push**（2026-09-16；33 个 commit 积压已清零）
 Working tree:           见「已知限制 #1」
@@ -50,8 +50,12 @@ G3 provenance        PASS     — 2026-09-15 实测
 python -m user_tools.import_dataset --package examples/half_cell_demo
 ```
 
-结果：679 行转 canonical / 12 项校验 / 严重 0 / 警告 2 / 匹配参数集
+结果：679 行转 canonical / **13 项校验 / 严重 0 / 警告 3** / 匹配参数集
 `Jackowska2025_2mAh_cm2` (grade B) / 输出 `outputs/user_datasets/demo_birmingham_cover5`。
+
+（2026-09-17 复核：仍是 679 行；检查项 12 → 13、警告 2 → 3 是新增的体系锚定
+窗口门带来的 —— 该 demo 是 NCM 半电池且未声明工作电极材料，所以那条是
+"检查被跳过"的 WARN，不是错误。见 `docs/chemistry_windows_and_gitt_qc.md`。）
 
 ### G2 SPM/SPMe/DFN 回放 — PASS
 
@@ -1072,12 +1076,66 @@ p-ocv 是 C/50，`gitt`/`gitthold` 实为 C/50 CC–CV 且多通道交错。
 
 ---
 
+## L4 验收与两项新 QC 门（2026-09-17 晚）
+
+导师清单核过之后，判定「真正要动手」的是三件（细节：
+`docs/chemistry_windows_and_gitt_qc.md` / `docs/l4_rate_prediction.md`）。
+**平台科学核心（runner / evaluator / factory / registry / rates / paths）改动 = 0。**
+
+### ① 体系锚定电压窗口
+
+`battery_sim/datasets/chemistry_windows.py`（新增，纯规则）+ 接进
+`user_tools/validate.py` 的两条检查码 `VOLTAGE_WINDOW_SYSTEM` /
+`VOLTAGE_SYSTEM_RANGE`。原来只核「数据 vs 用户自填窗口」——填 `[0.005, 15]`
+也 PASS；现在会与**该体系**的窗口对账（石墨半电池 0.005–1.5 V，硬界 0–2.5 V）。
+没声明工作电极材料就 WARN 说明检查被跳过（**跳过 ≠ 通过**）。
+
+### ② 脉冲协议 QC 分级
+
+`protocol_type` 进 experiment 闭集；`SAMPLING_INTERVAL_GAP` 对脉冲协议升级为
+**FAIL**；新增 4 条：`GITT_STRUCTURE` / `GITT_PULSE_DURATION`（实测中位脉冲时长
+vs 声明，5 % 容差）/ `GITT_PULSE_UNIFORMITY`（std/median ≤ 0.10）/
+`GITT_PULSE_RESOLUTION`（脉冲内部间隔 > 3× 中位即 FAIL）。依据：
+D_s 由脉冲时长与 ΔV 算出。
+
+### ③ L4 倍率预测验收
+
+`python -m identification.rate_prediction`（新增）。四道门：角色门（辨识集不能当
+留出集）/ 尺度门（模型 vs **电芯声明**容量，不是窗口电荷）/ 覆盖率门（< 80 % 记失败）/
+初值接线门（起点差 > 30 mV 记失败）。合成倍率梯夹具
+`examples/synthetic_rate_ladder/` 实测：
+
+```text
+真值参数（D_s ×0.35）          目标倍率 C1: RMSE 3.27 mV, 覆盖 100.0%  PASS
+零拟合负对照（不做覆盖）        目标倍率 C1: RMSE 20.09 mV, 覆盖 100.0%  PASS（差 6×）
+目标数据集声明成 identification  ->  角色门拒绝（PredictionProtocolError）
+```
+
+**首轮暴露并修掉的接线缺口（对真实石墨同样致命）**：GCD 路径
+（`load_processed_discharge`）原先没挂 `attrs['initialisation']`，
+于是半电池回放从参数集默认初值出发 —— 夹具实测起点 **1.453 V** vs 记录
+**0.745 V**，整个 RMSE 被这 708 mV 的初值差吃掉，看上去像"模型差 60 mV"。
+已在 `RecycledGraphiteAdapter` 里覆盖该方法挂上（与 sintef / dlr / birmingham
+一致）。修前/修后同一夹具：**59.89 mV → 3.27 mV**。
+
+### 本轮实证（可复跑）
+
+```bash
+python -m user_tools.import_dataset --package examples/half_cell_demo
+# -> 13 项校验 / 严重 0 / 警告 3（新增的 WARN 是"体系窗口被跳过：缺声明"）/ 导入 PASS
+
+python -m pytest -q
+# -> 597 passed, 5 warnings, 119.66s
+```
+
+---
+
 ## 测试状态
 
 ```text
-pytest:        549 passed, 5 warnings
+pytest:        597 passed, 5 warnings
 failures:      0
-duration:      111.70s
+duration:      119.66s
 last run date: 2026-09-17  (提交前复跑)
 command:       python -m pytest -q   (WSL, conda env pybamm)
 ```
@@ -1090,7 +1148,7 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 | `HANDOFF.md` | 88 | **504** |
 
 两个数字互不相同，且都与实际不符。已改为指向本文件，不再写死数字。
-**引用测试数时只引用本文件的 549。**
+**引用测试数时只引用本文件的 597。**
 （2026-09-16 的增量：329 → 356 是 G6.1a 的 28 项 `test_dlr_gitt.py`；
 356 → 374 是尺度对齐门的 18 项 `test_scale_alignment.py`；
 374 → 392 是 G6.1c 的 18 项 `test_recovery_stats.py`；
@@ -1102,7 +1160,10 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 ⚠️ **更正**：上一版把 504 写成"当前值"，但同一轮后来实测是 **517**
 （`test_recycled_graphite.py` 在契约变更后又有增/改写），504 是过期数。
 → 517 + **32** = **549**：`test_material_processing.py`（20 项）+
-`test_ht_templates.py`（12 项），本轮新增。）
+`test_ht_templates.py`（12 项）。
+→ 549 + **48** = **597**：`test_user_data_qc.py`（29 项：体系锚定电压窗 +
+脉冲协议分级）+ `test_rate_prediction.py`（19 项：L4 验收的判据与措辞）。
+本轮新增的三件见「L4 验收与两项新 QC 门」一节。）
 
 ---
 

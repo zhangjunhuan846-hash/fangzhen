@@ -17,7 +17,9 @@
     "temperature": 25.0,
     "protocol": "CC_Cover5",
     "current_sign": "discharge_negative",
-    "initial_soc": null
+    "initial_soc": null,
+    "pulse_duration_s": null,
+    "relax_duration_s": null
   },
   "source_file": "demo_birmingham_cover5.csv",
   "ignored_files": [],
@@ -72,8 +74,8 @@
     "import_status": "PASS",
     "simulation_allowed": true,
     "n_fail": 0,
-    "n_warn": 2,
-    "n_checks": 12
+    "n_warn": 3,
+    "n_checks": 13
   },
   "protocol_interpretation": {
     "source_protocol_label": "CC_Cover5",
@@ -139,13 +141,19 @@
       "code": "SAMPLING_INTERVAL",
       "severity": "PASS",
       "message": "采样间隔统计已记录",
-      "evidence": "median dt=3.544 s, max dt=120 s, duration=1.75e+04 s"
+      "evidence": "median dt=3.544 s, max dt=120 s, protocol_type=未声明, duration=1.75e+04 s"
     },
     {
       "code": "SAMPLING_INTERVAL_GAP",
       "severity": "WARN",
       "message": "存在明显采样间断（最大间隔是中位数间隔的 34 倍）",
       "evidence": "median 3.544 s vs max 120 s"
+    },
+    {
+      "code": "VOLTAGE_WINDOW_SYSTEM",
+      "severity": "WARN",
+      "message": "没有与该体系匹配的参考窗口，这项检查被跳过：半电池但这套声明没有对应的参考窗口：工作电极材料不是石墨（working_electrode_material / physical_working_electrode 未写或不在别名表内）。当前表内只有 graphite || Li metal 一条半电池规则。跳过不等于通过 —— 请补声明，或确认该体系确实不在规则表内",
+      "evidence": "半电池但这套声明没有对应的参考窗口：工作电极材料不是石墨（working_electrode_material / physical_working_electrode 未写或不在别名表内）。当前表内只有 graphite || Li metal 一条半电池规则"
     },
     {
       "code": "AMBIENT_TEMPERATURE",
