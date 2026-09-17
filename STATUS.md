@@ -12,7 +12,8 @@
 
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
-Last verified commit:   b16f5ef  (2026-09-17, 结构表征契约 + 回收石墨 adapter 骨架)
+Last verified commit:   2f1895b  (2026-09-17, 商用石墨热处理梯度设计 v2 + 工艺史契约
+                                    + 四份样品元数据模板；平台本体仍未改动)
 Tag:                    v0.1.0-platform  (**平台开发阶段冻结**；接新数据不再是开发任务)
 origin/main:            **与本地同链，已 push**（2026-09-16；33 个 commit 积压已清零）
 Working tree:           见「已知限制 #1」
