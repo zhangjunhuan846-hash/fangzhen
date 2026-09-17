@@ -1,0 +1,17 @@
+{
+  "provenance": "SYNTHETIC FIXTURE 真值（不是从任何测量反演的）：D_s = D_ref × 0.35",
+  "overrides": {
+    "Ds": {
+      "shape": "constant",
+      "amplitude_dex": -0.4559319556497244,
+      "source": "synthetic_fixture_truth",
+      "note": "夹具写死的 D_s 倍率；真实工作里这里应填 GITT 反演值"
+    }
+  },
+  "sources": {
+    "Ds": {
+      "source": "synthetic_fixture_truth",
+      "note": "仅用于验证 L4 链路可跑，不构成任何参数结论"
+    }
+  }
+}

@@ -208,7 +208,12 @@ electrode.area_cm2 / particle.d50_um / cell.counter_electrode / cell.electrolyte
 | **L1 数据进入** | 格式能不能不靠人工修改进平台？ | `python -m battery_sim.datasets.material_metadata --series templates/commercial_graphite_ht/metadata`<br>`python scripts/dev/recycled_graphite_e2e.py --root data/raw/graphite_ht/CG-AR` | 元数据错误 = 0；canonical 四列齐全；契约自检 PASS |
 | **L2 模型复现** | 实验曲线能不能被模型以合理的误差回放？ | 同上（回放段） | 0.1C 回放完成；**记录** RMSE 与残差形状（**不作判据**，只作基线） |
 | **L3 参数辨识** | 这份数据到底约束了哪个参数？ | `python -m identification.parameter_report --windows <逐窗口 CSV> --mode material` | 逐参数给出**五个判定词之一**；`D_s` 只认 `identifiable` 才报数值，`bounded` 只报界 |
-| **L4 预测** | 辨识出的参数能不能外推？ | 用 0.1C 辨识的参数**前向预测 1C**，与 `_holdout_1C/` 比对 | 趋势与量级一致，且**参数一个都没回改**（回改即判失败） |
+| **L4 预测** | 辨识出的参数能不能外推？ | **`python -m identification.rate_prediction --fit-dataset <样品> --fit-rate C0p2 --target-dataset <样品>_holdout --target-rate C1 --overrides <辨识出的参数 JSON>`**（2026-09-17 落地，见 `docs/l4_rate_prediction.md`） | 趋势与量级一致，且**参数一个都没回改**（回改即判失败）；L4 入口自带四道门：角色门 / 尺度门 / 覆盖率门 / 初值接线门 |
+
+**L4 的两条现成护栏（不要再自己写）**：① 目标数据集若是 `identification` 角色，
+脚本直接拒绝（辨识集不能当留出集）；② 覆盖率 < 80 % 或回放起点与记录起点
+差 > 30 mV，都记失败且不给 RMSE 结论 —— 后者是初值没接上的接线故障，
+在真实半电池上踩过一次（回放起点偏 708 mV）。
 
 **L3 的诚实边界（必须一起引用）**：平台报的不是一条 `D_s(x)` 曲线，而是
 **每个 GITT 窗口的 1 mV 带宽 + 判定**。在公开石墨数据上实测：
@@ -262,7 +267,9 @@ electrode.area_cm2 / particle.d50_um / cell.counter_electrode / cell.electrolyte
 | **GITT → 逐窗口 1 mV 带宽 + 判定** | ✅ 现成（G6.1b-1 / G6.1c 的估计器，双向都跑过） |
 | 自动参数报告（五词判定 + material 模式） | ✅ 现成（`identification/parameter_report.py`） |
 | 材料与工艺元数据契约 | ✅ 现成（含本设计新增的 `processing` 块与系列级校验） |
-| **倍率前向预测（L4）** | ⚠️ 仿真侧现成（`run_baseline_cell` 任意速率），**缺的是把 1C 回放与留出集比对的现成入口** —— 需要一个小脚本，不是新能力 |
+| **倍率前向预测（L4）** | ✅ **已就位**（2026-09-17）：`python -m identification.rate_prediction`，带角色门 / 尺度门 / 覆盖率门 / 初值接线门；合成倍率梯夹具实测真值 3.27 mV vs 零拟合负对照 20.09 mV（`docs/l4_rate_prediction.md`） |
+| **体系锚定电压窗 + 脉冲协议 QC** | ✅ **已就位**（2026-09-17）：石墨半电池 0.005–1.5 V 硬约束进 `user_tools/validate.py`；`protocol_type=GITT` 时采样间断与脉冲时长不一致直接 FAIL（`docs/chemistry_windows_and_gitt_qc.md`） |
+| **半电池 GCD 回放的初值** | ✅ **已修**（2026-09-17）：`RecycledGraphiteAdapter.load_processed_discharge` 原先没挂 `attrs['initialisation']`，回放从参数集默认初值出发（实测起点偏 708 mV）。修前/修后同一夹具 59.89 → 3.27 mV |
 | **EIS → k0 / Rct** | ❌ **完全没有**（无拟合通路）。测量照做（数据有价值），但本轮 `k0`/`Rct` 在报告里是 **`not_measured`**，且理由写明是**「已测但无通路」**，不是「没测」 |
 | 降解量 / 锂库存损失输出 | ❌ runner 不输出 SOC/浓度/降解量 |
 | 回收石墨专用 adapter | ⚠️ 骨架已就位（`battery_sim/datasets/recycled_graphite.py`），真实仪器格式待接 |

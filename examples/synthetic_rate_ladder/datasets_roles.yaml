@@ -1,0 +1,6 @@
+synth_ladder_ident:
+  dataset_role: identification
+  dataset_role_note: 夹具：C/5 放电，参数从这里辨识
+synth_ladder_holdout:
+  dataset_role: validation
+  dataset_role_note: 夹具：1C 放电，只用于预测评分，禁止进入拟合

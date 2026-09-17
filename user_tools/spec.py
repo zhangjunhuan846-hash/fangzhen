@@ -96,8 +96,40 @@ def unit_factor_offset(field: str, unit: str) -> tuple[float, float]:
 ALLOWED_CHEMISTRY = ["LFP", "NMC", "LCO", "other"]
 ALLOWED_CELL_CONFIGURATION = ["full_cell", "half_cell"]
 ALLOWED_WORKING_ELECTRODE = ["positive", "negative", ""]
+# 工作电极**材料**（不是槽位）。它只为一件事存在：把"这个体系该用哪个电压
+# 窗口"从数据里 anchor 住（见 battery_sim/datasets/chemistry_windows.py）。
+# `chemistry` 那一栏在平台里装的是**正极**化学体系，装不下"负极是石墨"，
+# 而半电池的窗口恰恰由工作电极决定。留空 = 无法锚定 = 该项检查跳过（不猜）。
+ALLOWED_WORKING_ELECTRODE_MATERIAL = [
+    "graphite",
+    "nmc",
+    "lfp",
+    "lco",
+    "lithium_metal",
+    "silicon_c",
+    "other",
+    "",
+]
 ALLOWED_COUNTER_ELECTRODE = ["lithium_metal", "graphite", "other", ""]
 ALLOWED_CURRENT_SIGN = ["discharge_positive", "discharge_negative"]
+# 协议类型（**闭集**）。它决定 QC 的严厉程度：
+#   脉冲型协议（GITT / PITT）里，采样间断会把脉冲时长与弛豫完整度算错，
+#   而 D_s 直接由脉冲时长与 ΔV 决定 —— 所以那里间断是 FAIL，不是 WARN。
+# 自由文本的 `protocol` 字段保留（仪器档位名要原样留住），
+# 但它**不参与**分级；分级只认 `protocol_type`（或它的可识别写法）。
+ALLOWED_PROTOCOL_TYPE = [
+    "GCD",
+    "GITT",
+    "PITT",
+    "pOCV",
+    "rate_capability",
+    "cycle_life",
+    "EIS",
+    "other",
+    "",
+]
+#: 脉冲型协议：这些协议下采样间断/脉冲时长不一致会直接污染参数
+PULSE_PROTOCOL_TYPES = ("GITT", "PITT")
 # 用途声明：identification / validation / benchmark / prediction
 # （词表与规则在 governance/dataset_roles.py，这里只引用，不复制）
 ALLOWED_DATASET_ROLE = list(ALLOWED_DECLARED_ROLES)
@@ -112,6 +144,8 @@ EXPERIMENT_FIELDS = [
     ("dataset_role", "数据用途", False, ALLOWED_DATASET_ROLE),
     ("cell_configuration", "电池构型", True, ALLOWED_CELL_CONFIGURATION),
     ("working_electrode", "工作电极", False, ALLOWED_WORKING_ELECTRODE),
+    ("working_electrode_material", "工作电极材料", False,
+     ALLOWED_WORKING_ELECTRODE_MATERIAL),
     ("counter_electrode", "对电极", False, ALLOWED_COUNTER_ELECTRODE),
     ("nominal_capacity", "标称容量 [Ah]", False, None),
     ("active_material_loading", "面容量 [mAh/cm2]", False, None),
@@ -120,7 +154,10 @@ EXPERIMENT_FIELDS = [
     ("voltage_lower", "下限电压 [V]", True, None),
     ("voltage_upper", "上限电压 [V]", True, None),
     ("temperature", "环境温度 [C]", False, None),
-    ("protocol", "测试protocol", False, None),
+    ("protocol", "测试protocol（原始档位名）", False, None),
+    ("protocol_type", "协议类型（闭集）", False, ALLOWED_PROTOCOL_TYPE),
+    ("pulse_duration_s", "GITT 脉冲时长 [s]", False, None),
+    ("relax_duration_s", "GITT 静置时长 [s]", False, None),
     ("current_sign", "原始电流符号", True, ALLOWED_CURRENT_SIGN),
     ("initial_soc", "初始 SOC (0-1, 可选)", False, None),
 ]
@@ -134,7 +171,45 @@ NUMERIC_EXPERIMENT_FIELDS = {
     "voltage_upper",
     "temperature",
     "initial_soc",
+    "pulse_duration_s",
+    "relax_duration_s",
 }
+
+#: 自由文本 protocol 里可识别的脉冲协议写法（只用于**补齐**未填的
+#: protocol_type；识别不到就保持空，绝不硬猜成 GITT）
+_PULSE_TEXT_TOKENS = ("gitt", "pitt", "pulse", "脉冲")
+_GCD_TEXT_TOKENS = ("gcd", "cc_cv", "cccv", "恒流", "充放电")
+
+
+def protocol_type_of(exp: dict) -> str:
+    """取协议类型（闭集内），**优先显式声明**。
+
+    * ``protocol_type`` 填了 -> 原样规整返回（不在闭集内则原样返回，
+      由调用方报错；本函数不静默改写）。
+    * 没填 -> 只在自由文本 ``protocol`` 里找**无歧义的**脉冲协议写法
+      （gitt / pitt / pulse / 脉冲）。找不到就返回 ``""`` = 未知。
+      识别不到时**不许**默认成 GITT：这会让一份普通 GCD 也走脉冲级判据。
+    """
+    raw = str(exp.get("protocol_type", "") or "").strip()
+    if raw:
+        for allowed in ALLOWED_PROTOCOL_TYPE:
+            if allowed and raw.lower() == allowed.lower():
+                return allowed
+        return raw
+
+    text = str(exp.get("protocol", "") or "").strip().lower()
+    if not text:
+        return ""
+    if any(tok in text for tok in _PULSE_TEXT_TOKENS):
+        return "GITT" if "pitt" not in text else "PITT"
+    if any(tok in text for tok in _GCD_TEXT_TOKENS):
+        return "GCD"
+    return ""
+
+
+def is_pulse_protocol(protocol_type: str) -> bool:
+    """该协议是否属于"时间结构会被采样质量直接毁掉"的一类。"""
+    return str(protocol_type).strip().upper() in PULSE_PROTOCOL_TYPES
 
 # ------------------------------------------------------------------
 # S6 参数集兼容支持表

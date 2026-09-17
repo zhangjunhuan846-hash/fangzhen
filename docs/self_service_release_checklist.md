@@ -38,7 +38,12 @@ PENDING: Windows double-click UAT        —— 需真人（你或师姐）在�
   effective_c_rate     ≈ 0.221           （= max|I| / nominal_capacity，平台换算）
   ```
   二者不必相等；勿把原始标签读成精确倍率。
-- **experiment sheet 共 16 个字段**（dataset_name … initial_soc），非 14。
+- **experiment sheet 共 21 个字段**（dataset_name … initial_soc）。
+  2026-09-17 新增四个：`working_electrode_material`（体系锚定电压窗要用）、
+  `protocol_type`（闭集；决定 QC 严厉程度）、`pulse_duration_s` /
+  `relax_duration_s`（GITT 时长核对）。旧数据包缺这些键不会报错
+  （读不到就是空），但会少两项检查 —— 见
+  `docs/chemistry_windows_and_gitt_qc.md`。
 
 ## 文件位置
 

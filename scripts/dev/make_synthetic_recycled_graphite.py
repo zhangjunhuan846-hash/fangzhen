@@ -201,14 +201,21 @@ def _ocp_table() -> tuple:
     return sto, ocp_v
 
 
-def _simulate(t: np.ndarray, i: np.ndarray, ds_multiplier: float) -> np.ndarray:
-    """用平台自己的回放路径生成电压轨迹。
+def _simulate(t: np.ndarray, i: np.ndarray, ds_multiplier: float,
+              *, x0: float = 0.01):
+    """用平台自己的回放路径生成电压轨迹，返回 ``(t_sim, V_sim)``。
 
     必须声明 ``initialisation`` 块（平台契约）：半电池的 ``initial_soc`` 约定不适用，
     而默认初值会让 "Maximum voltage [V]" 事件在初值处就违反
     （实测 ``SolverError: Events ['Maximum voltage [V]'] are non-positive at
-    initial conditions``）。夹具因此显式从**装配态**出发：x0 = 0.01（脱锂），
-    并把这个 x0 与对应 OCV 写进块里。
+    initial conditions``）。夹具因此显式写死初值 x0（默认 0.01 = 装配态脱锂）
+    并把它与对应 OCV 一起写进块里。
+
+    ``x0`` 可传：倍率梯夹具要换到一个**平坦**的工作点（见
+    ``scripts/dev/make_synthetic_rate_ladder.py``）。原因是反演的条件数 ——
+    回放侧要靠"实测静置 OCV -> inverse_ocp -> x0"把初值找回来，
+    而稀相端 dOCP/dx 极大（本参数集实测 x=0.01 处 ~0.78 V，x=0.1 处 ~0.22 V），
+    网格分辨率上的一点点误差就会变成几十 mV 的起点差。
     """
     import pandas as pd
 
@@ -218,7 +225,7 @@ def _simulate(t: np.ndarray, i: np.ndarray, ds_multiplier: float) -> np.ndarray:
     max_key = "Maximum concentration in positive electrode [mol.m-3]"
     sto, ocp_v = _ocp_table()
     order = np.argsort(ocp_v)
-    x0 = 0.01                       # 装配态：脱锂
+    x0 = float(x0)
     v0 = float(np.interp(x0, sto, ocp_v))
     # 用共享反演复核一遍（x0 -> OCP -> x0），反演与初值必须是同一个自洽关系
     x_check = inverse_ocp(sto[order], ocp_v[order], v0)

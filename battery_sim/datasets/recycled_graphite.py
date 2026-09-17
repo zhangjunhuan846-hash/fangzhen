@@ -457,6 +457,35 @@ class RecycledGraphiteAdapter(NewDatasetAdapter):
         head = rest["voltage_V"].iloc[: max(1, len(rest) // 3)]
         return float(head.median())
 
+    def load_processed_discharge(self, cell, rate) -> pd.DataFrame:
+        """GCD 路径：把**窗口自己的**静置 OCV 带进回放。
+
+        为什么必须覆盖（2026-09-17 实测）：模板的默认实现只挂
+        ``contract_check`` / ``canonical_convention``，**不带**
+        ``initialisation``。于是半电池的额定放电回放从参数集**默认初值**
+        出发 —— 本夹具实测起点 1.45 V，而记录起点 0.75 V —— 整个 RMSE
+        被这个初值差吃掉，看上去像"模型不对"，其实是接线没接上。
+        协议路径（:meth:`load_processed_protocol`）一直带着这个块，
+        GCD 路径漏了；这里补上，与 sintef / dlr / birmingham 各自在
+        ``load_processed_*`` 里挂 ``initialisation`` 的做法一致。
+
+        读不到静置段时不静默：把原因挂进 ``attrs``，让上层能看见
+        （半电池没有实测静置 OCV 就没有合法的初值来源，
+        这时任何 RMSE 都应当先被质疑）。
+        """
+        df = super().load_processed_discharge(cell, rate)
+        try:
+            v0 = self.read_initial_state(str(cell))
+        except Exception as exc:                      # noqa: BLE001
+            df.attrs["initialisation_skipped"] = (
+                f"{type(exc).__name__}: {exc}"
+            )
+            return df
+        df.attrs["initialisation"] = self.initialisation_block(
+            str(cell), v0=v0
+        )
+        return df
+
     def read_ambient_temperature(self, cell) -> float:
         raw = self.read_source_table(str(cell))
         return float(raw["temperature_C"].median())

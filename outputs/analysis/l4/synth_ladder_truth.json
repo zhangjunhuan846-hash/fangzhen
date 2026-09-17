@@ -1,0 +1,115 @@
+{
+  "kind": "L4_rate_prediction",
+  "fit": {
+    "dataset": "synth_ladder_ident",
+    "rate": "C0p2",
+    "cell": "SYN-LADDER",
+    "role": "identification",
+    "metrics": {
+      "rmse_time_aligned_mV": 1.5273697499351897,
+      "mae_time_aligned_mV": 0.955082329119551,
+      "bias_time_aligned_mV": 0.8481777276090587,
+      "max_abs_error_mV": 4.620060182540339,
+      "coverage_fraction": 1.0,
+      "n_comparison_points": 541,
+      "median_current_A": 0.03125,
+      "c_rate_measured": 0.2,
+      "Q_exp_integrated_Ah": 0.046875,
+      "Q_exp_reported_Ah": 0.046875,
+      "simulated_forced_window_charge_Ah": 0.046875,
+      "capacity_error_pct": 0.0,
+      "ambient_temperature_C": 25.0,
+      "protocol_id": "",
+      "initial_state_type": "",
+      "initial_state_source": ""
+    },
+    "output_dir": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/outputs/platform/synth_ladder_ident/baseline/SPM/cellSYN-LADDER",
+    "initial_offset_mV": -0.2957599587941062,
+    "note": "in-sample：这套参数就是从这一侧来的，其 RMSE 不是预测误差"
+  },
+  "target": {
+    "dataset": "synth_ladder_holdout",
+    "rate": "C1",
+    "cell": "SYN-LADDER",
+    "role": "validation",
+    "metrics": {
+      "rmse_time_aligned_mV": 3.2746423533655142,
+      "mae_time_aligned_mV": 1.831258753331875,
+      "bias_time_aligned_mV": 1.7797645419255914,
+      "max_abs_error_mV": 15.88911425416779,
+      "coverage_fraction": 1.0,
+      "n_comparison_points": 82,
+      "median_current_A": 0.15625,
+      "c_rate_measured": 1.0,
+      "Q_exp_integrated_Ah": 0.03515625,
+      "Q_exp_reported_Ah": 0.03515625,
+      "simulated_forced_window_charge_Ah": 0.03515625,
+      "capacity_error_pct": 0.0,
+      "ambient_temperature_C": 25.0,
+      "protocol_id": "",
+      "initial_state_type": "",
+      "initial_state_source": ""
+    },
+    "output_dir": "/mnt/c/Users/24330/WorkBuddy/仿真模拟/outputs/platform/synth_ladder_holdout/baseline/SPM/cellSYN-LADDER",
+    "applied_overrides": [
+      {
+        "parameter_set": "Ecker2015_graphite_halfcell",
+        "key": "Positive particle diffusivity [m2.s-1]",
+        "old": {
+          "__callable__": "graphite_diffusivity_Ecker2015",
+          "__qualname__": "graphite_diffusivity_Ecker2015",
+          "__module__": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell"
+        },
+        "new": {
+          "__callable__": "L4_constant",
+          "__qualname__": "shape_override.<locals>.shaped",
+          "__module__": "identification.representations"
+        },
+        "source": {
+          "source": "synthetic_fixture_truth",
+          "method": "D_s(x,T) = D_ref(x,T) * 10**(-0.4559 * phi_constant(x))",
+          "note": "夹具写死的 D_s 倍率；真实工作里这里应填 GITT 反演值"
+        },
+        "rate_slug": "C1"
+      }
+    ],
+    "initial_offset_mV": -0.26896665099089556
+  },
+  "overrides": {
+    "provenance": "SYNTHETIC FIXTURE 真值（不是从任何测量反演的）：D_s = D_ref × 0.35",
+    "sources": {
+      "Ds": {
+        "source": "synthetic_fixture_truth",
+        "note": "仅用于验证 L4 链路可跑，不构成任何参数结论"
+      },
+      "Positive particle diffusivity [m2.s-1]": {
+        "source": "synthetic_fixture_truth",
+        "method": "D_s(x,T) = D_ref(x,T) * 10**(-0.4559 * phi_constant(x))",
+        "note": "夹具写死的 D_s 倍率；真实工作里这里应填 GITT 反演值"
+      }
+    },
+    "keys": [
+      "Positive particle diffusivity [m2.s-1]"
+    ]
+  },
+  "scale": {
+    "Q_exp_integrated_Ah": 0.03515625,
+    "model_nominal_capacity_Ah": 0.15625,
+    "cell_nominal_capacity_Ah": 0.15625,
+    "median_current_A": 0.15625,
+    "c_rate_on_cell": 4.444444444444445,
+    "c_rate_on_model_unscaled": 1.0,
+    "window_charge_fraction_of_model": 0.225,
+    "capacity_ratio_model_over_measured": 1.0,
+    "log10_ratio": 0.0,
+    "verdict": "aligned",
+    "basis": "model nominal capacity vs declared cell nominal capacity"
+  },
+  "alignment_mode": "check",
+  "coverage_min": 0.8,
+  "model_name": "SPM",
+  "parameter_set": "Ecker2015_graphite_halfcell",
+  "warnings": [],
+  "failures": [],
+  "link_ok": true
+}

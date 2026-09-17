@@ -1,0 +1,17 @@
+{
+  "provenance": "SYNTHETIC FIXTURE 负对照：不做任何覆盖（等于零拟合回放）",
+  "overrides": {
+    "Ds": {
+      "shape": "constant",
+      "amplitude_dex": 0.0,
+      "source": "zero_fit_control",
+      "note": "负对照：期望它在留出倍率上明显更差"
+    }
+  },
+  "sources": {
+    "Ds": {
+      "source": "zero_fit_control",
+      "note": "负对照"
+    }
+  }
+}

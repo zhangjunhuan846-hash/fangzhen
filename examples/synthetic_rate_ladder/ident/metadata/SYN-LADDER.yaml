@@ -1,0 +1,29 @@
+sample_id: SYN-LADDER
+material_class: pristine
+source: SYNTHETIC RATE-LADDER FIXTURE (ident, 0.2C) —— 不是实验样品；曲线由平台自己的回放路径生成
+electrode:
+  mass_loading_mg_cm2: 1.8
+  coating_thickness_um: 45.0
+  area_cm2: 86.0
+  binder: 夹具值（PVDF 5 %）
+particle:
+  d50_um: 12.0
+cell:
+  format: CR2032
+  counter_electrode: Li 片（夹具）
+  electrolyte: 1 M LiPF6 EC:DEC（夹具）
+measurements:
+- technique: CC_charge_discharge
+  file: examples/synthetic_rate_ladder/ident/raw/electrochemistry/SYN-LADDER_gcd.csv
+  role: identification
+  notes: 夹具：600 s 静置 + 0.2C 放电到 ~30% DoD；真值 D_s ×0.35；初值 x0=0.4（平台工作点，反演良态）
+structure:
+  xrd:
+    available: false
+    not_available_reason: 合成夹具：没有真实 XRD
+  raman:
+    available: false
+    not_available_reason: 合成夹具：没有真实 Raman
+  bet:
+    available: false
+    not_available_reason: 合成夹具：没有真实 BET
