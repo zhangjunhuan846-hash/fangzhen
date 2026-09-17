@@ -103,8 +103,15 @@ def missing_fields(meta: Dict[str, Any]) -> List[str]:
         if value is None or (isinstance(value, str) and not value.strip()):
             missing.append(path)
     if str(_dig(meta, "material_class") or "").strip() in REGENERATION_REQUIRED_FOR:
+        # 结构化回收史（recycling.treatment）填了的话，regeneration_condition
+        # 就是一个重复字段：**二选一即可**（结构化那份才是机器可读的）。
+        treatment = _dig(meta, "recycling.treatment") or {}
+        has_block = isinstance(treatment, dict) and any(
+            _filled(v) for v in treatment.values())
         value = _dig(meta, "regeneration_condition")
-        if value is None or (isinstance(value, str) and not value.strip()):
+        if not has_block and (value is None
+                              or (isinstance(value, str)
+                                  and not value.strip())):
             missing.append("regeneration_condition")
     if not _dig(meta, "measurements"):
         missing.append("measurements")
@@ -193,6 +200,160 @@ def _filled(value: Any) -> bool:
     if isinstance(value, (list, tuple)):
         return any(_filled(v) for v in value)
     return True
+
+
+# ---------------------------------------------------------------
+# 回收史（recycling provenance）
+#
+# 为什么它对回收材料是**必填**而不是"最好有"
+#   回收材料最大的问题不是测量误差，而是**样品身份不可追踪**：
+#   两个都叫"再生石墨"的样品，一个是酸浸 + 600 °C Ar、一个是碱处理 + 900 °C
+#   Ar/H2 —— 根本不是同一个材料。缺了这段历史，D_s 的任何差异都无法归因，
+#   而"再生石墨"这个词本身会被当成一个材料类别来用。
+#
+#   所以 material_class ∈ {recycled, regenerated} 时，这一块**必须**给出
+#   （来源三问 + 处理四问）。pristine 的参照样品可以不填。
+# ---------------------------------------------------------------
+RECYCLING_REQUIRED_FOR = ("recycled", "regenerated")
+
+RECYCLING_SOURCE_FIELDS = ("battery_type", "cathode_type", "graphite_origin")
+RECYCLING_TREATMENT_FIELDS = ("method", "temperature_C", "duration_h",
+                              "atmosphere")
+
+#: 氧化性气氛 + 高温 = 石墨会被烧掉。只 warn：先让人确认气氛写法与单位，
+#: 不直接判死（"air" 也可能是实验室内部的缩写）。
+OXIDATIVE_HINTS = ("air", "o2", "oxygen", "空气", "氧")
+OXIDATIVE_ALERT_ABOVE_C = 500.0
+
+
+def validate_recycling(meta: Dict[str, Any]) -> Dict[str, List[str]]:
+    """校验 ``recycling:`` 块。返回 ``{errors, warnings, missing}``。"""
+    errors: List[str] = []
+    warnings: List[str] = []
+    missing: List[str] = []
+
+    cls = str(meta.get("material_class") or "").strip()
+    raw = meta.get("recycling")
+    required = cls in RECYCLING_REQUIRED_FOR
+
+    if raw is None:
+        if required:
+            errors.append(
+                f"material_class='{cls}' 必须给 recycling 块"
+                f"（source: {'/'.join(RECYCLING_SOURCE_FIELDS)}；"
+                f"treatment: {'/'.join(RECYCLING_TREATMENT_FIELDS)}）——"
+                f"缺了它，两个「再生石墨」无法区分是不是同一个材料"
+            )
+            missing.extend(f"recycling.{p}" for p in
+                           ("source", "treatment"))
+        return {"errors": errors, "warnings": warnings, "missing": missing}
+    if not isinstance(raw, dict):
+        errors.append("recycling 必须是 mapping（source / treatment）")
+        return {"errors": errors, "warnings": warnings, "missing": missing}
+
+    source = raw.get("source")
+    treatment = raw.get("treatment")
+    if not isinstance(source, dict):
+        errors.append("recycling.source 必须是 mapping")
+        source = {}
+    if not isinstance(treatment, dict):
+        errors.append("recycling.treatment 必须是 mapping")
+        treatment = {}
+
+    for group, fields in (("source", RECYCLING_SOURCE_FIELDS),
+                          ("treatment", RECYCLING_TREATMENT_FIELDS)):
+        for field in fields:
+            value = (source if group == "source" else treatment).get(field)
+            if not _filled(value):
+                missing.append(f"recycling.{group}.{field}")
+                errors.append(
+                    f"recycling.{group}.{field} 必填"
+                    f"（{RECYCLING_FIELD_HELP[field]}）"
+                )
+
+    if _filled(treatment.get("temperature_C")):
+        try:
+            temp = float(treatment["temperature_C"])
+            if temp < 0:
+                errors.append(f"recycling.treatment.temperature_C = {temp} 为负")
+            else:
+                atmo = str(treatment.get("atmosphere") or "")
+                if (temp > OXIDATIVE_ALERT_ABOVE_C
+                        and any(h in atmo.lower() for h in OXIDATIVE_HINTS)):
+                    warnings.append(
+                        f"处理气氛写作 '{atmo}' 且温度 {temp} °C —— "
+                        f"石墨在氧化性气氛下 >{OXIDATIVE_ALERT_ABOVE_C:g} °C 会烧损，"
+                        f"先确认气氛写法（Ar / N2 / 真空？）再解释容量损失"
+                    )
+        except (TypeError, ValueError):
+            errors.append(
+                f"recycling.treatment.temperature_C = "
+                f"{treatment['temperature_C']!r} 不是数字"
+            )
+
+    if _filled(treatment.get("duration_h")):
+        try:
+            if float(treatment["duration_h"]) <= 0:
+                errors.append("recycling.treatment.duration_h 必须为正")
+        except (TypeError, ValueError):
+            errors.append(
+                f"recycling.treatment.duration_h = "
+                f"{treatment['duration_h']!r} 不是数字"
+            )
+
+    return {"errors": errors, "warnings": warnings, "missing": missing}
+
+
+#: 逐字段的"为什么问这个"
+RECYCLING_FIELD_HELP = {
+    "battery_type": "退役电池类型（例：18650 NMC/石墨 动力电池）",
+    "cathode_type": "正极体系（例：NMC532 / LFP）—— 它决定石墨被什么污染",
+    "graphite_origin": "石墨本身从哪来（原生人造石墨 / 天然 / 未知）",
+    "method": "再生方法（例：酸浸 / 碱处理 / 水洗 / 热处理 / 组合）",
+    "temperature_C": "处理温度（°C）；氧化性气氛高温会烧损石墨",
+    "duration_h": "处理时长（h）",
+    "atmosphere": "处理气氛（例：Ar / N2 / Ar-H2 / 真空）",
+}
+
+
+def recycling_identity(meta: Dict[str, Any]) -> Dict[str, Any]:
+    """这一份样品的**身份元组**（用于分组与"是不是同一个材料"的判断）。
+
+    报告里 fresh / spent / regenerated 三组必须带着它出现，
+    否则表格里的"再生石墨"是一个无法复核的标签。
+    """
+    raw = meta.get("recycling") or {}
+    source = raw.get("source") or {}
+    treatment = raw.get("treatment") or {}
+    return {
+        "sample_id": meta.get("sample_id"),
+        "material_class": meta.get("material_class"),
+        "battery_type": source.get("battery_type"),
+        "cathode_type": source.get("cathode_type"),
+        "graphite_origin": source.get("graphite_origin"),
+        "method": treatment.get("method"),
+        "temperature_C": treatment.get("temperature_C"),
+        "duration_h": treatment.get("duration_h"),
+        "atmosphere": treatment.get("atmosphere"),
+    }
+
+
+def recycling_summary(meta: Dict[str, Any]) -> str:
+    """一行摘要（报告用）。没有回收史时**明说没有**，不留白。"""
+    identity = recycling_identity(meta)
+    if not _filled(identity.get("method")) and \
+            not _filled(identity.get("battery_type")):
+        return "recycling: 未声明（pristine 参照可不填；回收料必须填）"
+    parts = [
+        f"来自 {identity.get('battery_type') or '?'}"
+        f" / 正极 {identity.get('cathode_type') or '?'}"
+        f" / 石墨 {identity.get('graphite_origin') or '?'}",
+        f"处理 {identity.get('method') or '?'}"
+        f" @ {identity.get('temperature_C')} °C"
+        f" × {identity.get('duration_h')} h"
+        f" in {identity.get('atmosphere') or '?'}",
+    ]
+    return "recycling: " + "；".join(parts)
 
 
 def validate_structure(meta: Dict[str, Any]) -> Dict[str, List[str]]:
@@ -491,6 +652,12 @@ def validate(meta: Dict[str, Any]) -> Dict[str, List[str]]:
     errors.extend(structure["errors"])
     warnings.extend(structure["warnings"])
     pending = list(structure["pending"])
+
+    # 回收史：回收/再生料的**样品身份**（缺了它"再生石墨"只是一个标签）
+    recycling = validate_recycling(meta)
+    errors.extend(recycling["errors"])
+    warnings.extend(recycling["warnings"])
+    missing.extend(recycling["missing"])
 
     return {"errors": errors, "warnings": warnings, "missing": missing,
             "pending": pending}

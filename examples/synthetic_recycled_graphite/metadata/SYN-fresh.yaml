@@ -1,0 +1,33 @@
+sample_id: SYN-fresh
+material_class: pristine
+source: SYNTHETIC FIXTURE —— 商业石墨参照（夹具里的「真值」是 D_s ×1.0）；不是实验样品
+electrode:
+  mass_loading_mg_cm2: 1.8
+  coating_thickness_um: 45.0
+  area_cm2: 86.0
+  binder: 夹具值（PVDF 5 %）
+particle:
+  d50_um: 12.0
+cell:
+  format: CR2032
+  counter_electrode: Li 片（夹具）
+  electrolyte: 1 M LiPF6 EC:DEC（夹具）
+measurements:
+- technique: CC_charge_discharge
+  file: examples/synthetic_recycled_graphite/raw/electrochemistry/SYN-fresh_gcd.csv
+  role: identification
+  notes: 夹具：600 s 静置 + C/5 放电 4 h（≈80 % DoD），136.39 mAh
+- technique: GITT
+  file: examples/synthetic_recycled_graphite/raw/electrochemistry/SYN-fresh_gitt.csv
+  role: identification
+  notes: 夹具：6 × (pulse 600 s @C/10 + rest 1800 s)
+structure:
+  xrd:
+    available: false
+    not_available_reason: 合成夹具：没有真实 XRD（真实样品必须填）
+  raman:
+    available: false
+    not_available_reason: 合成夹具：没有真实 Raman
+  bet:
+    available: false
+    not_available_reason: 合成夹具：没有真实 BET

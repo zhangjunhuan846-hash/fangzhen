@@ -201,6 +201,15 @@ def _complete_metadata(**overrides) -> dict:
         "material_class": "recycled",
         "regeneration_condition": "500 C, Ar, 2 h",
         "source": "本实验室 2026-08 批次",
+        # 回收/再生料的**样品身份**：缺了它两个"再生石墨"无法区分
+        # （契约要求，见 tests/test_recycled_graphite.py）
+        "recycling": {
+            "source": {"battery_type": "18650 NMC/石墨",
+                       "cathode_type": "NMC532",
+                       "graphite_origin": "人造石墨"},
+            "treatment": {"method": "热处理", "temperature_C": 500.0,
+                          "duration_h": 2.0, "atmosphere": "Ar"},
+        },
         "electrode": {"mass_loading_mg_cm2": 1.8,
                       "coating_thickness_um": 45.0,
                       "area_cm2": 1.54},

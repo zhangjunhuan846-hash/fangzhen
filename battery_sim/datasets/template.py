@@ -320,6 +320,17 @@ class NewDatasetAdapter(BatteryDatasetAdapter):
         df.attrs["canonical_convention"] = SIGN_CONVENTION
         return df
 
+    def load_processed_discharge(self, cell, rate) -> pd.DataFrame:
+        """``rate`` -> 一条**已处理**放电。默认与 :meth:`load_discharge` 同一件事。
+
+        为什么要单独一个方法：公开回放入口 ``run_baseline_cell`` 调的是
+        ``load_processed_discharge``，而模板原先没有实现它 ——
+        新数据集会在回放时才炸 ``AttributeError``（G6.2a 之后的端到端实测踩到）。
+        按 rate 映射到**不同窗口**的数据集（如 ``dlr_gitt``：rate 其实是窗口）
+        覆盖这个方法即可。
+        """
+        return self.load_discharge(cell, rate)
+
     def get_initial_state(self, cell) -> float:
         value = float(self.read_initial_state(str(cell)))
         if not (-0.1 < value < MAX_PLAUSIBLE_VOLTAGE_V):
