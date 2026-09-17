@@ -12,8 +12,8 @@
 
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
-Last verified commit:   280ca81  (2026-09-17 晚，L4 倍率预测验收 + 体系锚定电压窗
-                                    + 脉冲协议 QC 分级 + GCD 路径初值接线修复)
+Last verified commit:   630f5eb  (2026-09-17 晚，材料元数据入口共用同一张电压窗口规则表
+                                    + EIS→k0/Rct 本轮不做的决定入册)
 Tag:                    v0.1.0-platform  (**平台开发阶段冻结**；接新数据不再是开发任务)
 origin/main:            **与本地同链，已 push**（2026-09-16；33 个 commit 积压已清零）
 Working tree:           见「已知限制 #1」
@@ -1118,14 +1118,37 @@ D_s 由脉冲时长与 ΔV 算出。
 已在 `RecycledGraphiteAdapter` 里覆盖该方法挂上（与 sintef / dlr / birmingham
 一致）。修前/修后同一夹具：**59.89 mV → 3.27 mV**。
 
+### ④ 材料元数据入口共用同一张规则表（2026-09-17 晚）
+
+上面三项里，① 原先只接在**自服务导入通道**；真实样品走的是材料元数据路径
+（`metadata/*.yaml`），于是「demo 数据很严格、自己的实验数据反而绕过」。
+补法**不复制规则**：`material_metadata.validate_voltage_window()` 直接调
+`chemistry_windows`，词表也只有一份（`user_tools/spec.py` 从那边 import）。
+材料元数据新增三个可选键（模板已预填）：`cell.working_electrode_material` /
+`cell.counter_electrode_type` / `cell.voltage_window_V`。
+唯一性由测试钉住（`test_vocabularies_have_a_single_source` +
+`test_templates_declare_the_anchor_fields`）。四个真实模板没掉进"检查被跳过"。
+
+### ⑤ EIS → k0/Rct：本轮明确不做（决定已记录）
+
+EIS 照测、数据照存，但**不建 EIS→k0/Rct 的拟合通路**；`k0`/`Rct` 一律
+`not_measured`，理由写「已测但无通路」。三条理由（任一不成立都还值得做）：
+① 论文主线不用它；② 等效电路模型的选择本身决定 Rct（Randles vs CPE 给不同值）
+⇒ 那是"模型选择"不是材料性质；③ `Rct → k0` 需要真实反应面积，而半电池的活性
+面积/粗糙度我们没有独立测量 ⇒ 换算出的 k0 是**假参数**。
+详见 `docs/graphite_heat_treatment_test_plan.md` §10.1。
+
 ### 本轮实证（可复跑）
 
 ```bash
 python -m user_tools.import_dataset --package examples/half_cell_demo
 # -> 13 项校验 / 严重 0 / 警告 3（新增的 WARN 是"体系窗口被跳过：缺声明"）/ 导入 PASS
 
+python -m battery_sim.datasets.material_metadata --series templates/commercial_graphite_ht/metadata
+# -> 28 个错误（= 7 个只有人能填的实测量 × 4 份），窗口检查未产生任何新错误/警告
+
 python -m pytest -q
-# -> 597 passed, 5 warnings, 119.66s
+# -> 613 passed, 5 warnings, 128.49s
 ```
 
 ---
@@ -1133,9 +1156,9 @@ python -m pytest -q
 ## 测试状态
 
 ```text
-pytest:        597 passed, 5 warnings
+pytest:        613 passed, 5 warnings
 failures:      0
-duration:      119.66s
+duration:      128.49s
 last run date: 2026-09-17  (提交前复跑)
 command:       python -m pytest -q   (WSL, conda env pybamm)
 ```
@@ -1148,7 +1171,7 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 | `HANDOFF.md` | 88 | **504** |
 
 两个数字互不相同，且都与实际不符。已改为指向本文件，不再写死数字。
-**引用测试数时只引用本文件的 597。**
+**引用测试数时只引用本文件的 613。**
 （2026-09-16 的增量：329 → 356 是 G6.1a 的 28 项 `test_dlr_gitt.py`；
 356 → 374 是尺度对齐门的 18 项 `test_scale_alignment.py`；
 374 → 392 是 G6.1c 的 18 项 `test_recovery_stats.py`；
@@ -1163,7 +1186,8 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 `test_ht_templates.py`（12 项）。
 → 549 + **48** = **597**：`test_user_data_qc.py`（29 项：体系锚定电压窗 +
 脉冲协议分级）+ `test_rate_prediction.py`（19 项：L4 验收的判据与措辞）。
-本轮新增的三件见「L4 验收与两项新 QC 门」一节。）
+→ 597 + **16** = **613**：`test_material_voltage_window.py`（材料元数据入口）
+—— 同一张规则表接进第二个入口，见「L4 验收与两项新 QC 门」④。）
 
 ---
 
