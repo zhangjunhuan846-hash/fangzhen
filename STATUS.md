@@ -12,7 +12,7 @@
 
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
-Last verified commit:   27bf413  (2026-09-16, G6.2a 表示接口门 + 平台冻结点标记)
+Last verified commit:   b16f5ef  (2026-09-17, 结构表征契约 + 回收石墨 adapter 骨架)
 Tag:                    v0.1.0-platform  (**平台开发阶段冻结**；接新数据不再是开发任务)
 origin/main:            **与本地同链，已 push**（2026-09-16；33 个 commit 积压已清零）
 Working tree:           见「已知限制 #1」
@@ -107,6 +107,7 @@ G6 graphite‖Li 实验约束模型                   IN PROGRESS
   G6.1c GITT 激励地图（476 窗口，双向）         放电 **FAIL(M1/M2)**｜充电 **PASS(6/6)** — 见下
   G6.1b-2 3-region basis                        落脚点**存在但很窄**（3 个窗口；先测方向独立性）
   G6.2a D_s(x) 表示接口门                       **接口 PASS / 判据 9/11**（2 条窗口类 FAIL）— 见下
+  ══ 结构表征契约 + 回收石墨 adapter 骨架 ═      完成 —— 2026-09-17，见下
   G6.2 graphite identifiability                 NOT STARTED
   G6.3 独立 protocol 验证                       NOT STARTED
   ══ 平台冻结包（productization freeze）═         完成 —— 2026-09-16，见下
@@ -618,6 +619,35 @@ $x_0\approx0.015$ 处 **5.1×**。更深一点（$x_0\approx0.021$）**反号**�
 只有 SPM / 单电芯 / 26 °C / 150 s 脉冲；§7.3 的"方向效应"是**实测现象**、机制解释只是**假设**；
 **不是对 Ecker2015 的验证**。
 
+### 结构表征契约 + 回收石墨 adapter 骨架 — **完成**（2026-09-17）
+
+导师 Step 1/2：**契约先于数据**。字段、单位、来源、缺失处理方式全部定下来，
+数据到手时只剩「填 metadata + 跑自检」。
+
+- **结构块** `structure: {xrd, raman, bet}`（`battery_sim/datasets/material_metadata.py`）：
+  键是**闭集白名单**；`available: true` 时必须给 file / role / 关键测量量 / source；
+  `available: false` 时必须给 `not_available_reason`
+  （「没测」与「忘了写」在下游无法区分，与 `not_measured` 同一个道理）。
+  关键测量量：xrd `d002_nm`｜raman `id_ig`｜bet `surface_area_m2_g` **+** `pore_volume_cm3_g`
+  （**不只留面积**：回收石墨更关心孔结构）。
+- **只收测量量**：`defect_level: high` 这类**解释**被拒绝，并指向该写的测量量
+  （`INTERPRETATION_KEYS` 里 6 条定向提示：defect_level / graphitization / crystallinity /
+  activation / quality / capacity_fade）。单位写在字段名里（`_nm`/`_cm1`/`_m2_g`/`_cm3_g`），
+  **不做换算**；超常见区间的值只 warn（先怀疑单位，不直接判死）。
+- **逐块来源**：`source: {type, instrument, operator, date}`，`type` 词表
+  `experiment|literature|vendor|estimate`；缺任一项即错
+  （「出现 BET=56.3 却不知道谁测的 / 哪台仪器 / 哪一天」）。
+- **回收石墨 adapter 骨架** `battery_sim/datasets/recycled_graphite.py`
+  （**不写进 live config**，避免空数据集破坏管线）：
+  `python -m battery_sim.datasets.recycled_graphite --validate`
+  → **PASS（0 错 / 0 警 / 5 待办）**，含义是**契约成立、等数据**；
+  `--require-data` 把「数据未就位」升级为错误（数据到手后的复核用）。
+  能力声明守契约：基类的协议接口**保持未覆盖**（有测试钉住）。
+- **目录约定**（样品是 metadata 字段，**不是**目录层级，否则加一个样品就要改代码）：
+  `raw/electrochemistry/`、`raw/structure/`、`processed/`。
+- **`examples/frozen_results/`**：只放 summary.json + report.md + 一张图（**209 KB**），
+  **不放全部 CSV**；`outputs/fitting/` 继续 gitignore（复核靠重跑命令）。
+
 ### G6.2a D_s(x) 表示接口门 — **接口 PASS / 判据 9/11**（2026-09-16）
 
 完整报告 `docs/g6.2a_representation_interface.md`。
@@ -974,9 +1004,9 @@ p-ocv 是 C/50，`gitt`/`gitthold` 实为 C/50 CC–CV 且多通道交错。
 ## 测试状态
 
 ```text
-pytest:        466 passed, 5 warnings
+pytest:        504 passed, 5 warnings
 failures:      0
-duration:      117.04s
+duration:      113.75s
 last run date: 2026-09-16  (提交前复跑)
 command:       python -m pytest -q   (WSL, conda env pybamm)
 ```
@@ -985,17 +1015,19 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 
 | 文件 | 写的数 | 实际 |
 |---|---|---|
-| `README.md` | 293 | **466** |
-| `HANDOFF.md` | 88 | **466** |
+| `README.md` | 293 | **504** |
+| `HANDOFF.md` | 88 | **504** |
 
 两个数字互不相同，且都与实际不符。已改为指向本文件，不再写死数字。
-**引用测试数时只引用本文件的 466。**
+**引用测试数时只引用本文件的 504。**
 （2026-09-16 的增量：329 → 356 是 G6.1a 的 28 项 `test_dlr_gitt.py`；
 356 → 374 是尺度对齐门的 18 项 `test_scale_alignment.py`；
 374 → 392 是 G6.1c 的 18 项 `test_recovery_stats.py`；
 392 → **448** 是平台冻结包的 56 项：`test_dataset_template.py` +
 `test_analysis_mode.py` + `test_parameter_report.py`；
-448 → **466** 是 G6.2a 的 18 项 `test_representations.py`。）
+448 → **466** 是 G6.2a 的 18 项 `test_representations.py`；
+466 → **504** 是结构契约与 adapter 的 38 项：`test_material_structure.py`
++ `test_recycled_graphite.py`。）
 
 ---
 

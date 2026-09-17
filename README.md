@@ -31,6 +31,8 @@ A reproducible framework connecting battery experimental data, electrochemical m
 - 出报告：`python -m identification.parameter_report --windows <逐窗口表> ...`
 - 真实材料分析必须用 `analysis_mode="material"`（synthetic truth 会被代码拒绝）
 - **尺度对齐是所有参数结论的前提**：`docs/scale_alignment_gate.md`（Q_model == Q_measured）
+- 回收石墨（数据未到位也能自检契约）：`python -m battery_sim.datasets.recycled_graphite --validate`
+- 冻结产物样例（少量：summary + 报告 + 图）：`examples/frozen_results/`
 - 设计与历史决策：`docs/architecture/`
 
 ---
