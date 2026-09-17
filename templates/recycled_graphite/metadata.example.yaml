@@ -59,3 +59,69 @@ parameter_sources:
   Ds: null
   k0: null
   Rct: null
+
+# ============================================================
+# 结构表征（XRD / Raman / BET）
+#
+# 三条硬规矩（契约的一部分，越界会报错）：
+#   1. **只填测量量**。`id_ig: 1.02` 对；`defect_level: high` 错 ——
+#      后者是解释，属于分析层（Phase 3 的"结构 → 参数"关联）。
+#   2. **键是闭集**（白名单见 material_metadata.STRUCTURE_FIELDS）。
+#      多一个键就是越界，因为自由键会让"这个数从哪来"半年后无法回答。
+#   3. **每个块都要给 source**（type/instrument/operator/date）：
+#      出现 `BET=56.3` 却不知道谁测的、哪台仪器、哪一天，这个数不能进论文。
+#
+# 单位写在字段名里（`_nm` / `_cm1` / `_m2_g` / `_cm3_g`）——
+# 名字即契约，不做单位换算。
+#
+# 没测的块**必须**写 available: false + not_available_reason：
+# "没测"与"忘了写"在下游完全一样，所以缺失也要有说法。
+# ============================================================
+structure:
+
+  xrd:
+    available: false               # true 时必须给 file / role / wavelength_nm / d002_nm / source
+    not_available_reason: null     # 例："样品量不足，未做 XRD"
+    file: null                     # 相对仓库根；例 "data/raw/LIB/recycled_graphite/raw/structure/xrd.raw"
+    role: null                     # identification | validation | exploration
+    wavelength_nm: null            # 例 0.15406 (Cu Kα1)
+    d002_nm: null                  # 石墨 d002 ≈ 0.336 nm
+    lc_nm: null                    # 可选：沿 c 轴堆叠尺寸
+    la_nm: null                    # 可选：面内尺寸
+    crystallite_method: null       # 可选：Scherrer / 其它，必须写明
+    source:
+      type: null                   # experiment | literature | vendor | estimate
+      instrument: null
+      operator: null
+      date: null
+
+  raman:
+    available: false
+    not_available_reason: null
+    file: null
+    role: null
+    laser_wavelength_nm: null      # 例 532
+    id_ig: null                    # 例 1.02（不要写 "缺陷多"）
+    g_band_cm1: null               # 可选
+    d_band_cm1: null               # 可选
+    source:
+      type: null
+      instrument: null
+      operator: null
+      date: null
+
+  bet:
+    available: false
+    not_available_reason: null
+    file: null
+    role: null
+    adsorption_gas: null           # 例 "N2" / "CO2"（微孔要用 CO2）
+    surface_area_m2_g: null
+    pore_volume_cm3_g: null        # 不要只留面积：回石墨更关心孔结构
+    pore_size_distribution: null   # 文件路径，或含 file 的 mapping
+    model: null                    # 可选：BET / BJH / DFT / HK
+    source:
+      type: null
+      instrument: null
+      operator: null
+      date: null

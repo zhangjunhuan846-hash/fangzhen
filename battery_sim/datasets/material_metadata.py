@@ -127,6 +127,261 @@ def load_metadata(path) -> Dict[str, Any]:
     return data
 
 
+#: pybamm 无关；这些名字同时是**单位声明**（`_nm` / `_m2_g` / `_cm3_g` / `_cm1`）
+STRUCTURE_BLOCKS = ("xrd", "raman", "bet")
+
+#: 每个块的**白名单**。多一个键就是越界 —— 见下面 WHY WHITELIST。
+STRUCTURE_FIELDS = {
+    "xrd": ("available", "file", "role", "wavelength_nm", "d002_nm",
+            "lc_nm", "la_nm", "crystallite_method", "source",
+            "not_available_reason"),
+    "raman": ("available", "file", "role", "laser_wavelength_nm", "id_ig",
+              "g_band_cm1", "d_band_cm1", "source", "not_available_reason"),
+    "bet": ("available", "file", "role", "adsorption_gas",
+            "surface_area_m2_g", "pore_volume_cm3_g", "pore_size_distribution",
+            "model", "source", "not_available_reason"),
+}
+
+#: `available: true` 时必须给的字段（其余为可选）
+STRUCTURE_REQUIRED = {
+    "xrd": ("file", "role", "wavelength_nm", "d002_nm", "source"),
+    "raman": ("file", "role", "laser_wavelength_nm", "id_ig", "source"),
+    "bet": ("file", "role", "adsorption_gas", "surface_area_m2_g",
+            "pore_volume_cm3_g", "source"),
+}
+
+#: 必须为正数的字段（单位写在名字里）
+STRUCTURE_POSITIVE = (
+    "wavelength_nm", "d002_nm", "lc_nm", "la_nm", "laser_wavelength_nm",
+    "id_ig", "g_band_cm1", "d_band_cm1", "surface_area_m2_g",
+    "pore_volume_cm3_g",
+)
+
+#: 结构表征的来源词表（与测量清单同一套口径）
+SOURCE_TYPES = ("experiment", "literature", "vendor", "estimate")
+
+#: 已知的"解释性"键名：写进来就直接报错，并给出该写什么
+INTERPRETATION_KEYS = {
+    "defect_level": "写 `id_ig`（测量量）；缺陷程度的判断放在分析层",
+    "quality": "写具体测量量（`d002_nm` / `id_ig` / `surface_area_m2_g`）",
+    "graphitization": "写 `d002_nm` 与 `lc_nm`；「石墨化程度」是解释",
+    "crystallinity": "写 `d002_nm` / `lc_nm` / `crystallite_method`",
+    "activation": "写 `surface_area_m2_g` 与 `pore_volume_cm3_g`",
+    "capacity_fade": "那是电化学派生量，不属于结构表征",
+}
+
+#: 数值合理区间（只 warn，不判死）：超范围通常是单位或测错
+STRUCTURE_PLAUSIBLE = {
+    "d002_nm": (0.20, 1.00),        # 石墨 d002 ≈ 0.336 nm
+    "id_ig": (0.05, 20.0),
+    "surface_area_m2_g": (0.01, 5000.0),
+}
+
+
+def _filled(value: Any) -> bool:
+    """"填了没有"的判定：``None`` / 空串 / 空 dict / **全为 null 的 dict** 都算没填。
+
+    最后一条是为了模板：``source: {type: null, instrument: null, ...}``
+    是"还没填"的形态，不该被读成"填了一个空来源"。
+    """
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, dict):
+        return any(_filled(v) for v in value.values())
+    if isinstance(value, (list, tuple)):
+        return any(_filled(v) for v in value)
+    return True
+
+
+def validate_structure(meta: Dict[str, Any]) -> Dict[str, List[str]]:
+    """校验 ``structure:`` 块。返回 ``{errors, warnings, pending}``。
+
+    WHY WHITELIST
+        "平台只保存测量量"这条原则靠自觉是守不住的：一旦允许自由键，
+        第一个写进来的会是 `defect_level: high`，半年后没人知道它是
+        从 `id_ig` 推的还是从别的什么推的，而它会和参数一起进相关性分析。
+        所以键必须**闭集**，越界要报错，并告诉他该写哪个测量量。
+
+    WHY `not_available_reason`
+        "缺失处理方式"也是契约的一部分：一个块要么给出测量量与来源，
+        要么明确说明**为什么没有**。否则"没测"与"忘了写"在下游完全一样。
+        与 `not_measured` 判定词是同一个道理。
+    """
+    errors: List[str] = []
+    warnings: List[str] = []
+    pending: List[str] = []
+
+    raw = meta.get("structure")
+    if raw is None:
+        pending.append(
+            "structure: 整块未声明 —— XRD/Raman/BET 一个都没有，"
+            "Phase 3 的「结构 → 参数」关联无从建立"
+        )
+        return {"errors": errors, "warnings": warnings, "pending": pending}
+    if not isinstance(raw, dict):
+        errors.append("structure 必须是一个 mapping（键为 xrd / raman / bet）")
+        return {"errors": errors, "warnings": warnings, "pending": pending}
+
+    unknown_blocks = [k for k in raw if k not in STRUCTURE_BLOCKS]
+    if unknown_blocks:
+        errors.append(
+            f"structure 里有未知块 {unknown_blocks}；"
+            f"允许 {list(STRUCTURE_BLOCKS)}"
+        )
+
+    for block in STRUCTURE_BLOCKS:
+        entry = raw.get(block)
+        where = f"structure.{block}"
+        if entry is None:
+            pending.append(f"{where}: 未声明（没测过？写上 available: false + 原因）")
+            continue
+        if not isinstance(entry, dict):
+            errors.append(f"{where} 必须是 mapping")
+            continue
+
+        # 1 键白名单（含解释性键的定向提示）
+        allowed = STRUCTURE_FIELDS[block]
+        for key in entry:
+            if key in allowed:
+                continue
+            hint = INTERPRETATION_KEYS.get(str(key).lower())
+            if hint:
+                errors.append(
+                    f"{where}.{key} 是**解释**不是测量量：{hint}。"
+                    f"（结构与参数的关联属分析层，不写进数据契约）"
+                )
+            else:
+                errors.append(
+                    f"{where}.{key} 不在允许字段内 {list(allowed)}"
+                )
+
+        if "available" not in entry:
+            errors.append(f"{where}.available 必填（true/false）")
+            continue
+        available = entry["available"]
+        if not isinstance(available, bool):
+            errors.append(f"{where}.available 必须是布尔值，得到 {available!r}")
+            continue
+
+        # 2 缺失处理方式
+        if not available:
+            reason = str(entry.get("not_available_reason") or "").strip()
+            if not reason:
+                errors.append(
+                    f"{where}.available=false 必须写 not_available_reason"
+                    f"（没测 / 样品不够 / 仪器不可用 —— 说明「为什么没有」）"
+                )
+            else:
+                pending.append(f"{where}: 未测（{reason}）")
+            # available=false 时其余字段可以留空，但填了就要合法。
+            # "填了"要用 _filled 判：模板里 source 是一堆 null 的 mapping，
+            # 那种形态是"还没填"，不是"自相矛盾"。
+            for key in STRUCTURE_REQUIRED[block]:
+                if _filled(entry.get(key)):
+                    warnings.append(
+                        f"{where}.available=false 却填了 {key} —— 自相矛盾"
+                    )
+            continue
+
+        # 3 available=true：必填 + 来源 + 数值
+        for key in STRUCTURE_REQUIRED[block]:
+            value = entry.get(key)
+            if value is None or (isinstance(value, str)
+                                 and not str(value).strip()):
+                errors.append(
+                    f"{where}.{key} 必填（available=true 就要给出测量量与来源）"
+                )
+        role = str(entry.get("role") or "").strip()
+        if role and role not in ("identification", "validation", "exploration"):
+            errors.append(
+                f"{where}.role='{role}' 不在 "
+                f"['identification', 'validation', 'exploration'] 内"
+            )
+        src = entry.get("source")
+        if src is not None:
+            errors.extend(_validate_source(src, where))
+
+        for key in STRUCTURE_POSITIVE:
+            if key not in entry or entry[key] in (None, ""):
+                continue
+            try:
+                num = float(entry[key])
+            except (TypeError, ValueError):
+                errors.append(f"{where}.{key} = {entry[key]!r} 不是数字")
+                continue
+            if not num > 0:
+                errors.append(f"{where}.{key} = {num} 必须为正")
+                continue
+            band = STRUCTURE_PLAUSIBLE.get(key)
+            if band and not (band[0] <= num <= band[1]):
+                warnings.append(
+                    f"{where}.{key} = {num} 落在常见区间 {band} 之外 —— "
+                    f"先确认单位（名字里的单位就是契约）"
+                )
+
+        # 4 孔分布：文件路径或含 file 的 mapping
+        if block == "bet" and "pore_size_distribution" in entry:
+            psd = entry["pore_size_distribution"]
+            ok_form = (isinstance(psd, str) and psd.strip()) or (
+                isinstance(psd, dict) and str(psd.get("file") or "").strip())
+            if not ok_form:
+                errors.append(
+                    "structure.bet.pore_size_distribution 必须是文件路径"
+                    "（字符串）或含 file 的 mapping"
+                )
+
+    return {"errors": errors, "warnings": warnings, "pending": pending}
+
+
+def _validate_source(src: Any, where: str) -> List[str]:
+    """结构表征同样要**逐条来源**：谁测的、什么仪器、哪一天、什么样品状态。"""
+    if not isinstance(src, dict):
+        return [f"{where}.source 必须是 mapping（type/instrument/operator/date）"]
+    out: List[str] = []
+    stype = str(src.get("type") or "").strip()
+    if stype not in SOURCE_TYPES:
+        out.append(
+            f"{where}.source.type='{stype}' 不在 {list(SOURCE_TYPES)} 内"
+        )
+    for key in ("instrument", "operator", "date"):
+        if not str(src.get(key) or "").strip():
+            out.append(
+                f"{where}.source.{key} 必填 —— 出现 「BET=56.3」 却不知道"
+                f"谁测的/哪台仪器/哪一天，这个数就不能进论文"
+            )
+    return out
+
+
+def structure_available(meta: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """已测的结构块（含文件路径与关键测量量），供报告引用。"""
+    out: Dict[str, Dict[str, Any]] = {}
+    raw = meta.get("structure") or {}
+    if not isinstance(raw, dict):
+        return out
+    for block in STRUCTURE_BLOCKS:
+        entry = raw.get(block)
+        if isinstance(entry, dict) and entry.get("available") is True:
+            out[block] = dict(entry)
+    return out
+
+
+def structure_pending(meta: Dict[str, Any]) -> List[str]:
+    """哪些结构块没有（含原因）——报告里要写出来，不能留白。"""
+    out: List[str] = []
+    raw = meta.get("structure") or {}
+    if not isinstance(raw, dict):
+        return [f"{b}: 未声明" for b in STRUCTURE_BLOCKS]
+    for block in STRUCTURE_BLOCKS:
+        entry = raw.get(block)
+        if not isinstance(entry, dict):
+            out.append(f"{block}: 未声明")
+        elif entry.get("available") is not True:
+            out.append(f"{block}: {entry.get('not_available_reason') or '未测'}")
+    return out
+
+
 def validate(meta: Dict[str, Any]) -> Dict[str, List[str]]:
     """返回 ``{errors, warnings, missing}``。
 
@@ -231,7 +486,14 @@ def validate(meta: Dict[str, Any]) -> Dict[str, List[str]]:
                 except ValueError as exc:
                     errors.append(str(exc))
 
-    return {"errors": errors, "warnings": warnings, "missing": missing}
+    # 结构表征（XRD / Raman / BET）：只收测量量与来源，解释留给分析层
+    structure = validate_structure(meta)
+    errors.extend(structure["errors"])
+    warnings.extend(structure["warnings"])
+    pending = list(structure["pending"])
+
+    return {"errors": errors, "warnings": warnings, "missing": missing,
+            "pending": pending}
 
 
 def validate_parameter_source(name: str, source) -> str:
@@ -288,6 +550,20 @@ def render(meta: Optional[Dict[str, Any]],
     )
     tech = techniques(meta)
     lines.append(f"measurements    : {tech if tech else '(未声明)'}")
+
+    # 结构表征：只写测量量（数值 + 单位写在字段名里），解释留在分析层
+    keys = {"xrd": ("d002_nm", "nm"), "raman": ("id_ig", ""),
+            "bet": ("surface_area_m2_g", "m2/g")}
+    avail = structure_available(meta)
+    if avail:
+        parts = []
+        for block, entry in avail.items():
+            field, unit = keys[block]
+            parts.append(f"{block} {field}={entry.get(field)}{unit}")
+        lines.append(f"structure       : {' | '.join(parts)}")
+    gaps = structure_pending(meta)
+    if gaps:
+        lines.append(f"structure gap   : {'; '.join(gaps)}")
 
     if result is not None:
         for err in result.get("errors", []):

@@ -1,0 +1,154 @@
+{
+  "gate": "G6.2a D_s(x) representation interface gate",
+  "run": {
+    "dataset": "dlr_gitt",
+    "cell": "Hydra.0b_A",
+    "parameter_set": "Ecker2015_graphite_halfcell",
+    "n_simulations": 246,
+    "runtime_s": 45.01337261699996,
+    "windows": [
+      "GITT-charge#t475",
+      "GITT-discharge#t120"
+    ],
+    "scan_half_dex": 1.0,
+    "scan_step_dex": 0.05,
+    "level_mV": 1.0,
+    "limit_dex": 0.3
+  },
+  "criteria": {
+    "A1_activity[GITT-charge#t475]": true,
+    "A1_order[GITT-charge#t475]": false,
+    "N1_zero[GITT-charge#t475]": true,
+    "N2_coverage[GITT-charge#t475]": false,
+    "A1_activity[GITT-discharge#t120]": true,
+    "A1_order[GITT-discharge#t120]": true,
+    "N1_zero[GITT-discharge#t120]": true,
+    "N2_coverage[GITT-discharge#t120]": true,
+    "A2_json": true,
+    "A2_source": true,
+    "A3_report": true
+  },
+  "passed": false,
+  "interface_passed": true,
+  "window_criteria_failed": [
+    "A1_order[GITT-charge#t475]",
+    "N2_coverage[GITT-charge#t475]"
+  ],
+  "rows": [
+    {
+      "window": "GITT-charge#t475",
+      "shape": "constant",
+      "peak_model_to_model_rmse_mV": 64.80206590687753,
+      "band_width_dex": 0.09879380423810188,
+      "band_truncated": false,
+      "band_resolution_dex": 0.05,
+      "verdict": "identifiable",
+      "coverage_min": 0.853,
+      "n_unreachable_amps": 2,
+      "dv_pulse_min_mV": 172.05979483183765,
+      "dv_pulse_max_mV": 514.9987259953457,
+      "n_sim": 41
+    },
+    {
+      "window": "GITT-charge#t475",
+      "shape": "linear",
+      "peak_model_to_model_rmse_mV": 58.394336782226034,
+      "band_width_dex": 0.03585256097064341,
+      "band_truncated": false,
+      "band_resolution_dex": 0.05,
+      "verdict": "identifiable",
+      "coverage_min": 0.84,
+      "n_unreachable_amps": 10,
+      "dv_pulse_min_mV": 168.91298009477197,
+      "dv_pulse_max_mV": 484.29961099538366,
+      "n_sim": 41
+    },
+    {
+      "window": "GITT-charge#t475",
+      "shape": "three_region",
+      "peak_model_to_model_rmse_mV": 38.20690030544418,
+      "band_width_dex": 0.13710339593439436,
+      "band_truncated": false,
+      "band_resolution_dex": 0.05,
+      "verdict": "identifiable",
+      "coverage_min": 1.0,
+      "n_unreachable_amps": 0,
+      "dv_pulse_min_mV": 175.81569744865266,
+      "dv_pulse_max_mV": 389.0370640903964,
+      "n_sim": 41
+    },
+    {
+      "window": "GITT-discharge#t120",
+      "shape": "constant",
+      "peak_model_to_model_rmse_mV": 2.8713466838082646,
+      "band_width_dex": 0.8966339993170667,
+      "band_truncated": false,
+      "band_resolution_dex": 0.050000000000000044,
+      "verdict": "not identifiable",
+      "coverage_min": 1.0,
+      "n_unreachable_amps": 0,
+      "dv_pulse_min_mV": -20.130619474155953,
+      "dv_pulse_max_mV": -6.4573155123875265,
+      "n_sim": 41
+    },
+    {
+      "window": "GITT-discharge#t120",
+      "shape": "linear",
+      "peak_model_to_model_rmse_mV": 1.0453837010778868,
+      "band_width_dex": 1.9594390596850366,
+      "band_truncated": true,
+      "band_resolution_dex": 0.050000000000000044,
+      "verdict": "bounded",
+      "coverage_min": 1.0,
+      "n_unreachable_amps": 0,
+      "dv_pulse_min_mV": -16.151233841858474,
+      "dv_pulse_max_mV": -9.375373583921224,
+      "n_sim": 41
+    },
+    {
+      "window": "GITT-discharge#t120",
+      "shape": "three_region",
+      "peak_model_to_model_rmse_mV": 4.517830847303043,
+      "band_width_dex": 0.6332912942344234,
+      "band_truncated": false,
+      "band_resolution_dex": 0.050000000000000044,
+      "verdict": "not identifiable",
+      "coverage_min": 1.0,
+      "n_unreachable_amps": 0,
+      "dv_pulse_min_mV": -21.312351006352607,
+      "dv_pulse_max_mV": -5.45929790666723,
+      "n_sim": 41
+    }
+  ],
+  "shape_resolution_mV": {
+    "GITT-charge#t475": {
+      "linear_vs_constant": 63.48104653353409,
+      "three_region_vs_constant": 0.898202346155877
+    },
+    "GITT-discharge#t120": {
+      "linear_vs_constant": 0.5444777778476199,
+      "three_region_vs_constant": 2.8555425511126775
+    }
+  },
+  "bands_measured_with_unreachable_amps": [
+    {
+      "window": "GITT-charge#t475",
+      "shape": "constant",
+      "n_unreachable_amps": 2,
+      "band_width_dex": 0.09879380423810188
+    },
+    {
+      "window": "GITT-charge#t475",
+      "shape": "linear",
+      "n_unreachable_amps": 10,
+      "band_width_dex": 0.03585256097064341
+    }
+  ],
+  "caveats": [
+    "只验接口，不做辨识、不做优化、不拟合任何测量。",
+    "带宽是 model-to-model 量（同模型、同尺度、无噪声）；这里它只是「接口通了之后顺带看到的数」，不是结论。",
+    "形状幅度按 RMS 归一化（phi 的 rms=1、除 phi_0 外 mean=0），三个形状的 amp 因此可比。",
+    "three_region 只用一个方向（两端 vs 中段），因为 G6.1c 已实测：加自由系数只加带宽，不加信息。",
+    "数据集是公开 benchmark（dlr_gitt），不是任何回收石墨样品。"
+  ]
+}
