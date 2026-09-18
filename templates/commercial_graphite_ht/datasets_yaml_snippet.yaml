@@ -45,21 +45,26 @@ graphite_ht_cg_900:
 # ------------------------------------------------------------------
 # Level 4 的留出集：把 1C 曲线单独放一个目录，才会被**平台的**门看住
 #
+# ⚠️ 1C 必须来自**独立平行电芯**（CG-AR-03 / CG-600-03 / ...），
+#    不是 01/02 的某一段 —— 见 docs/preregistration_2026-09-18.md §2。
+#    同一颗电芯的最后一段 1C 只能叫 protocol holdout，不能写独立验证。
+#    文件名请带上电芯号（CG-AR-03_rate_1C.csv），让复核时一眼看得出来源。
+#
 # 角色分离写在两处，机制不同，别混：
 #   · metadata 的 measurements[].role: validation
-#       → 声明层面（每个样品的 rate_1C.csv 那样登记）
+#       → 声明层面（在对应样品的 measurements 里登记那份 1C 文件）
 #   · 下面这个数据集条目的 dataset_role: validation
 #       → 平台层面：governance/dataset_roles.py 会在拿它标定时直接报错
-#   想要第二道门，就把 1C 的导出复制/软链到这里（4 个文件），
+#   想要第二道门，就把 1C 的导出复制/软链到这里（每样品一个文件），
 #   目录名固定，便于复核：
-#       data/raw/graphite_ht/_holdout_1C/CG-AR_rate_1C.csv
-#       data/raw/graphite_ht/_holdout_1C/CG-600_rate_1C.csv
-#       data/raw/graphite_ht/_holdout_1C/CG-800_rate_1C.csv
-#       data/raw/graphite_ht/_holdout_1C/CG-900_rate_1C.csv
+#       data/raw/graphite_ht/_holdout_1C/CG-AR-03_rate_1C.csv
+#       data/raw/graphite_ht/_holdout_1C/CG-600-03_rate_1C.csv
+#       data/raw/graphite_ht/_holdout_1C/CG-800-03_rate_1C.csv
+#       data/raw/graphite_ht/_holdout_1C/CG-900-03_rate_1C.csv
 # ------------------------------------------------------------------
 graphite_ht_rate_holdout:
   adapter: "graphite_ht"
   raw_dir: "data/raw/graphite_ht/_holdout_1C"
   parameter_set: "Ecker2015_graphite_halfcell"
   dataset_role: "validation"
-  dataset_role_note: "1C 留出集（四个样品）：只用于预测检验，禁止进入任何拟合"
+  dataset_role_note: "1C 留出集（四样品的 03 号电芯）：只用于预测检验，禁止进入任何拟合；来源电芯必须与辨识侧不同"

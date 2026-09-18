@@ -1172,6 +1172,31 @@ EIS 照测、数据照存，但**不建 EIS→k0/Rct 的拟合通路**；`k0`/`R
 → L3 CG-AR 双向 GITT 出逐窗口 bandwidth map（不是一条漂亮的 `D_s(x)`）→ L4 冻结参数预测未参与辨识的 1C。
 **CG-AR 先跑通整条链，再铺 600/800/900** —— 这样实验问题与材料差异才分得开。
 
+### ⑦ 判据冻结（预注册）与 run 记录
+
+**软件冻结 ≠ 判据冻结，两件事分开记录。** `v0.1.0-platform` 指向**代码**状态；
+L1–L4 的**规则**随后续文档演进。所以每次正式 run 必须同时记两个 commit：
+
+| 字段 | 含义 |
+| --- | --- |
+| `software_commit` | 代码基线（`v0.1.0-platform` = `ee2fb36`，不再移动） |
+| `protocol_docs_commit` | 当时的**判据规则**在哪一版文档里 |
+
+判据已冻结在 **`docs/preregistration_2026-09-18.md`**（开跑后不得修改，只能按 §5
+版本化 amendment 新增，且必须写明「改动发生在看结果之前还是之后」）。
+自该文件起冻结的判据族 = 既有编号 **M1 / M1b / M2 / M3 / M4 / N1**
+（沿用 `docs/g6.1c_excitation_map.md`；**没有 M5–M9**，不要凭印象补号）。
+每次 run 复制 `templates/commercial_graphite_ht/run_record.yaml` 填好存档。
+
+**L4 的 holdout 必须是独立平行电芯**：≥3 颗电芯按 `preregistration §2` 分工
+（01 = GITT 侧、02 = identification 侧、**03 = 1C holdout**）。同一颗电芯的最后一段 1C
+只能称 protocol holdout，不得写独立验证。
+
+**「CG-AR 跑不过」是有效结果。** 只要 QC / 尺度 / 初值 / 独立 holdout 四道门是干净通过的，
+大量 `bounded`/`unconstrained` 或 L4 预测失败**仍是有效科学结论**（G6.1c 在公开石墨数据上
+就出现过：放电扫程 239 个窗口一个都不合格）。不可接受的是靠改平台/改判据/回头调参
+把它「修到通过」；报负结果时必须同时报出**哪一道门是干净通过的**。
+
 ### 本轮实证（可复跑）
 
 ```bash

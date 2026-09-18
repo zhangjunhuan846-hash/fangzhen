@@ -1,0 +1,46 @@
+# ============================================================
+# 正式 run 记录（模板）—— 每次正式分析复制一份填好存档
+#
+# 为什么要两个 commit：
+#   software_commit       = 代码状态（v0.1.0-platform 指向的那个 SHA，不再移动）
+#   protocol_docs_commit  = 当时的**判据规则**在哪一版文档里
+# 论文 Methods 只写 tag 是不够的：判据随后续文档演进，读者无法知道当时用的是哪一版。
+#
+# 复制到哪：outputs/analysis/runs/<sample_id>_<cell_id>_<stage>_<date>.yaml
+# 判据本身见 docs/preregistration_2026-09-18.md（冻结，开跑后不改）
+# ============================================================
+
+software_baseline: "v0.1.0-platform"
+software_commit: "ee2fb36"        # 代码基线（不改）
+protocol_docs_commit: ""          # 本次 run 时的 HEAD，例 cc76f30
+preregistration: "docs/preregistration_2026-09-18.md"
+
+analysis_date: ""                 # YYYY-MM-DD
+stage: ""                         # L1 | L2 | L3 | L4
+
+sample_id: ""                     # CG-AR / CG-600 / CG-800 / CG-900
+cell_id: ""                       # CG-AR-01 / CG-AR-02 / CG-AR-03（电芯级角色见 preregistration §2）
+dataset_dir: ""                   # data/raw/graphite_ht/CG-AR
+dataset_hash: ""                  # 命令见 preregistration §1（只统计原始数据目录）
+
+command: ""                       # 实际执行的命令，原样粘贴（可复算是记录的全部意义）
+outputs: []                       # 产物路径（报告 / JSON / 图）
+
+# 逐门结果：pass | fail | not_run，并带上关键数字（不要只写"通过"）
+gates:
+  L1_metadata_errors: ""          # 期望 0
+  L1_d50_measured: ""             # true/false（+ 实测值 µm）
+  L1_protocol_declared: ""        # protocol_type / pulse_duration_s
+  L1_nominal_capacity_source: ""  # 例 "formation cycle 3 reversible capacity"
+  L2_initial_offset_mV: ""        # 门槛 ±30 mV
+  L2_scale_verdict: ""            # aligned / misaligned / unknown
+  L2_coverage: ""                 # 门槛 ≥ 0.80
+  L2_termination: ""              # 终止原因
+  L3_M1_existence: ""             # 合格窗口数
+  L3_band_map: ""                 # 产物路径（逐窗口 bandwidth map）
+  L4_gates: ""                    # 角色 / 尺度 / 覆盖率 / 初值 四道门
+  L4_rmse_mV: ""                  # 如实报，不设"必须小于"的门
+
+verdict: ""                       # 一句话结论：只写判据支持的部分
+negative_result_reason: ""        # 若为负结果：是"模型/材料"层面还是"链路"层面（必须区分）
+caveats: []                       # 必须一起引用的限制（措辞见 preregistration §3.5）
