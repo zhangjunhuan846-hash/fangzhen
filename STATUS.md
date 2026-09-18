@@ -12,13 +12,23 @@
 
 ```text
 Platform version:       v0.1 (run_pipeline.py 自述版本；尚无语义化版本号)
-Last verified commit:   630f5eb  (2026-09-17 晚，材料元数据入口共用同一张电压窗口规则表
-                                    + EIS→k0/Rct 本轮不做的决定入册)
-Tag:                    v0.1.0-platform  (**平台开发阶段冻结**；接新数据不再是开发任务)
-origin/main:            **与本地同链，已 push**（2026-09-16；33 个 commit 积压已清零）
+Frozen baseline:        ee2fb36  (2026-09-17 定稿 = **真实实验前冻结基线**)
+Tag:                    v0.1.0-platform -> ee2fb36
+                        **此 tag 从 2026-09-17 起不再移动**（见下「版本号纪律」）
+origin/main:            **与本地同链，已 push**（2026-09-17；main 与 feat 分支同 SHA）
 Working tree:           见「已知限制 #1」
-STATUS.md last updated: 2026-09-17
+STATUS.md last updated: 2026-09-18
 ```
+
+### 版本号纪律（2026-09-17 定）
+
+`v0.1.0-platform` 表示**某个固定状态**，现在指向真实实验前的冻结基线，
+**从此刻起不再移动**。后面的任何改动 —— 哪怕只修一个真实仪器的解析器 ——
+都走 **`v0.1.1`**（或实验分支），不再重指 `v0.1.0-platform`。
+原因：一个会被反复重指的 tag 不表示任何状态，而「这批实验数据是在哪个平台上跑的」
+是论文里必须能回答的问题。（本页记录的历史 SHA 保持不变，可回溯。）
+
+**验收对象也随之切换**：从「代码是否正确」换成「**真实商业石墨数据能不能过 L1→L4**」。
 
 ---
 
@@ -1137,6 +1147,30 @@ EIS 照测、数据照存，但**不建 EIS→k0/Rct 的拟合通路**；`k0`/`R
 ⇒ 那是"模型选择"不是材料性质；③ `Rct → k0` 需要真实反应面积，而半电池的活性
 面积/粗糙度我们没有独立测量 ⇒ 换算出的 k0 是**假参数**。
 详见 `docs/graphite_heat_treatment_test_plan.md` §10.1。
+
+**措辞映射（重要，避免稿件自相矛盾）**：内部五词 schema 保留 `not_measured`
+这个枚举不变；但**稿件里不许写成 `not_measured`**（读起来像"没测"），
+必须写成 **「measured, but not inferred by the current pipeline」**。
+平台报告里对应的中文原句是「已测，但平台没有从它拟合 k0 的通路」。
+两处指的是同一件事，读者看到的必须是后者。
+
+### ⑥ 真实数据阶段：三条红线 + 推进顺序
+
+平台侧到此**不再加模块**。接下来的验收对象是真实数据能否过 L1→L4，
+判据写在 `templates/commercial_graphite_ht/README.md` §0（数据到手当天的检查单）
+与 `docs/graphite_heat_treatment_test_plan.md` §7。三条红线（detail 见那两处）：
+
+1. **D50 没有实测** ⇒ 不解释跨样品 `D_s` 差异（`D ∝ R²`；参数集 R_p 与实测 D50/2 差 1.56×
+   ⇒ `D_s` 差 2.4×）。
+2. **`protocol_type` / `pulse_duration_s` 没声明** ⇒ GITT QC 的结论不当正式证据
+   （不声明时那四条判据会退化成 WARN：这正是最该严的地方被放松）。
+3. **`nominal_capacity_Ah` 没有来源明确的实测值** ⇒ 不声称 L4 已过尺度一致性
+   （还须记 `capacity_source` 与取值 cycle，例「formation cycle 3 reversible capacity」）。
+
+**顺序（不许因为某一级失败就绕过）**：L1 四组 metadata/声明补齐（三颗平行电池先看原始值一致性）
+→ **L2 只用 CG-AR**（起始 OCV/x0、容量尺度、电流方向、覆盖率、termination；不过不铺另外三组）
+→ L3 CG-AR 双向 GITT 出逐窗口 bandwidth map（不是一条漂亮的 `D_s(x)`）→ L4 冻结参数预测未参与辨识的 1C。
+**CG-AR 先跑通整条链，再铺 600/800/900** —— 这样实验问题与材料差异才分得开。
 
 ### 本轮实证（可复跑）
 

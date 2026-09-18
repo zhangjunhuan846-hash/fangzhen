@@ -215,6 +215,28 @@ electrode.area_cm2 / particle.d50_um / cell.counter_electrode / cell.electrolyte
 差 > 30 mV，都记失败且不给 RMSE 结论 —— 后者是初值没接上的接线故障，
 在真实半电池上踩过一次（回放起点偏 708 mV）。
 
+**推进顺序（2026-09-17 定，不许因为某一级失败就绕过去）**：
+
+```text
+L1 四组声明补齐（≥3 颗平行电池：先看**原始值**与一致性）
+      |
+L2 **只拿 CG-AR 做**回放（起始 OCV/x0、容量尺度、电流方向、覆盖率、termination）
+      |          这里不过，不铺另外三组
+L3 CG-AR **双向** GITT -> 逐窗口 bandwidth map（不是先报一条漂亮的 D_s(x)）
+      |
+L4 冻结 identification 的参数，直接预测**未参与辨识**的 1C（不许回头调参）
+```
+
+**CG-AR 先跑通整条链，再铺 600/800/900**：平台已经复杂到足以让一个真实数据问题
+产生很多"看起来像物理结果"的假象；先用未处理对照把
+「实测 → QC → 回放 → 可辨识地图 → 冻结参数 → 1C 预测」走一遍，
+才能把**实验问题**与**材料差异**拆开。
+
+三条**结论级红线**（不满足就不许下相应结论）见
+`templates/commercial_graphite_ht/README.md` §0：① D50 实测；② `protocol_type` /
+`pulse_duration_s` 声明；③ `nominal_capacity_Ah` 有来源明确的实测值
+（并记 `capacity_source` 与取值 cycle）。
+
 **L3 的诚实边界（必须一起引用）**：平台报的不是一条 `D_s(x)` 曲线，而是
 **每个 GITT 窗口的 1 mV 带宽 + 判定**。在公开石墨数据上实测：
 225 个放电窗口里 **0 个**、230 个充电窗口里 **3 个** 能达到 0.30 dex
@@ -293,6 +315,16 @@ electrode.area_cm2 / particle.d50_um / cell.counter_electrode / cell.electrolyte
 
 **什么时候再考虑**：第一篇跑完 L1–L4 之后，如果真实数据出现「D_s 与倍率预测不一致」
 且 EIS 是唯一能解释它的证据，再单开一轮（那时也需要先定电路模型与面积口径）。
+
+**措辞映射（2026-09-17 定，避免稿件自相矛盾）**：内部五词 schema **保留**
+`not_measured` 这个枚举不变（它是机器判定词），但**稿件里不许写成 `not_measured`**
+—— 读者会读成"没测"。稿件必须写成：
+
+> **measured, but not inferred by the current pipeline**
+
+平台报告里对应的中文原句是「已测，但平台没有从它拟合 k0 的通路」。
+两处指同一件事；`k0`/`Rct` 在结果表里的状态仍然是"已测、未推断"，
+不是"未测"。EIS 曲线本身可以作为辅助观察展示（例如 600/800/900 的阻抗演化）。
 
 ---
 
