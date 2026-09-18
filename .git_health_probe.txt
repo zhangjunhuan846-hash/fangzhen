@@ -1,2 +1,0 @@
-git stability probe, created 2026-09-15 17:24 local.
-Delete this file and drop the commit once .git has survived a full scan cycle.

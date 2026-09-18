@@ -1,0 +1,19 @@
+# 换行符策略：**一律不转换**（`-text` 对每个文件生效）
+#
+# 为什么必须写死这一条：
+#   本仓库用 **文件 sha256** 做输入指纹（`parameters/export_parameter_set.py`
+#   的 `verify_inputs`，以及各处 provenance 记录）。指纹是**按字节**算的，
+#   所以任何 checkout 期的换行符转换都会让指纹失效。
+#
+# 实测事故（2026-09-18）：
+#   · 作者机上 `core.autocrlf=false`（仓库本地配置）⇒ 检出为 LF，指纹通过；
+#   · 别人 `git clone` 时**不继承**这个本地配置，走 Git for Windows 的系统默认
+#     `core.autocrlf=true` ⇒ 检出被转成 CRLF ⇒
+#     `outputs/analysis/graphite_phaseB16/v1/graphite_Ds_app.csv`
+#     14305 B(LF) → 14380 B(CRLF) ⇒ 4 套石墨参数集的 `verify_inputs` 全部报
+#     「sha256 不符（输入已改变）」，`test_parameter_set_export.py` 直接失败。
+#   ⇒ 这是**只有别人 clone 才会出现**的失败，作者本机永远看不到。
+#
+# 因此：不设 `text=auto`、不设 `eol=lf`——两者都会让「作者看到的」与
+# 「别人 clone 到的」不一致。`-text` = 字节原样存取。
+* -text

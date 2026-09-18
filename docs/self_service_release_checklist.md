@@ -8,7 +8,7 @@
 
 ```text
 PASS:    importer                        —— generic csv/xls/xlsx → canonical（显式映射+单位+符号）
-PASS:    validation                      —— 12 项校验，FAIL 阻断 simulation
+PASS:    validation                      —— 13 项校验，FAIL 阻断 simulation
 PASS:    canonical conversion            —— importer ≡ 专用 adapter（numerically equivalent within
                                            floating-point tolerance：max|Δt|=0s, |ΔI|=1e-16 A, |ΔV|=0 V）
 PASS:    simulation dispatch path        —— user_tools.adapter → run_baseline_cell，battery_sim/ 零改动

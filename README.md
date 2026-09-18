@@ -13,11 +13,14 @@ A reproducible framework connecting battery experimental data, electrochemical m
 
 ---
 
-## 🔒 已冻结版本 `v0.1.0-platform`（2026-09-16）
+## 🔒 已冻结版本 `v0.1.0-platform`
 
-**状态**：平台开发阶段结束，进入「冻结 → 接真实材料」。
-**唯一可信状态页**：[`STATUS.md`](STATUS.md)（版本、判据、测试数、已知限制）。
-**Tag**：`v0.1.0-platform`。**备份**：`../_git_bundles/fangzhen_platform_freeze_pushed.bundle`。
+**状态**：平台开发阶段结束，进入「冻结 → 接真实材料」。**验收对象是「真实数据能否过 L1–L4」，不是代码。**
+**唯一可信状态页**：[`STATUS.md`](STATUS.md)（版本、判据、测试数、已知限制）。**与其它文档冲突时以它为准。**
+**Tag**：`v0.1.0-platform` → `ee2fb36`（**此 tag 不再移动**；之后的任何改动走 `v0.1.1` 或实验分支）。
+**判据冻结**：[`docs/preregistration_2026-09-18.md`](docs/preregistration_2026-09-18.md)
+（开跑后只能按 §5 版本化 amendment）+
+[`docs/preregistration_annex_A_parameter_provenance.md`](docs/preregistration_annex_A_parameter_provenance.md)（参数来源矩阵：实测 / 实测派生 / 沿用药参集 / 允许辨识 / 不报）。
 
 冻结的含义是：**接一份新数据不再是开发任务**。
 
@@ -338,7 +341,7 @@ Experiment
 # 🚀 Quick Start
 
 **先跑这个。** `examples/half_cell_demo/` 是自包含案例，clone 后即可运行，
-不需要 13 GB 的 `data/` 原始库：实验 CSV → 12 项导入校验 → zero-fit DFN baseline。
+不需要 13 GB 的 `data/` 原始库：实验 CSV → 13 项导入校验 → zero-fit DFN baseline。
 
 ```bash
 # 1) 环境（详见 HANDOFF.md：WSL Ubuntu + conda + pip install -r requirements.txt）
@@ -352,6 +355,12 @@ python -m user_tools.run_baseline    --package examples/half_cell_demo --models 
 python run_pipeline.py --list-datasets
 python run_pipeline.py --config configs/example.yaml
 ```
+
+> ⚠️ **`python -m pytest -q` 在新 clone 里不会全绿，这是预期的。**
+> 实测（全新 clone、无 `data/`）：`44 failed, 495 passed, 4 skipped, 70 errors`，
+> 失败全部是 `FileNotFoundError` 指向 `data/...`（原始数据集不在仓库内）。
+> `STATUS.md` 的 613 passed 是**带 `data/` 的完整环境**下的数字。
+> 只想看结论走上面第 2 步；要看历史结果直接翻 `outputs/analysis/`（见 `HANDOFF.md` §4.1）。
 
 化学体系显式注册表：`configs/chemistry.yaml` —— 化学体系 → 正负极/电解液/
 电池形式/参数集 + 溯源等级（A-exact / B-compatible_surrogate），可直接对接

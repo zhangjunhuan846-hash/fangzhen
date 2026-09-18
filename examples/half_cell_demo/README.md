@@ -33,7 +33,7 @@ WSL 环境先 `source ~/miniforge3/etc/profile.d/conda.sh && conda activate pyba
 | `result/baseline_metrics.csv` | RMSE(t)=104.29 mV，MAE=34.26 mV（zero-fit，未拟合） |
 | `result/curve.png` | 仿真 vs 实验 电压-时间对齐曲线 |
 | `result/metrics.csv` | 平台标准指标表（run 级） |
-| `result/validation_report.html` | 12 项校验报告（严重 0，警告 2） |
+| `result/validation_report.html` | 13 项校验报告（严重 0，警告 3） |
 | `result/dataset_manifest.json` | 完整溯源：参数集 Jackowska2025_2mAh_cm2、匹配等级、zero-fit 声明 |
 
 ## 换成自己的实验数据

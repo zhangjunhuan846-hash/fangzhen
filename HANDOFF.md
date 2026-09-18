@@ -1,8 +1,11 @@
 # HANDOFF · 平台交接与从零安装指南
 
-> 这是**代码包**：不含任何实验数据（`data/`、`outputs/`、`logs/` 均不在包内）。
-> 唯一附带的数据文件是 `user_dataset_template/raw/demo_birmingham_cover5.csv`，
-> 来自公开的 Birmingham NCM920305 数据集（Zenodo），仅用于双击演示。
+> **不含原始实验数据**：`data/`（约 13 GB 公开数据集库）与 `logs/` 不在仓库内。
+> **但仓库里有历史结果**：`outputs/`（约 430 个文件：评价指标、逐窗口表、报告、图）
+> 与 `examples/frozen_results/` 都随包附上，**clone 后不跑任何仿真也能直接翻阅结论**。
+> 附带的两个数据文件是 `user_dataset_template/raw/demo_birmingham_cover5.csv` 与
+> `examples/half_cell_demo/raw/demo_birmingham_cover5.csv`，来自公开的
+> Birmingham NCM920305 数据集（Zenodo），仅用于演示。
 
 ---
 
@@ -87,7 +90,33 @@ python run_pipeline.py --list-datasets     # 应列出 5 个数据集
 | `tests/` | 回归测试（**需要完整数据目录才能跑**，数据不在本包内）。当前项数见 `STATUS.md`，勿引用本文档里的历史数字 |
 | `external/Jackowska-2025-JPS/` | 公开的 Jackowska 半电池参数集代码（第三方仓库快照，commit 9f3b526） |
 
-不在包内：`data/`（14 GB 数据集）、`outputs/`（历史结果）、`logs/`、`.git`。
+不在仓库内：`data/`（约 13 GB 公开数据集库）、`logs/`、`.git/`（clone 自带）。
+**在仓库内**：`outputs/`（约 430 个历史结果文件）、`examples/`、`templates/`、`docs/`。
+
+### 4.1 clone 之后先做什么（**已实测，2026-09-18**）
+
+```bash
+# ① 看结论，不需要数据、不需要跑仿真
+ls outputs/analysis            # G5/G6 的可辨识性地图、L4 倍率预测报告、各项审计
+ls examples/frozen_results     # 冻结产物样例（报告 + 图，各自带 README）
+
+# ② 跑一个能跑的端到端示例（自包含，不需要 data/）
+python -m user_tools.import_dataset --package examples/half_cell_demo
+python -m user_tools.run_baseline   --package examples/half_cell_demo --models DFN
+# 实测输出：13 项校验 / 严重 0 / 警告 3 / 导入 PASS / DFN baseline RMSE(t) ≈ 104 mV
+```
+
+⚠️ **`python -m pytest -q` 在 clone 里不会全绿 —— 这是预期的，不是代码坏了。**
+实测（全新 clone，无 `data/`）：
+
+```text
+44 failed, 495 passed, 4 skipped, 70 errors
+```
+
+`failed` 与 `errors` **全部**是 `FileNotFoundError`，指向 `data/...`
+（DLR / SINTEF / Chen2020 / CALCE / Birmingham 的原始文件）。
+`STATUS.md` 里的 613 passed 是**带 `data/` 的完整环境**下的数字。
+要全绿请先按 §2 准备 `data/`；**只用 clone 复现结论，走 ① 与 ② 即可。**
 
 ---
 
