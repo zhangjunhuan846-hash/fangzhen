@@ -1,0 +1,435 @@
+# ==============================================================================
+# MODULES.yaml — 模块清单（可执行的架构契约）
+#
+# 回答三个问题：
+#   ① 哪些模块是必要的（不管怎么迭代都得留）？
+#   ② 其他模块按某次需要补上来时，怎么补才算"合适"？
+#   ③ 要打包成一个 Project，边界在哪？
+#
+# 【判据 — 这是本文件的全部价值所在】
+#   分档不看"重不重要"（不可执行），只看一条：
+#
+#       把它删掉，测试会不会红？
+#
+#     core     删掉 ⇒ 有测试变红 ⇒ 不许删。改动必须走版本号。
+#     optional 删掉 ⇒ 有测试变红，但红的语义是"能力少了一个"，不是"平台会说假话"
+#     scratch  删掉 ⇒ 没有任何测试变红 ⇒ 它本来就该是一次性的
+#
+#   这条判据可以机器验证（见 scripts/check_module_manifest.py）。
+#   "重不重要"不能验证，"删了会不会红"能。
+#
+# 【维护规则】
+#   新增任何模块 ⇒ 必须在本文件登记，否则校验脚本判定 FAIL。
+#   这是防"下一个探针悄悄溜进 scripts/"的唯一机制。
+# ==============================================================================
+
+meta:
+  version: 1
+  updated: "2026-09-29"
+  owner: "张俊焕"
+  note: >
+    本清单跨三个仓库：平台（仿真模拟）、Agent 本地加固副本（Battery-Sim-Agent）、
+    拆解产物（repos_download）。三者在打包时的地位不同，见 pack 节。
+
+# ==============================================================================
+# 一、平台：不可删（core）
+# 判据：删掉 ⇒ 测试变红；且变红的是【科学判据】类测试，不是【功能缺失】类
+# ==============================================================================
+core:
+  - path: battery_sim/
+    layer: "④ 仿真内核"
+    role: "科学计算核心：模型构造、求解、协议回放、指标"
+    modules: 38
+    test_hook: "test_model_factory.py / test_metrics.py / test_capacity_matching.py / test_scale_alignment.py"
+    why_core: >
+      这是平台之所以是平台的东西。STATUS.md 多处声明"科学核心改动 = 0"，
+      但从未变成可执行清单——本条目就是那个清单项。
+    freeze: "ee2fb36"
+    pack: required
+
+  - path: configs/datasets.yaml
+    layer: "① 数据来源"
+    role: "7 个数据集的注册表；新增数据集 = 一个 adapter + 这里一行"
+    test_hook: "test_registry.py / test_dataset_roles.py"
+    why_core: "删掉平台不知道自己能跑什么数据；且 registry 会直接抛错"
+    pack: required
+
+  - path: governance/
+    layer: "③ 治理层"
+    role: "本轮新增。回答『这个参数能不能被定住、凭什么值得信』"
+    modules: 8
+    detail:
+      - settings_hash.py: "三层比对前的设置指纹"
+      - noise_floor.py: "噪声底标定 + k 预注册"
+      - analysis_mode.py: "五词判定闭集"
+      - geometry_channel.py: "失败与成功结构同构"
+      - dataset_roles.py: "识别集/基准集分离，拿 holdout 标定直接报错"
+      - scale_alignment.py: "尺度对齐门（Q_model == Q_measured）"
+      - borrow_ledger.py: "借鉴溯源账本"
+    test_hook: "test_settings_hash.py / test_noise_floor.py / test_analysis_mode.py / test_geometry_channel.py / test_dataset_roles.py / test_scale_alignment.py / test_borrow_ledger.py"
+    why_core: >
+      这一层的作用是【让平台不能悄悄说错话】。删掉任何一项，
+      对应的静默错误就回来了——而静默错误的特点是【不会让别的测试红】，
+      所以必须把这一层的测试本身当作核心。
+    pack: required
+
+  - path: user_tools/validate.py
+    layer: "② 接入层的门"
+    role: "13 项 QC + 体系锚定电压窗 + GITT 脉冲协议分级"
+    test_hook: "test_user_data_qc.py / test_material_voltage_window.py / test_ht_templates.py"
+    why_core: "删掉 ⇒ 错数据能一路走到结论里"
+    pack: required
+
+  - path: user_tools/settings_wiring.py
+    layer: "③ 治理层的接线"
+    role: >
+      把 governance/settings_hash 的指纹填进 run_record 的四个槽位。
+    test_hook: "test_settings_wiring.py（15 项）"
+    why_core: >
+      **这是"缺口 3"的接线件，删掉缺口就重新张开。**
+      缺口 3 的真正形态不是"模块没有"（settings_hash 早有模块也有测试），
+      而是：模板里挖了四个槽位，**没有任何代码去填**。实测证据：
+        grep -rn "settings_hash_per_level" --include=*.py . | grep -v tests/  → 0 命中
+      这个文件是那 0 命中的解法。删掉它，三层比对的前置门就永远空着，
+      而空着**不会让任何别的测试红** —— 这正是要把它列为 core 的理由。
+      它另外承载一条关键语义：三层里只要有一层不可复算（旧 run 缺
+      solver/model_options），总判定必须是 'unknown'，**不许是 True**。
+      实测 2026-09-29：outputs/ 下 61 份 run_metadata 无一份可复算。
+    pack: required
+
+  - path: run_pipeline.py
+    layer: "入口"
+    role: "reproduction / benchmark / baseline / sensitivity 四个模式的 CLI"
+    test_hook: "test_cli.py / test_run_config.py / smoke_test_pipeline.py"
+    pack: required
+
+  - path: battery_sim/config.py
+    layer: "配置"
+    role: "路径与运行期配置"
+    test_hook: null
+    why_core: >
+      ⚠️ 无测试提及，但被判为 core：它是所有模块的公共依赖，
+      删掉会让全平台 import 失败（这种"红"是所有测试一起红，属于结构性命中）。
+    pack: required
+
+  - path: battery_sim/paths.py
+    layer: "路径"
+    role: "仓库内所有路径的唯一来源"
+    test_hook: "conftest.py + 8 个测试"
+    pack: required
+
+  - path: battery_sim/registry.py
+    layer: "② 接入层"
+    role: "数据集注册与解析"
+    test_hook: "被 15 个测试文件引用（全平台最多）"
+    pack: required
+
+  - path: battery_sim/schemas.py
+    layer: "② 接入层"
+    role: "canonical 数据的列 schema"
+    test_hook: "test_calce.py / test_sintef_graphite.py"
+    pack: required
+
+  - path: battery_sim/rates.py
+    layer: "② 接入层"
+    role: "倍率令牌的 canonical 表（冻结）"
+    test_hook: "test_calce.py"
+    why_core: "冻结表；sintef adapter 因 C/50 不在表内而自带一张表，说明改动此处有连锁后果"
+    pack: required
+
+  - path: battery_sim/logging_utils.py
+    layer: "基础设施"
+    role: "运行日志"
+    test_hook: null
+    why_core: "被 runner 全面依赖；且 run_record 的可追溯性依赖它"
+    pack: required
+
+  - path: scripts/check_module_manifest.py
+    layer: "验证"
+    role: "★ 校验本清单：路径是否存在 / core 是否有测试 / 新文件是否登记"
+    test_hook: "test_module_manifest.py（9 项）"
+    why_core: >
+      没有它，本文件就是一份会腐烂的文档；有了它，才成为契约。
+      它是"防下一个探针溜进来"的机制本体。
+    pack: required
+
+  - path: MODULE_GRAPH.yaml
+    layer: "验证 / 细化层"
+    role: "★ 单模块级依赖图（本清单的细化层）；回答老师要求的『细化得看代码』"
+    test_hook: "test_module_graph.py（11 项）"
+    why_core: >
+      目录级分档回答不了"同一目录里哪些是真核心"与"依赖方向是否单向"。
+      本文件用 in-degree 给出真核心（paths.py:16、datasets/base:13），
+      并发现一处模块级反向依赖（governance.geometry_channel -> battery_sim）。
+    pack: required
+
+  - path: scripts/scan_module_graph.py
+    layer: "验证"
+    role: "扫描器：AST 静态解析 import，生成单模块级依赖图"
+    test_hook: "test_module_graph.py::test_scanner_runs_and_reports_module_count"
+    pack: required
+
+  - path: scripts/check_module_graph.py
+    layer: "验证"
+    role: "校验器：确认依赖图与代码一致；能分辨 lazy 与 module 级依赖"
+    test_hook: "test_module_graph.py::test_checker_passes_on_current_tree"
+    pack: required
+
+  - path: tests/
+    layer: "验证"
+    role: "49 个测试文件 / 759 项"
+    why_core: >
+      测试本身就是核心资产：本清单的"删了会不会红"判据完全建立在它之上。
+      没有测试 ⇒ 三档分类退化成主观判断。
+    pack: required
+
+# ==============================================================================
+# 二、平台：可换（optional）
+# 判据：删掉 ⇒ 测试会红，但红的是"这个能力没了"，不是"平台会说假话"
+# 换法：见 module_contract 节
+# ==============================================================================
+optional:
+  - path: battery_sim/datasets/
+    layer: "② 接入层"
+    role: "7 个 adapter + base/template/ocp_lookup/material_metadata"
+    test_hook: "每个 adapter 各有对应测试"
+    swap_how: "换数据集 = 新增一个 adapter 文件 + datasets.yaml 一行；不许改 runner"
+    pack: included
+
+  - path: battery_sim/models/
+    layer: "④ 内核"
+    role: "PyBaMM 模型工厂 + 参数来源"
+    test_hook: "test_model_factory.py / test_graphite_ocp_paramset.py"
+    swap_how: "换模型族（SPM/SPMe/DFN）走 supported_models 声明，不改工厂"
+    pack: included
+
+  - path: battery_sim/protocols/
+    layer: "④ 内核"
+    role: "协议构造"
+    pack: included
+
+  - path: battery_sim/evaluation/
+    layer: "⑤ 识别与报告"
+    role: "指标与绘图"
+    test_hook: "test_metrics.py（metrics.py）；plotting.py 无测试"
+    pack: included
+
+  - path: battery_sim/excitation/
+    layer: "④ 内核"
+    role: "激励门（活性门）"
+    test_hook: "protocol.py 被 8 个测试引用；basytec.py 无测试"
+    pack: included
+
+  - path: extraction/
+    layer: "⑤ 识别与报告"
+    role: "从数据反演 OCP / apparent D_s"
+    modules: 9
+    test_hook: "test_ocp_extractor.py / test_gitt_extractor.py / test_gitt_ds_v2.py / test_hires_ocp.py / test_ds_diagnostics.py"
+    swap_how: "提取算法可换；换时须保留『只有 identifiable 才报数值』的出口约定"
+    pack: included
+
+  - path: identification/
+    layer: "⑤ 识别与报告"
+    role: "参数辨识、可辨识性地图、前向预测"
+    modules: 10
+    test_hook: "test_parameter_report.py / test_recovery_stats.py / test_representations.py / test_rate_prediction.py"
+    uncovered: "forward.py / multiprotocol.py 无测试提及"
+    swap_how: "辨识算法可换；forward.py 是 L4 前向预测入口，换时须保住『预测不重拟合』性质"
+    pack: included
+
+  - path: analysis/
+    layer: "⑤ 分析（一次性为主）"
+    role: "残差图谱、定向灵敏度"
+    modules: 7
+    test_hook: null
+    note: "全部无测试 ⇒ 按判据本应归 scratch；但产物已被文档引用（docs/targeted_sensitivity_A2.md 等），故列为 optional 并标注『产物是证据，代码是一次性的』"
+    pack: evidence_only
+
+  - path: user_tools/
+    layer: "② 接入 + 工具"
+    role: "import_dataset / report / sigma_noise / geometry_channel 等 14 个"
+    test_hook: "test_user_data_qc.py / test_sigma_noise_cli.py / test_geometry_channel.py / test_gap_wiring.py"
+    uncovered: "adapter.py / importer.py / report.py / run_baseline.py / make_*.py / check_*.py 无测试"
+    swap_how: "sigma_noise.py 的 k 必须走预注册文件，不许有默认值"
+    pack: included
+
+  - path: templates/
+    layer: "① 数据来源"
+    role: "用户数据模板"
+    test_hook: "test_dataset_template.py / test_ht_templates.py"
+    pack: included
+
+  - path: examples/
+    layer: "夹具"
+    role: "合成数据示例"
+    pack: included
+
+  - path: parameters/
+    layer: "参数集"
+    role: "导出的参数文件"
+    pack: included
+
+  - path: external/
+    layer: "外部依赖（vendored）"
+    role: "Jackowska-2025-JPS（PyBaMM==25.8 锁）+ pybamm-input-data（OCP 表）"
+    warn: "严禁 pip install 进平台 env；OCP 表被半数 adapter 依赖，必须随包"
+    pack: required
+
+# ==============================================================================
+# 三、平台：一次性（scratch）
+# 判据：删掉 ⇒ 没有任何测试变红
+# 处理：打包时【不进 Project】，或进 archive/ 而不在 import 路径上
+# ==============================================================================
+scratch:
+  - path: scripts/probe_*.py
+    count: 43
+    role: "调试探针；用于定位单个现象，用完即弃"
+    rule: "禁止被任何正式模块 import"
+
+  - path: scripts/*_phase_*_compare.py
+    count: 8
+    role: "阶段间对比脚本"
+    note: "产物是证据（docs 引用），代码是一次性的"
+
+  - path: scripts/
+    label: "顶层零散脚本，逐个登记，共 14 个"
+    role: "历史阶段的分诊、审计、导出、聚合；均有明确结论产出"
+    explicit:
+      - aggregate_protocol_results.py: "把多次 protocol run 聚合（产物被 docs 引用）"
+      - analyze_baseline.py: "基线结果分析"
+      - audit_20r_step18.py: "CALCE 20R Step 18 审计（结论进 docs/v03）"
+      - audit_a123_step28.py: "CALCE A123 Step 28 审计（结论进 docs/v04）"
+      - export_graphite_parameter_sets.py: "石墨参数集导出（parameters/ 的来源）"
+      - triage_graphite_datasets.py: "石墨数据集分诊"
+      - triage_graphite_pocv.py: "pOCV 分诊"
+      - triage_graphite_rest.py: "静置段分诊"
+      - lfp_gitt_audit.py: "LFP GITT 审计"
+      - run_baseline.py: "基线运行入口"
+      - run_reproduction.py: "复现运行入口"
+      - check_module_manifest.py: "★ 本清单的校验脚本（属 core，见下）"
+      - graphite_phase_*.py: "见上一条通配"
+    rule: "禁止被任何正式模块 import；结论写进 docs/ 后即可归档"
+
+  - path: scripts/_*.py
+    count: 3
+    role: "一次性交叉校验（_seam_demo / _shape_check / _output_isolation）"
+    note: "已在 wiring 文档标注『可删或提升为测试』"
+
+  - path: scripts/audit/ scripts/dev/ scripts/lfp_h1*/ scripts/lfp_screening/ scripts/halfcell_birmingham/
+    role: "历史阶段脚本；结论已进 docs"
+
+# ==============================================================================
+# 四、Agent 侧（Battery-Sim-Agent 本地加固副本）
+# ==============================================================================
+agent:
+  path: "C:/Users/24330/WorkBuddy/Battery-Sim-Agent"
+  upstream: "github.com/opqrst-chen/Battery-Sim-Agent"
+  upstream_commit: "354f2dd (Init, 2026-05-28)"
+  license: "MIT"
+  vcs:
+    is_git: false
+    risk: >
+      ⚠️ tarball 解压，不是 git 仓库 ⇒ 本地加固（契约 + SimRequest + 参数能力守卫，
+      283 项测试）没有任何版本控制备份。打包前必须处理。
+  core:
+    - battery_agent/contract.py
+    - battery_agent/parse.py
+    - battery_agent/param_capability.py
+    - battery_agent/sim_contract.py
+    - battery_agent/simulator.py
+    - battery_agent/memory.py
+    - battery_agent/params.py
+    - battery_agent/pipeline.py
+    - battery_agent/pipeline/
+    - battery_agent/configs/
+    - battery_agent/utils/
+    - tests/ (13 files)
+    - scripts/check_param_closure.py
+    - scripts/verify_three_names.py
+  scratch:
+    - battery_agent/experiments.csv
+    - read_test_result.ipynb
+  pack: sibling
+  pack_note: >
+    Agent 不并入平台主包。它作为 sibling 目录随 Project 交付，
+    理由见 docs/architecture/agent_platform_fusion.md §1（三层只做前两层）。
+
+# ==============================================================================
+# 五、拆解产物（repos_download）
+# 地位：证据与溯源，不是运行时依赖
+# ==============================================================================
+survey:
+  path: "C:/Users/24330/WorkBuddy/repos_download"
+  vcs: { is_git: false }
+  parts:
+    "00_源码仓库": "6 个上游源码快照（证据）"
+    "01_分析产出": "模块拆解 + 通用模块对照（结论）"
+    "02_抽取模块": "battery_agent_core（85 passed，唯一可复用的代码产物）"
+    "03_新增仓库": "4 个额外仓库源码（证据）"
+    "04_项目地图": "21 个仓库的元数据核实（结论）"
+    "99_下载临时": "tarball 与解压副本（可删）"
+  pack: evidence_only
+  pack_note: >
+    源码快照体积大且版权属于上游，打包时【不进主包】。
+    只带 01_分析产出 / 04_项目地图 / 02_抽取模块 三部分。
+
+# ==============================================================================
+# 六、新模块接入协议（回答第二问）
+# 照抄平台已验证的模式：configs/datasets.yaml 的 "新 adapter + 一行注册、核心不动"
+# ==============================================================================
+module_contract:
+  steps:
+    - "1. 独立目录：新模块不许改已有模块的文件"
+    - "2. 清单登记：在本文件登记 {path, layer, tier, test_hook, pack}"
+    - "3. additive 入口：不许 monkey patch（agent_platform_fusion.md §3 已写死）"
+    - "4. 存在性测试：加一条测试断言该模块被注册"
+    - "5. 若归 core，必须同时给测试；若无法给测试，只能归 scratch"
+  anti_patterns:
+    - name: "静默默认值"
+      example: "k=3.0 直接写在函数默认参数里"
+      why: "看起来像决定了，其实是事后挑的"
+    - name: "哨兵值"
+      example: "失败返回 capacity=0"
+      why: "与『真算出 0』不可分"
+    - name: "两处各写一份常量"
+      example: "SEARCH_KEYS 在两条 pipeline 各一份"
+      why: "必然漂移"
+    - name: "同名不同义"
+      example: "prompt 用 snake_case、白名单用 PyBaMM 风格"
+      why: "零重叠导致空转"
+
+# ==============================================================================
+# 七、Project 打包（回答第三问）
+# ==============================================================================
+pack:
+  name: "battery-sim-platform"
+  version: "v0.1.1-pack"
+  blocks:
+    - name: "运行时"
+      content: "battery_sim/ governance/ extraction/ identification/ user_tools/
+                configs/ templates/ parameters/ external/ run_pipeline.py battery_sim/config.py"
+      size_driver: "external/ 与参数表"
+    - name: "验证"
+      content: "tests/ pytest.ini requirements.txt"
+      gate: "必须 759 passed 才允许打包"
+    - name: "证据"
+      content: "STATUS.md docs/ outputs/ 的图谱与 report.json"
+      note: "STATUS.md 是唯一可信状态页，pack 时必须领先于其它文档"
+    - name: "证据（拆解）"
+      content: "repos_download/01_分析产出 repos_download/04_项目地图 repos_download/02_抽取模块"
+    - name: "sibling（不并入主包）"
+      content: "Battery-Sim-Agent 本地加固副本"
+  excluded:
+    - "data/ —— 13 GB，.gitignore 已排除；打包时给获取脚本而非数据"
+    - "99_下载临时/ —— tarball 与解压副本"
+    - "repos_download/00_源码仓库 与 03_新增仓库 —— 上游版权，不随包分发"
+    - "outputs/ 下的中间产物（保留图谱与 report.json 即可）"
+    - "scripts/ 下的 scratch（或移入 archive/ 且不在 import 路径）"
+  reproducibility:
+    env: "WSL Ubuntu + conda env pybamm（Python 3.11 / PyBaMM 26.8.0.0）"
+    lock: "requirements.txt 已逐条锁版本；numpy 必须 <2.4（PyBOP 26.3 依赖）"
+    known_gap: "G0 = PARTIAL：未在干净机器上验证过；Windows 侧无 PyBaMM 是硬分叉"
+  vcs_actions:
+    - "① repo_download 与 Battery-Sim-Agent 都不是 git 仓库 ⇒ 打包前先各自 init + commit"
+    - "② 平台从 v0.1.0-platform(ee2fb36) 起不再重指 tag；本包走 v0.1.1"
+    - "③ 每次正式 run 记两个 commit：software_commit + protocol_docs_commit"

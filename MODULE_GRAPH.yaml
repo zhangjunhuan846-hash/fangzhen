@@ -1,0 +1,243 @@
+# ==============================================================================
+# MODULE_GRAPH.yaml — 单模块级依赖图与分档
+#
+# 本文件是 MODULES.yaml 的**细化层**：MODULES.yaml 按目录分档（38 个模块一条），
+# 本文件把每一条拆到单文件，并标出**模块与模块之间**的关系。
+#
+# 为什么需要它：老师指出「要细化得看代码」「模块和模块之间就成了关键」。
+# 目录级分档回答不了两个问题：
+#   ① 同一个目录里，哪些文件是真核心、哪些是叶子？
+#   ② 依赖方向是不是真的单向？
+#
+# 【生成方式】不是手写，是扫出来的：
+#   python scripts/scan_module_graph.py        （静态 AST 分析，不 import pybamm）
+#   python scripts/check_module_graph.py       （校验本文件与代码是否一致）
+#
+# 【判据仍是同一条】删掉它，测试会不会红。本文件只是把粒度从目录降到文件。
+# ==============================================================================
+
+meta:
+  generated_by: "scripts/scan_module_graph.py"
+  generated_on: "2026-09-29"
+  scope: "battery_sim / governance / extraction / identification / analysis / user_tools"
+  method: "AST 静态解析 import 语句；不拉起 pybamm；相对引用于拼接回绝对名后归约"
+
+# ==============================================================================
+# 一、真核心：按被依赖次数（in-degree）排序 —— 这才是代码说的核心
+# ==============================================================================
+# ⚠️ 这一节直接推翻目录级判断：目录级把整个 battery_sim/（38 模块）列为一条 core，
+#    但单模块级显示，真正被全平台依赖的只有下面这 8 个。
+hubs:
+  - module: battery_sim.paths
+    in_degree: 16
+    lines: 53
+    role: "仓库内所有路径的唯一来源"
+    why_hub: >
+      只有 53 行，却被 16 个模块依赖 —— **真正的核心不是最复杂的模块，是最被依赖的**。
+      任何路径规则的改动会波及全平台。
+    tier: core
+    delete_consequence: "全平台 import 失败（结构性命中）"
+
+  - module: battery_sim.datasets.base
+    in_degree: 13
+    lines: 127
+    role: "数据集适配器基类（契约）"
+    why_hub: "7 个 adapter 全部继承它；改基类等于改 7 个数据集的行为"
+    tier: core
+    delete_consequence: "7 个 adapter 全部报错（判据性命中）"
+
+  - module: battery_sim.models.pybamm_factory
+    in_degree: 11
+    lines: 246
+    role: "PyBaMM 模型工厂 + 参数加载"
+    why_hub: "所有仿真入口都要经它构造模型"
+    tier: core
+    delete_consequence: "所有仿真模式无法运行"
+
+  - module: battery_sim.schemas
+    in_degree: 8
+    lines: 112
+    role: "canonical 数据列 schema"
+    why_hub: "数据进出的形状定义"
+    tier: core
+
+  - module: battery_sim.registry
+    in_degree: 7
+    lines: 137
+    role: "数据集注册与解析"
+    tier: core
+
+  - module: user_tools.spec
+    in_degree: 7
+    lines: 398
+    role: "用户数据规格（列/单位/角色声明）"
+    why_hub: >
+      ⚠️ 它不在 battery_sim 里，却排在并列第 6 —— **说明"接入层"与"内核"同等核心**，
+      这是目录级分档看不出来的。
+    tier: core
+
+  - module: battery_sim.simulation.baseline
+    in_degree: 5
+    role: "基线回放主循环"
+    tier: core
+
+  - module: battery_sim.datasets.material_metadata
+    in_degree: 4
+    role: "材料元数据 schema 与校验"
+    note: "被 governance.geometry_channel 依赖 —— 这是反向依赖的成因，见 cross_layer"
+    tier: core
+
+# ==============================================================================
+# 二、分层依赖方向 —— 声明与实况的差异（本文件最该看的一节）
+# ==============================================================================
+cross_layer:
+  declared:
+    rule: >
+      声明为五层单向：① 数据来源 → ② 接入层 → ③ 治理层 → ④ 仿真内核 → ⑤ 识别与报告。
+      治理层是被依赖方，不应反向依赖内核。
+    source: "MODULES.yaml / module_layering_and_intake.md"
+
+  measured:
+    - from: battery_sim.simulation.protocol_replay
+      to: governance.scale_alignment
+      kind: "lazy（函数体内 import）"
+      ok: true
+      verdict: >
+        **合法**：这是刻意设计的强制点 —— 尺度对齐门是回放的前置条件，
+        应由回放自己强制（默认 check）。已在 docs/scale_alignment_gate.md 记录。
+
+    - from: governance.geometry_channel
+      to: battery_sim.datasets.material_metadata
+      kind: "lazy（函数体内 import）"
+      ok: true
+      verdict: >
+        **原为模块级反向依赖 —— 2026-09-29 已修（v0.1.1）。**
+        修复前：`from battery_sim.datasets.material_metadata import load_metadata`
+        写在文件顶部 ⇒ `import governance.geometry_channel` 立刻拉起 6 个
+        battery_sim 模块，分层单向在导入期破产。
+        修复后：该 import 移入 `geometry_override_channel()` 函数体内，与同目录
+        `scale_alignment.py` 的既有写法一致。依赖关系与行为均不变，只是导入期不再牵连。
+        **实测证据**：修复前导入 governance.geometry_channel 牵连 6 个内核模块，
+        修复后为 **0**；本扫描器对该边的判读由 `[module]` 变为 `[lazy]`。
+        防回退：`tests/test_module_graph.py::test_no_module_level_back_dependency_remains`
+
+    - from: governance.scale_alignment
+      to: battery_sim.models.pybamm_factory
+      kind: "lazy"
+      ok: true
+
+    - from: governance.scale_alignment
+      to: battery_sim.datasets.base
+      kind: "lazy"
+      ok: true
+
+  conclusion: >
+    治理层的 3 处内核依赖**现全部为 lazy**（2026-09-29 前是 2 lazy + 1 模块级）。
+    结论：治理层与内核之间**不再有导入期焊接**；分层单向的声明现在与实况一致。
+    ⚠️ 注意这里的 "ok: true" 指的是**依赖方向与时机合规**，
+    **不代表该依赖本身应该存在** —— geometry_channel 仍需读 metadata 才能
+    把实测量翻成 PyBaMM 键，这是它的职责，不是缺陷。
+    防回退靠 `scripts/check_module_graph.py`（逐边核对 kind）+ 上述测试。
+
+# ==============================================================================
+# 三、叶子模块：被依赖，但不依赖任何仓库内模块
+# ==============================================================================
+leaves:
+  note: >
+    叶子是最安全的模块：改它不会波及别人。但其中几个被依赖次数很高，
+    所以"安全"是相对的 —— 见下面标注。
+  items:
+    - {module: battery_sim.paths, in_degree: 16, tier: core,
+       warn: "叶子但高依赖：改它波及全平台"}
+    - {module: battery_sim.schemas, in_degree: 8, tier: core,
+       warn: "同上，数据形状定义"}
+    - {module: battery_sim.logging_utils, in_degree: 4, tier: core}
+    - {module: governance.dataset_roles, in_degree: 4, tier: core,
+       note: "被 identification 与 user_tools 依赖 —— 治理层里最核心的一个"}
+    - {module: battery_sim.datasets.chemistry_windows, in_degree: 3, tier: core}
+    - {module: battery_sim.excitation.protocol, in_degree: 3, tier: optional}
+    - {module: battery_sim.protocols.chen2020, in_degree: 3, tier: optional}
+    - {module: battery_sim.evaluation.metrics, in_degree: 3, tier: optional}
+    - {module: extraction.gitt_diffusivity, in_degree: 2, tier: optional}
+    - {module: extraction.hires_trace, in_degree: 2, tier: optional}
+    - {module: extraction.ocp_extractor, in_degree: 2, tier: optional}
+    - {module: battery_sim.evaluation.plotting, in_degree: 2, tier: optional}
+    - {module: battery_sim.datasets.ocp_lookup, in_degree: 2, tier: optional}
+    - {module: governance.scale_alignment, in_degree: 2, tier: core}
+    - {module: user_tools.report, in_degree: 1, tier: optional}
+    - {module: battery_sim.rates, in_degree: 1, tier: core,
+       note: "冻结表；虽只被 1 个模块依赖，但 sintef adapter 因它不含 C/50 而自带一张表"}
+
+# ==============================================================================
+# 四、孤立模块：既不依赖别人、也没人依赖
+# ==============================================================================
+# ⚠️ 这一节是"有没有接进流水线"的直接证据。
+isolated:
+  - module: governance.settings_hash
+    verdict: "**不该孤立** —— 它是三层比对的前置门，却没有任何模块调用它"
+    action: "接线缺口，记入待办"
+
+  - module: governance.borrow_ledger
+    verdict: "**可不接线** —— 它是溯源账本，由 CLI 与测试使用，不是运行时依赖"
+    action: "保持孤立，但 tier 仍是 core（删了溯源能力就没了）"
+
+  - module: identification.recovery_stats
+    verdict: "证据产物生成器（G5 恢复统计），由脚本调用"
+    action: "保持孤立"
+
+  - module: analysis.*
+    modules:
+      - analysis.plot_residual_atlas
+      - analysis.targeted_sensitivity.build_tables
+      - analysis.targeted_sensitivity.common
+      - analysis.targeted_sensitivity.interpret_a2
+      - analysis.targeted_sensitivity.plot_a2
+    verdict: "一次性分析脚本；产物是证据（docs 引用），代码是一次性的"
+    action: "归纳 scratch"
+
+  - module: user_tools.make_demo
+    verdict: "开发辅助"
+    action: "归纳 scratch"
+
+# ==============================================================================
+# 五、循环依赖
+# ==============================================================================
+cycles:
+  - pair: [battery_sim.models, battery_sim.models.pybamm_factory]
+    real: false
+    why: >
+      包导出惯例导致的假环：`models/__init__.py` 转出 build_model，
+      而 pybamm_factory 又 `from battery_sim.models import parameter_sources`。
+      Python 能正常解析（实测可 import），不是隐患。
+    action: "不改"
+
+# ==============================================================================
+# 六、科研 / 工业双档（只有标注，不展开）
+# ==============================================================================
+# 老师指出："如果需求只是单纯科研，相对简单；要下工业界，就会难一点。"
+# 本节只标注差异，不展开成方案。
+research_vs_industry:
+  note: "同一模块，科研够用、工业不够。差异不在这批代码里，而在缺失的能力上。"
+  marks:
+    - {module: battery_sim.logging_utils, research: "够用", industry: "不够：需审计日志与可追溯"}
+    - {module: governance.settings_hash, research: "够用", industry: "不够：需配置管理与版本回滚"}
+    - {module: scripts/probe_*.py, research: "留着（研究过程证据）", industry: "必须清（不进交付物）"}
+    - {module: data/（不随包）, research: "可接受", industry: "不行：需数据血缘与可重放"}
+    - {module: scripts/check_module_manifest.py, research: "够用", industry: "基础：还需依赖锁定与制品签名"}
+  out_of_scope: "工业化的其余部分（部署、监控、SLA）不在本项目范围"
+
+# ==============================================================================
+# 七、分档修正（相对 MODULES.yaml）
+# ==============================================================================
+corrections:
+  - about: "目录级把 battery_sim/（38 模块）整体列为 core"
+    measured: "真正被全平台依赖的只有 8 个 hub；其余多为 optional 或叶子"
+    action: "不动 MODULES.yaml 的目录级结论（作为粗筛），本文件作为细筛"
+
+  - about: "user_tools 在目录级列为 optional"
+    measured: "其中的 user_tools/spec.py 以 in_degree=7 排进真核心前 6"
+    action: "本文件把它单独提升为 core"
+
+  - about: "governance.settings_hash 被列为 core"
+    measured: "实测**没有任何模块依赖它**（孤立）"
+    action: "tier 保持 core（能力不可删），但**接线缺口**必须记入待办"
