@@ -26,18 +26,54 @@ dataset_hash: ""                  # 命令见 preregistration §1（只统计原
 command: ""                       # 实际执行的命令，原样粘贴（可复算是记录的全部意义）
 outputs: []                       # 产物路径（报告 / JSON / 图）
 
+# ------------------------------------------------------------
+# 三个缺口的产物（2026-09-28 新增，全部 additive）
+# ------------------------------------------------------------
+# 缺口 2：静置电压噪声底（annex B §A3）。
+#   从 `python -m user_tools.sigma_noise --csv <空跑记录> --k <k>` 的 JSON 取。
+#   **没有它，预注册的 N1 判据（零激励代价面精确平坦）是空的判据。**
+#   注意：若 `sigma_noise_resolution_limited: true`，这个 sigma 反映的是
+#   **仪器分辨率**而不是噪声，N1 的结论必须一起引用这条（否则会被一个
+#   "看起来很小"的下限满足掉）。
+sigma_noise_mV: ""
+sigma_noise_k: ""                 # 判据倍数：max|ΔV| <= k * sigma_noise
+sigma_noise_source: ""            # 空跑记录文件路径 + 标定日期
+sigma_noise_resolution_limited: ""  # true/false（来自标定 JSON）
+sigma_noise_report: ""            # 报告路径（outputs/noise_floor/*.md）
+
+# 缺口 1：几何实测值到模型的通路（annex A §4.1）。
+#   `geometry_source` 必须**逐键**写明「值 / 来自哪个实测文件 / 公式」，
+#   不许写"用了实测几何"。本轮两种处理二选一（人工转写 / v0.1.1 接通路），
+#   不得混用（见 annex A §4.1）。
+geometry_mode: ""                 # manual_transcription | v0.1.1_channel | none
+geometry_source: {}               # 例 {"Positive particle radius [m]": {"value": 8.79e-6, "origin": "...", "formula": "D50/2"}}
+radius_used_m: ""                 # ★ 本轮用的是哪个 R —— 不打印 = 把粒径变化读成扩散变化
+radius_report_line: ""            # 上一条的人类可读版本（直接把报告里那行粘来）
+geometry_conflict_checked: ""     # true/false：是否已确认与 scale_alignment='align' 不同时使用
+
+# 缺口 3：数值设置指纹（M0/M1/M2 三层比对的前置门）。
+#   三层**零自由参数**，只允许差参数。网格/求解器/模型选项的任何差异
+#   会原封不动归给"参数化增益"，而这类差异在电压曲线上看不出来。
+#   由 `governance.settings_hash` 算出；**逐层记**（三个 run 各一个）。
+settings_hash_per_level: {}       # 例 {"M0": "a1b2...", "M1": "a1b2...", "M2": "a1b2..."}
+settings_identical_across_levels: ""  # true/false；false 时**不许**下"M2 比 M1 好"的结论
+settings_diff_detail: ""          # 若不一致：哪一项变了（直接粘 assert_same_settings 的报错）
+settings_hash_known_limits: []    # 从 governance.settings_hash.KNOWN_LIMITS 抄来，随结果一起引用
+
 # 逐门结果：pass | fail | not_run，并带上关键数字（不要只写"通过"）
 gates:
   L1_metadata_errors: ""          # 期望 0
   L1_d50_measured: ""             # true/false（+ 实测值 µm）
   L1_protocol_declared: ""        # protocol_type / pulse_duration_s
   L1_nominal_capacity_source: ""  # 例 "formation cycle 3 reversible capacity"
+  L1_geometry_channel_complete: ""  # true/false（缺口 1；false ⇒ 不许解释跨样品 D_s 差异）
   L2_initial_offset_mV: ""        # 门槛 ±30 mV
   L2_scale_verdict: ""            # aligned / misaligned / unknown
   L2_coverage: ""                 # 门槛 ≥ 0.80
   L2_termination: ""              # 终止原因
   L3_M1_existence: ""             # 合格窗口数
   L3_band_map: ""                 # 产物路径（逐窗口 bandwidth map）
+  L3_sigma_noise_mV: ""           # 缺口 2：N1 判据的输入
   L4_gates: ""                    # 角色 / 尺度 / 覆盖率 / 初值 四道门
   L4_rmse_mV: ""                  # 如实报，不设"必须小于"的门
 
