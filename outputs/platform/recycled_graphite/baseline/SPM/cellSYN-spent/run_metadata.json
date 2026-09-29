@@ -1,0 +1,39 @@
+{
+  "dataset": "recycled_graphite",
+  "model": "SPM",
+  "cell": "SYN-spent",
+  "mode": "baseline",
+  "rates": [
+    "C0p2"
+  ],
+  "rate_labels": [
+    "C/5"
+  ],
+  "c_rates": [
+    0.2
+  ],
+  "source_rates": [
+    "C0p2"
+  ],
+  "parameter_set": "Ecker2015_graphite_halfcell",
+  "parameter_overrides_requested": null,
+  "parameter_overrides_applied": null,
+  "parameter_override_sources": null,
+  "capacity_metric_type": "forced_current_window",
+  "capacity_is_predictive": false,
+  "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
+  "parameter_match": null,
+  "cell_configuration": "half_cell",
+  "working_electrode": "positive",
+  "model_options": {
+    "working electrode": "positive",
+    "x-average side reactions": "true"
+  },
+  "parameter_source": {},
+  "parameter_repo_commit": "",
+  "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
+  "reused_reference": "scripts/run_baseline.py",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-17T08:27:12+00:00",
+  "runtime_s": 0.19496412200010127
+}

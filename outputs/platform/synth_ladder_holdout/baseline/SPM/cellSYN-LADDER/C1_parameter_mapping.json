@@ -1,0 +1,31 @@
+{
+  "dataset": "synth_ladder_holdout",
+  "cell": "SYN-LADDER",
+  "model": "SPM",
+  "rate_slug": "C1",
+  "rate_label": "1C",
+  "c_rate": 1.0,
+  "source_rate": "C1",
+  "parameter_set": "Ecker2015_graphite_halfcell",
+  "external_repo_commit": "",
+  "pybamm_version": "26.8.0.0",
+  "solver": {
+    "class": "IDAKLUSolver",
+    "rtol": 1e-06,
+    "atol": 1e-06
+  },
+  "source_file": "",
+  "dataset_file_sha256": "",
+  "ocp_file": "",
+  "ocp_file_sha256": "",
+  "mapping": [
+    {
+      "parameter_set": "Ecker2015_graphite_halfcell",
+      "source_key": "Initial concentration in positive electrode [mol.m-3]",
+      "mapped_key": "Initial concentration in positive electrode [mol.m-3]",
+      "source_value": 26120.05,
+      "mapped_value": 12592.638674482756,
+      "mapping_reason": "inverse-OCP(rest OCV 0.1245 V) -> x0 = 0.3945 -> x0*c_max = 12592.6 mol/m3; measured rest OCV 0.1245 V -> x0 = 0.3945 via examples/synthetic_rate_ladder/holdout/processed/ocp_graphite.csv"
+    }
+  ]
+}

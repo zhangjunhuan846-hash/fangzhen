@@ -1,0 +1,76 @@
+{
+  "dataset": "synth_ladder_holdout",
+  "model": "SPM",
+  "cell": "SYN-LADDER",
+  "mode": "baseline",
+  "rates": [
+    "C1"
+  ],
+  "rate_labels": [
+    "1C"
+  ],
+  "c_rates": [
+    1.0
+  ],
+  "source_rates": [
+    "C1"
+  ],
+  "parameter_set": "Ecker2015_graphite_halfcell",
+  "parameter_overrides_requested": {
+    "Positive particle diffusivity [m2.s-1]": {
+      "__callable__": "L4_constant",
+      "__qualname__": "shape_override.<locals>.shaped",
+      "__module__": "identification.representations"
+    }
+  },
+  "parameter_overrides_applied": [
+    {
+      "parameter_set": "Ecker2015_graphite_halfcell",
+      "key": "Positive particle diffusivity [m2.s-1]",
+      "old": {
+        "__callable__": "graphite_diffusivity_Ecker2015",
+        "__qualname__": "graphite_diffusivity_Ecker2015",
+        "__module__": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell"
+      },
+      "new": {
+        "__callable__": "L4_constant",
+        "__qualname__": "shape_override.<locals>.shaped",
+        "__module__": "identification.representations"
+      },
+      "source": {
+        "source": "zero_fit_control",
+        "method": "D_s(x,T) = D_ref(x,T) * 10**(+0.0000 * phi_constant(x))",
+        "note": "负对照：期望它在留出倍率上明显更差"
+      },
+      "rate_slug": "C1"
+    }
+  ],
+  "parameter_override_sources": {
+    "Ds": {
+      "source": "zero_fit_control",
+      "note": "负对照"
+    },
+    "Positive particle diffusivity [m2.s-1]": {
+      "source": "zero_fit_control",
+      "method": "D_s(x,T) = D_ref(x,T) * 10**(+0.0000 * phi_constant(x))",
+      "note": "负对照：期望它在留出倍率上明显更差"
+    }
+  },
+  "capacity_metric_type": "forced_current_window",
+  "capacity_is_predictive": false,
+  "capacity_metric_note": "Q_sim integrates the experimentally measured current over the experimental time window, so Q_sim ~= Q_exp by construction.  Do NOT read baseline Q_sim-Q_exp as a capacity prediction; predictive capacity requires a constant-current run where the model itself reaches the cutoff.",
+  "parameter_match": null,
+  "cell_configuration": "half_cell",
+  "working_electrode": "positive",
+  "model_options": {
+    "working electrode": "positive",
+    "x-average side reactions": "true"
+  },
+  "parameter_source": {},
+  "parameter_repo_commit": "",
+  "metric_family": "time-aligned V(t) replay (rmse_time_aligned_mV / mae_time_aligned_mV / bias_time_aligned_mV)",
+  "reused_reference": "scripts/run_baseline.py",
+  "pybamm_version": "26.8.0.0",
+  "timestamp": "2026-09-17T14:09:51+00:00",
+  "runtime_s": 0.14461690900003532
+}

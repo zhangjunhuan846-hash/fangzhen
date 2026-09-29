@@ -1,0 +1,466 @@
+{
+  "dataset_id": "dlr_gitt",
+  "cell": "Hydra.0b_A",
+  "model": "SPM",
+  "generated_utc": "2026-09-16T15:35:11+00:00",
+  "output_mode": "protocol",
+  "protocol": {
+    "protocol_id": "dlr_gitt#t475",
+    "kind": "pulse",
+    "n_segments": 3,
+    "duration_s": 22833.105023998767,
+    "duty_cycle": 0.003113951121596569,
+    "temperature_C": 26.06902,
+    "segments": [
+      {
+        "kind": "rest",
+        "label": "Pause",
+        "t_start_s": 0.0,
+        "t_stop_s": 21862.00383999804,
+        "duration_s": 21862.00383999804,
+        "current_A": 0.0,
+        "voltage_start_V": 1.45440767028381,
+        "voltage_end_V": 0.918302246579665,
+        "row_start": 312112,
+        "row_stop": 314771
+      },
+      {
+        "kind": "pulse",
+        "label": "Charge",
+        "t_start_s": 21862.230182664935,
+        "t_stop_s": 21933.331355663948,
+        "duration_s": 71.10117299901322,
+        "current_A": -0.0006464475579627713,
+        "voltage_start_V": 0.918302246579665,
+        "voltage_end_V": 1.51486495214585,
+        "row_start": 314771,
+        "row_stop": 314846
+      },
+      {
+        "kind": "rest",
+        "label": "Pause",
+        "t_start_s": 21933.43951133173,
+        "t_stop_s": 22833.439522333443,
+        "duration_s": 900.0000110017136,
+        "current_A": 0.0,
+        "voltage_start_V": 1.49464895253268,
+        "voltage_end_V": 1.10482345055784,
+        "row_start": 314846,
+        "row_stop": 315306
+      }
+    ],
+    "source": {
+      "protocol_id": "dlr_gitt",
+      "n_phases": 957,
+      "phase_labels": [
+        "CalcOnce",
+        "Charge",
+        "Discharge",
+        "Pause"
+      ],
+      "duty_cycle": 0.03235504274489156,
+      "classified_as": "pulse_relax",
+      "pulse_duration_median_s": 150.01112249982543,
+      "rest_duration_median_s": 3651.014017166395,
+      "parent_protocol": "dlr_gitt",
+      "triplet_index": 475
+    }
+  },
+  "protocol_window": {
+    "protocol_id": "dlr_gitt#t475",
+    "kind": "pulse",
+    "n_segments": 3,
+    "duration_s": 22833.105023998767,
+    "duty_cycle": 0.003113951121596569,
+    "temperature_C": 26.06902,
+    "segments": [
+      {
+        "kind": "rest",
+        "label": "Pause",
+        "t_start_s": 0.0,
+        "t_stop_s": 21862.00383999804,
+        "duration_s": 21862.00383999804,
+        "current_A": 0.0,
+        "voltage_start_V": 1.45440767028381,
+        "voltage_end_V": 0.918302246579665,
+        "row_start": 312112,
+        "row_stop": 314771
+      },
+      {
+        "kind": "pulse",
+        "label": "Charge",
+        "t_start_s": 21862.230182664935,
+        "t_stop_s": 21933.331355663948,
+        "duration_s": 71.10117299901322,
+        "current_A": -0.0006464475579627713,
+        "voltage_start_V": 0.918302246579665,
+        "voltage_end_V": 1.51486495214585,
+        "row_start": 314771,
+        "row_stop": 314846
+      },
+      {
+        "kind": "rest",
+        "label": "Pause",
+        "t_start_s": 21933.43951133173,
+        "t_stop_s": 22833.439522333443,
+        "duration_s": 900.0000110017136,
+        "current_A": 0.0,
+        "voltage_start_V": 1.49464895253268,
+        "voltage_end_V": 1.10482345055784,
+        "row_start": 314846,
+        "row_stop": 315306
+      }
+    ],
+    "source": {
+      "protocol_id": "dlr_gitt",
+      "n_phases": 957,
+      "phase_labels": [
+        "CalcOnce",
+        "Charge",
+        "Discharge",
+        "Pause"
+      ],
+      "duty_cycle": 0.03235504274489156,
+      "classified_as": "pulse_relax",
+      "pulse_duration_median_s": 150.01112249982543,
+      "rest_duration_median_s": 3651.014017166395,
+      "parent_protocol": "dlr_gitt",
+      "triplet_index": 475
+    }
+  },
+  "scale_alignment": {
+    "overrides": {
+      "Electrode height [m]": 0.018138386373272183,
+      "Electrode width [m]": 0.015264978630971638
+    },
+    "source": {
+      "Electrode height [m]": {
+        "source": "CAPACITY ALIGNMENT (Q_model == Q_measured)",
+        "method": "governance/scale_alignment.py",
+        "stage": "capacity_alignment",
+        "basis": "the recorded charge over 'GITT-discharge' is 6.5277 mAh; parameter set 'Ecker2015_graphite_halfcell' describes a 202.398 mAh cell; the footprint is scaled by 0.179588 (area x0.032252) so the two agree",
+        "charge_reference": "GITT-discharge",
+        "params_scaled": [
+          "Electrode height [m]",
+          "Electrode width [m]"
+        ],
+        "scale_factor_area": 0.03225184395903401,
+        "scale_factor_linear": 0.17958798389378397
+      },
+      "Electrode width [m]": {
+        "source": "CAPACITY ALIGNMENT (Q_model == Q_measured)",
+        "method": "governance/scale_alignment.py",
+        "stage": "capacity_alignment",
+        "basis": "the recorded charge over 'GITT-discharge' is 6.5277 mAh; parameter set 'Ecker2015_graphite_halfcell' describes a 202.398 mAh cell; the footprint is scaled by 0.179588 (area x0.032252) so the two agree",
+        "charge_reference": "GITT-discharge",
+        "params_scaled": [
+          "Electrode height [m]",
+          "Electrode width [m]"
+        ],
+        "scale_factor_area": 0.03225184395903401,
+        "scale_factor_linear": 0.17958798389378397
+      }
+    },
+    "footprint_scale_area": 0.03225184395903401,
+    "footprint_scale_linear": 0.17958798389378397,
+    "charge_reference": "GITT-discharge",
+    "measured_charge_Ah": 0.006527718505368405,
+    "model_capacity_Ah": 0.20239830360272895,
+    "geometry": {
+      "parameter_set": "Ecker2015_graphite_halfcell",
+      "active_volume_fraction": 0.372403,
+      "thickness_m": 7.4e-05,
+      "c_max_mol_m3": 31920.0,
+      "footprint_dimensions_m": {
+        "Electrode height [m]": 0.101,
+        "Electrode width [m]": 0.085
+      },
+      "area_m2": 0.008585,
+      "capacity_Ah": 0.20239830360272895,
+      "capacity_formula": "eps_am * (height * width) * thickness * c_max * F / 3600",
+      "electrode_slot": "positive",
+      "electrode_slot_note": "a half cell puts its WORKING electrode in the positive slot on this platform; reading these keys by full-cell name returns nothing"
+    },
+    "reason": "the recorded charge over 'GITT-discharge' is 6.5277 mAh; parameter set 'Ecker2015_graphite_halfcell' describes a 202.398 mAh cell; the footprint is scaled by 0.179588 (area x0.032252) so the two agree",
+    "cell": "Hydra.0b_A",
+    "dataset_id": "dlr_gitt",
+    "parameter_set": "Ecker2015_graphite_halfcell",
+    "protocol_id": "GITT-charge#t475",
+    "stage": "capacity_alignment",
+    "upstream_stage": "geometry_audit",
+    "next_stage": "protocol_excitation",
+    "pipeline_stages": [
+      "dataset",
+      "geometry_audit",
+      "capacity_alignment",
+      "protocol_excitation",
+      "parameter_inference"
+    ],
+    "tolerance_dex": 0.05,
+    "log10_model_over_measured": 1.491445450072437,
+    "capacity_ratio_model_over_measured": 31.00597910836325,
+    "verdict": "misaligned",
+    "window_peak_current_A": 0.0006552197931672,
+    "c_rate_on_cell": 0.10037500738249455,
+    "c_rate_on_model_unscaled": 0.003237279075487101,
+    "c_rate_deficit_factor": 31.00597910836325,
+    "what_to_do": "apply rec['overrides'] via parameter_overrides; without it the model runs at 1/31.0 of the intended C-rate and a diffusion-limited protocol becomes inert",
+    "mode": "align",
+    "applied": true,
+    "overrides_applied": [
+      "Electrode height [m]",
+      "Electrode width [m]"
+    ]
+  },
+  "n_points_replayed": 2000,
+  "runtime_s": 0.20356538900000487,
+  "parameter_overrides_requested": {
+    "Electrode height [m]": 0.018138386373272183,
+    "Electrode width [m]": 0.015264978630971638,
+    "Positive particle diffusivity [m2.s-1]": {
+      "__callable__": "graphite_Ds_three_region_+0.500dex",
+      "__qualname__": "shape_override.<locals>.shaped",
+      "__module__": "identification.representations"
+    }
+  },
+  "parameter_overrides_applied": [
+    {
+      "parameter_set": "Ecker2015_graphite_halfcell",
+      "key": "Electrode height [m]",
+      "old": 0.101,
+      "new": 0.018138386373272183,
+      "source": {
+        "source": "CAPACITY ALIGNMENT (Q_model == Q_measured)",
+        "method": "governance/scale_alignment.py",
+        "stage": "capacity_alignment",
+        "basis": "the recorded charge over 'GITT-discharge' is 6.5277 mAh; parameter set 'Ecker2015_graphite_halfcell' describes a 202.398 mAh cell; the footprint is scaled by 0.179588 (area x0.032252) so the two agree",
+        "charge_reference": "GITT-discharge",
+        "params_scaled": [
+          "Electrode height [m]",
+          "Electrode width [m]"
+        ],
+        "scale_factor_area": 0.03225184395903401,
+        "scale_factor_linear": 0.17958798389378397
+      }
+    },
+    {
+      "parameter_set": "Ecker2015_graphite_halfcell",
+      "key": "Electrode width [m]",
+      "old": 0.085,
+      "new": 0.015264978630971638,
+      "source": {
+        "source": "CAPACITY ALIGNMENT (Q_model == Q_measured)",
+        "method": "governance/scale_alignment.py",
+        "stage": "capacity_alignment",
+        "basis": "the recorded charge over 'GITT-discharge' is 6.5277 mAh; parameter set 'Ecker2015_graphite_halfcell' describes a 202.398 mAh cell; the footprint is scaled by 0.179588 (area x0.032252) so the two agree",
+        "charge_reference": "GITT-discharge",
+        "params_scaled": [
+          "Electrode height [m]",
+          "Electrode width [m]"
+        ],
+        "scale_factor_area": 0.03225184395903401,
+        "scale_factor_linear": 0.17958798389378397
+      }
+    },
+    {
+      "parameter_set": "Ecker2015_graphite_halfcell",
+      "key": "Positive particle diffusivity [m2.s-1]",
+      "old": {
+        "__callable__": "graphite_diffusivity_Ecker2015",
+        "__qualname__": "graphite_diffusivity_Ecker2015",
+        "__module__": "pybamm.input.parameters.lithium_ion.Ecker2015_graphite_halfcell"
+      },
+      "new": {
+        "__callable__": "graphite_Ds_three_region_+0.500dex",
+        "__qualname__": "shape_override.<locals>.shaped",
+        "__module__": "identification.representations"
+      },
+      "source": {
+        "source": "G6.2a representation interface gate",
+        "method": "log10 D_s(x) = log10 D_ref(x) + amp * phi_three_region(x)",
+        "shape": "three_region",
+        "amplitude_dex": 0.5,
+        "phi_mean": -0.0003535533905932031,
+        "phi_rms": 1.0001249921884763,
+        "region_edges": [
+          0.3333333333333333,
+          0.6666666666666666
+        ],
+        "note": "RMS-normalised shape so amplitudes are comparable across representations; NOT a fit to any measurement"
+      }
+    }
+  ],
+  "parameter_override_sources": {
+    "Electrode height [m]": {
+      "source": "CAPACITY ALIGNMENT (Q_model == Q_measured)",
+      "method": "governance/scale_alignment.py",
+      "stage": "capacity_alignment",
+      "basis": "the recorded charge over 'GITT-discharge' is 6.5277 mAh; parameter set 'Ecker2015_graphite_halfcell' describes a 202.398 mAh cell; the footprint is scaled by 0.179588 (area x0.032252) so the two agree",
+      "charge_reference": "GITT-discharge",
+      "params_scaled": [
+        "Electrode height [m]",
+        "Electrode width [m]"
+      ],
+      "scale_factor_area": 0.03225184395903401,
+      "scale_factor_linear": 0.17958798389378397
+    },
+    "Electrode width [m]": {
+      "source": "CAPACITY ALIGNMENT (Q_model == Q_measured)",
+      "method": "governance/scale_alignment.py",
+      "stage": "capacity_alignment",
+      "basis": "the recorded charge over 'GITT-discharge' is 6.5277 mAh; parameter set 'Ecker2015_graphite_halfcell' describes a 202.398 mAh cell; the footprint is scaled by 0.179588 (area x0.032252) so the two agree",
+      "charge_reference": "GITT-discharge",
+      "params_scaled": [
+        "Electrode height [m]",
+        "Electrode width [m]"
+      ],
+      "scale_factor_area": 0.03225184395903401,
+      "scale_factor_linear": 0.17958798389378397
+    },
+    "Positive particle diffusivity [m2.s-1]": {
+      "source": "G6.2a representation interface gate",
+      "method": "log10 D_s(x) = log10 D_ref(x) + amp * phi_three_region(x)",
+      "shape": "three_region",
+      "amplitude_dex": 0.5,
+      "phi_mean": -0.0003535533905932031,
+      "phi_rms": 1.0001249921884763,
+      "region_edges": [
+        0.3333333333333333,
+        0.6666666666666666
+      ],
+      "note": "RMS-normalised shape so amplitudes are comparable across representations; NOT a fit to any measurement"
+    }
+  },
+  "parameter_mapping": [
+    {
+      "parameter_set": "Ecker2015_graphite_halfcell",
+      "source_key": "Initial concentration in positive electrode [mol.m-3]",
+      "mapped_key": "Initial concentration in positive electrode [mol.m-3]",
+      "source_value": 26120.05,
+      "mapped_value": 171.36770744426445,
+      "mapping_reason": "inverse-OCP(rest OCV 0.9488 V) -> x0 = 0.0054 -> x0*c_max = 171.4 mol/m3; graphite occupies the positive electrode slot of Ecker2015_graphite_halfcell (audited); initial Li fraction x0 = 0.0054 from the measured pre-pulse rest OCV 0.9488 V"
+    }
+  ],
+  "measured_transient": {
+    "v_pre_V": 0.918302246579665,
+    "v_pulse_end_V": 1.51486495214585,
+    "v_relax_end_V": 1.10482345055784,
+    "dv_pulse_mV": 596.562705566185,
+    "dv_relax_mV": -410.0415015880099,
+    "v_span_mV": 596.562705566185
+  },
+  "simulated_transient": {
+    "v_pre_V": 0.9629694499089192,
+    "v_pulse_end_V": 1.148641161767027,
+    "v_relax_end_V": 1.1174644453200313,
+    "dv_pulse_mV": 185.6717118581077,
+    "dv_relax_mV": -31.1767164469956,
+    "v_span_mV": 185.70827959202128
+  },
+  "window_provenance": {
+    "source_file": "DLR__LiGrHydra0b__20221114__GITT__25degC__Basytec.txt",
+    "source_dataset": "DLR (German Aerospace Center) Hydra.0b Li||graphite, GITT-OCV testplan; Basytec result-file export",
+    "source_header": {
+      "Date and Time of Data Converting": "05.09.2025 15:44:35",
+      "Name of Test": "Hydra.0b_A_GITTOCV-001",
+      "Battery": "Hydra.0b_A",
+      "Testplan": "Hydra0b_A_GITT-OCV.pln",
+      "Testchannel": "#12 1563 CH12",
+      "Start of Test": "14.11.2022 10:40:01",
+      "End of Test": "10.12.2022 02:27:48",
+      "Operator (Test)": "",
+      "Operator (Data converting)": "basytec",
+      "_file": "DLR__LiGrHydra0b__20221114__GITT__25degC__Basytec.txt",
+      "_n_rows": "315306",
+      "_sign_convention": "Basytec raw current negated once: raw negative = discharge -> platform canonical discharge = +"
+    },
+    "protocol_id": "dlr_gitt#t475",
+    "protocol_kind": "pulse",
+    "classification": "pulse_relax",
+    "identification": "rule-based, from the file's own Command column (Pause/Charge/Discharge); nothing inferred from step numbering or from a step index",
+    "segmentation": [
+      {
+        "kind": "rest",
+        "label": "Pause",
+        "t_start_s": 0.0,
+        "t_stop_s": 21862.00383999804,
+        "duration_s": 21862.00383999804,
+        "current_A": 0.0,
+        "voltage_start_V": 1.45440767028381,
+        "voltage_end_V": 0.918302246579665,
+        "row_start": 312112,
+        "row_stop": 314771
+      },
+      {
+        "kind": "pulse",
+        "label": "Charge",
+        "t_start_s": 21862.230182664935,
+        "t_stop_s": 21933.331355663948,
+        "duration_s": 71.10117299901322,
+        "current_A": -0.0006464475579627713,
+        "voltage_start_V": 0.918302246579665,
+        "voltage_end_V": 1.51486495214585,
+        "row_start": 314771,
+        "row_stop": 314846
+      },
+      {
+        "kind": "rest",
+        "label": "Pause",
+        "t_start_s": 21933.43951133173,
+        "t_stop_s": 22833.439522333443,
+        "duration_s": 900.0000110017136,
+        "current_A": 0.0,
+        "voltage_start_V": 1.49464895253268,
+        "voltage_end_V": 1.10482345055784,
+        "row_start": 314846,
+        "row_stop": 315306
+      }
+    ],
+    "duty_cycle": 0.003113951121596569,
+    "sign_convention": {
+      "raw": "Basytec: negative current = discharge",
+      "platform_canonical": "discharge = +, charge = -",
+      "action": "raw current NEGATED once, at parse time",
+      "verified_from_data": "canonical positive current coincides with FALLING voltage, which for graphite is lithiation and is the spontaneous (discharge) direction of a graphite||Li cell",
+      "model_check": "with graphite in the PyBaMM POSITIVE slot a positive current inserts Li and drives V down"
+    },
+    "unit_conversion": {
+      "time_s": "raw 'Time[h]' x 3600; rebased to the window start",
+      "current_A": "raw 'I[A]' negated to the canonical sign",
+      "voltage_V": "raw 'U[V]' used as-is",
+      "capacity_Ah": "trapezoidal integral of the CANONICAL current",
+      "temperature_ambient_C": "raw 'T1[degC]' MEASURED channel -- this dataset has one, unlike the SINTEF half-cell export"
+    },
+    "measured_temperature_C": {
+      "min": 26.05069,
+      "max": 26.11789,
+      "median": 26.08123
+    },
+    "c_rate": 0.1,
+    "c_rate_basis": "declared in configs/datasets.yaml; derived from the MEASURED charge passed in the sweep's pulses, not from a datasheet capacity (no datasheet was available)",
+    "n_points": 3194,
+    "duration_s": 22833.439522333443,
+    "rows_on_current": 75,
+    "current_A": {
+      "min": -0.0006552197931672,
+      "max": 1.07120402152683e-06
+    },
+    "voltage_V": {
+      "start": 1.45440767028381,
+      "end": 1.10482345055784,
+      "min": 0.918302246579665,
+      "max": 1.51486495214585
+    },
+    "cell_id": "Hydra.0b_A",
+    "known_difference_from_sintef_line": "different cell, different laboratory, different electrode preparation and OCP; replaying an Ecker2015-parameterised model against this record is a CAPABILITY demonstration, not a validation of that parameter set"
+  },
+  "window_initialisation": {
+    "method": "fixed_initial_concentration",
+    "ocp_voltage_V": 0.948816962976913,
+    "stoichiometry_from_ocp": 0.00536866251391806,
+    "concentration_parameter": "Initial concentration in positive electrode [mol.m-3]",
+    "max_concentration_parameter": "Maximum concentration in positive electrode [mol.m-3]",
+    "mapping_reason": "graphite occupies the positive electrode slot of Ecker2015_graphite_halfcell (audited); initial Li fraction x0 = 0.0054 from the measured pre-pulse rest OCV 0.9488 V",
+    "ocp_table_edge_fallback": false
+  }
+}
