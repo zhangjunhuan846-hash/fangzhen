@@ -1,0 +1,12 @@
+flowchart LR
+    core["v0.1 · 已完成<br/>仿真平台冻结"] --> loop["v0.2 · 已完成<br/>研究数据闭环"]
+    loop --> workbench["v0.3.10 · 已实现<br/>本地研究工作站"]
+    workbench --> validation["下一阶段<br/>真实材料独立验证"]
+    validation --> decision["研究目标<br/>跨协议可迁移预测"]
+
+    classDef done fill:#E7F4F1,stroke:#178B78,color:#153B36,stroke-width:2px;
+    classDef current fill:#EAF0FF,stroke:#4A69C6,color:#1E315D,stroke-width:3px;
+    classDef future fill:#F5F2FA,stroke:#8D79B6,color:#44385C,stroke-width:2px,stroke-dasharray:5 4;
+    class core,loop done;
+    class workbench current;
+    class validation,decision future;

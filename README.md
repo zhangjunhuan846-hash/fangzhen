@@ -1,375 +1,146 @@
-# 🔋 Battery Data–Model Integration Framework
+# 🔋 Fangzhen · 电池数据—模型研究工作站
 
 <p align="center">
-
-<strong>面向电池研究的数据—模型串联仿真平台</strong>
-
-<br>
-
-A reproducible framework connecting battery experimental data, electrochemical models and simulation analysis.
-
+  <strong>让实验记录、物理仿真、诊断分析与下一轮实验建议接在同一条可追溯的研究链上。</strong><br>
+  Battery data → model → simulation → evidence → experiment
 </p>
 
+<p align="center">
+  <a href="#项目能做什么">项目能力</a> ·
+  <a href="#研究流程">研究流程</a> ·
+  <a href="#快速开始">快速开始</a> ·
+  <a href="#项目路线图">路线图</a> ·
+  <a href="STATUS.md">验收状态</a>
+</p>
 
----
+> **当前软件：本地工作站 v0.3.10。** `v0.1.0-platform` 是保留的仿真平台冻结标签，两者用途不同。工作站增加了数据录入、参数探索、机器学习辅助研究，以及环境和经济筛选；这些工程能力不自动构成真实回收石墨的材料验证。详细判据与失败记录以 [STATUS.md](STATUS.md) 为准。
 
-## 🔒 已冻结版本 `v0.1.0-platform`
+## 项目能做什么
 
-**状态**：平台开发阶段结束，进入「冻结 → 接真实材料」。**验收对象是「真实数据能否过 L1–L4」，不是代码。**
-**唯一可信状态页**：[`STATUS.md`](STATUS.md)（版本、判据、测试数、已知限制）。**与其它文档冲突时以它为准。**
-**Tag**：`v0.1.0-platform` → `ee2fb36`（**此 tag 不再移动**；之后的任何改动走 `v0.1.1` 或实验分支）。
-**判据冻结**：[`docs/preregistration_2026-09-18.md`](docs/preregistration_2026-09-18.md)
-（开跑后只能按 §5 版本化 amendment）+
-[`docs/preregistration_annex_A_parameter_provenance.md`](docs/preregistration_annex_A_parameter_provenance.md)（参数来源矩阵：实测 / 实测派生 / 沿用药参集 / 允许辨识 / 不报）。
+| 研究环节 | 已有能力 | 关键约束 |
+| --- | --- | --- |
+| **实验数据** | 数据集适配、协议与单位核对；本地工作站的方案、样品、工艺、表征、极片与半电池记录；Excel/CSV 导入和版本归档 | 原始数据、来源和测试条件必须由研究者提供，软件不补造缺失实测值 |
+| **电化学仿真** | 基于 PyBaMM 的 SPM、SPMe、DFN 回放；公开案例、参数敏感性和固定窗口比较 | 尺度、几何、初态和协议需要先核对；低误差不等于参数可辨识或跨材料有效 |
+| **仿真诊断 Agent** | 在声明范围内探索扩散系数与交换电流密度倍率；记录每轮候选、失败原因和曲线；支持规则策略与可选兼容模型 API | Agent 只提出候选，物理任务与数据用途检查仍由平台执行；目前没有真实材料前瞻验证 |
+| **描述符与实验闭环** | 分组验证、有限候选模型建议、多目标探索、待实验记录与实验反馈 | 公开/合成回放是方法验收，建议必须经新的独立实验检验 |
+| **环境与经济** | 用户工艺清单、Brightway 前景 GWP 计算、成本核算和来源留档；独立的 EverBatt 社区迁移参考案例 | 按声明边界和功能单位筛选；尚非完整背景数据库 LCA 或资本现金流 TEA |
 
-冻结的含义是：**接一份新数据不再是开发任务**。
+工作站默认监听本机 `127.0.0.1`，研究记录保存在 `data/`（该目录不进 Git）。物理任务需要配置好的 WSL/PyBaMM 环境；Windows 打包程序也不是跨电脑零依赖安装包。具体版本说明见 [工作站文档](docs/workbench_v038.md)、[Agent 接入说明](docs/battery_agent_adaptation.md)和[环境与经济评价](docs/workbench_v036.md)。
 
-```
-实验数据 → dataset adapter → protocol 解析 → scale alignment → PyBaMM replay
-        → identifiability 判定 → 参数报告
-```
+## 研究流程
 
-- 接新数据：读 [`docs/adding_a_dataset.md`](docs/adding_a_dataset.md)（4 步 + 必答的 10 个格式问题），
-  自检 `python -m battery_sim.datasets.template --check <dataset_id>`
-- 出报告：`python -m identification.parameter_report --windows <逐窗口表> ...`
-- 真实材料分析必须用 `analysis_mode="material"`（synthetic truth 会被代码拒绝）
-- **尺度对齐是所有参数结论的前提**：`docs/scale_alignment_gate.md`（Q_model == Q_measured）
-- 回收石墨（数据未到位也能自检契约）：`python -m battery_sim.datasets.recycled_graphite --validate`
-- **第一线：商用石墨热处理梯度**（CG-AR / 600 / 800 / 900 °C）——
-  实验设计与验收阶梯 L1–L4：`docs/graphite_heat_treatment_test_plan.md`；
-  四份样品元数据模板与目录约定：`templates/commercial_graphite_ht/`
-  （跑 `python -m battery_sim.datasets.material_metadata --series templates/commercial_graphite_ht/metadata`
-  → 它只报**恰好 7 个只有人能填的实测量**）
-- 冻结产物样例（少量：summary + 报告 + 图）：`examples/frozen_results/`
-- 设计与历史决策：`docs/architecture/`
+数据能否进入模型、模型输出能否支持结论，在流程里是两道不同的关。诊断或 Agent 发现问题时回到数据与实验设计，而不是直接把最低误差写成验证结论。
 
----
+```mermaid
+flowchart LR
+    input["实验记录 / 公开数据"] --> contract["数据契约<br/>单位 · 协议 · 来源"]
+    contract --> gate{"尺度与用途<br/>检查通过?"}
+    gate -- 否 --> repair["补齐记录或修正输入"]
+    repair --> contract
+    gate -- 是 --> physics["PyBaMM 回放<br/>SPM · SPMe · DFN"]
+    physics --> evaluate["固定窗口评价<br/>误差 · 覆盖 · 残差"]
+    evaluate --> evidence{"独立验证<br/>是否充分?"}
+    evidence -- 否 --> design["诊断 / 参数探索<br/>提出下轮实验"]
+    design --> input
+    evidence -- 是 --> report["版本化报告<br/>写明适用范围"]
+    contract --> inventory["工艺清单<br/>能耗 · 物料 · 价格"]
+    inventory --> sustainability["碳足迹 / 成本<br/>同一功能单位"]
+    sustainability --> report
 
-## 📌 Overview
-
-电池研究中，实验数据、物理模型和分析流程通常相互独立，导致：
-
-- 实验数据格式不统一；
-- 数据难以直接进入电化学模型；
-- 模型比较和参数分析流程复杂；
-- 模拟结果缺少统一追踪机制。
-
-本项目基于 **PyBaMM** 构建数据—模型串联框架，实现：
-
-```
-
-Experimental Data
-↓
-Data Standardization
-↓
-Electrochemical Models
-↓
-Automated Simulation
-↓
-Evaluation & Analysis
-↓
-Sensitivity Exploration
-
+    classDef source fill:#E7F4F1,stroke:#178B78,color:#153B36,stroke-width:2px;
+    classDef process fill:#EAF0FF,stroke:#4A69C6,color:#1E315D,stroke-width:2px;
+    classDef decision fill:#FFF3DA,stroke:#C28B25,color:#533A13,stroke-width:2px;
+    classDef result fill:#F0EAFE,stroke:#8061BE,color:#38265B,stroke-width:2px;
+    class input,contract,inventory source;
+    class physics,evaluate,repair,design,sustainability process;
+    class gate,evidence decision;
+    class report result;
 ```
 
-用于支持电池模型验证、参数分析以及后续智能化设计。
+图源与独立预览：[研究流程](figures/research-workflow.md) · [Mermaid 源码](figures/research-workflow.mmd)
 
+这条链有三种常见输出：**公开数据回放**检验软件通路，**参数诊断**发现模型和数据哪里不一致，**独立实验**才检验结论能否迁移到新样品。碳足迹与成本使用另一套明确的工艺清单，不能与不同功能单位的参考结果混算。
 
----
+## 快速开始
 
-# 🏗️ Architecture
+### 1 · 从仓库自包含案例开始
 
-```
-             Battery Data
-
-                  │
-
-                  ▼
-
-      ┌───────────────────┐
-      │ Dataset Adapter   │
-      │ 数据标准化接口     │
-      └───────────────────┘
-
-                  │
-
-                  ▼
-
-      ┌───────────────────┐
-      │  PyBaMM Models    │
-      │ SPM/SPMe/DFN      │
-      └───────────────────┘
-
-                  │
-
-                  ▼
-
-      ┌───────────────────┐
-      │ Simulation Engine │
-      │ 自动化仿真流程     │
-      └───────────────────┘
-
-                  │
-
-                  ▼
-
-      ┌───────────────────┐
-      │ Evaluation        │
-      │ Error Analysis    │
-      └───────────────────┘
-
-                  │
-
-                  ▼
-
-      ┌───────────────────┐
-      │ Sensitivity       │
-      │ Parameter Analysis│
-      └───────────────────┘
-```
-
----
-
-# ✨ Features
-
-## 1. Multi-source Battery Data
-
-支持：
-
-- 恒流充放电数据；
-- 电压-时间曲线；
-- 电流-容量数据；
-- 不同采样频率实验数据。
-
-通过数据适配模块，实现不同实验数据统一进入模型。
-
-
----
-
-## 2. Electrochemical Model Support
-
-基于 PyBaMM：
-
-| Model | Description |
-|---|---|
-| SPM | 快速单粒子模型 |
-| SPMe | 考虑电解液影响 |
-| DFN | 完整电化学模型 |
-
-
-支持：
-
-- 模型自动调用；
-- 参数统一管理；
-- 不同模型性能比较。
-
-
----
-
-## 3. Automated Simulation Pipeline
-
-统一入口：
+`examples/half_cell_demo/` 可以在没有本地 `data/` 原始库的 clone 中运行。先按 [HANDOFF.md](HANDOFF.md) 配好 WSL Ubuntu 的 `pybamm` 环境，再执行：
 
 ```bash
-# 一键运行（推荐）：YAML 配置 → 读取数据 → 选参 → 仿真 → 评价 → 保存
-python run_pipeline.py --config configs/example.yaml
-
-# 或命令行形式
-python run_pipeline.py baseline --dataset chen2020 --model SPMe --cell 02
-```
-
-支持：
-
-| Mode         | Function  |
-| ------------ | --------- |
-| reproduction | 实验/文献结果复现 |
-| benchmark    | 模型性能比较    |
-| baseline     | 标准仿真      |
-| sensitivity  | 参数敏感性分析   |
-
----
-
-## 4. Simulation Evaluation
-
-自动计算：
-
-* Voltage RMSE；
-* MAE；
-* Capacity error；
-* Time alignment。
-
-输出：
-
-* 模拟曲线；
-* 评价指标；
-* 运行记录。
-
----
-
-## 5. Sensitivity Analysis
-
-分析：
-
-* 固相扩散系数；
-* 反应速率；
-* 电极参数；
-* 结构参数。
-
-用于：
-
-* 关键参数识别；
-* 模型优化；
-* 实验设计。
-
----
-
-# 📂 Project Structure
-
-```
-.
-├── run_pipeline.py        # Main entry（支持 --config 一键运行）
-├── battery_sim/           # Core simulation modules (frozen v0.4)
-├── configs/               # datasets / chemistry / models / sensitivity 注册表
-├── examples/              # 最小真实数据案例（half_cell_demo）
-├── user_tools/            # 自助入口：实验 CSV → 校验 → zero-fit baseline
-├── outputs/               # Simulation results
-├── external/              # Vendored upstream parameter-set repo (BSD-3)
-├── STATUS.md              # **唯一可信状态页**（门控表 / 测试数 / 已知限制）
-├── tests/                 # Regression tests (see STATUS.md for the current gate)
-└── README.md
-```
-
----
-
-# 🔬 Reproducibility
-
-每次运行自动保存：
-
-```
-run_metadata.json
-```
-
-记录：
-
-* Dataset
-* Model
-* Parameters
-* Runtime environment
-* Results
-
-保证模拟过程可追溯。
-
----
-
-# ✅ Current Status
-
-> 完整门控表、测试数、已知限制见 **`STATUS.md`**。下面这份清单只表示"曾经完成过"，
-> 不表示"当前仍然通过" —— 两者可能不一致，以 `STATUS.md` 为准。
-
-* [x] Dataset standardization
-* [x] PyBaMM integration
-* [x] SPM/SPMe/DFN support
-* [x] One-shot YAML run (`--config`)
-* [x] Explicit chemistry registry
-* [x] Automated simulation pipeline
-* [x] Benchmark workflow
-* [x] Baseline simulation
-* [x] Sensitivity analysis
-* [x] Result tracking
-* [x] Regression testing (count in `STATUS.md`)
-* [x] Experimental-CSV self-service entry (`user_tools/` + example case)
-* [x] Graphite half-cell line, Phase A: SINTEF graphite R2032 → zero-fit SPM chain
-* [x] Graphite Phase A.5: geometry-aware zero-fit (measured electrode geometry)
-* [x] Graphite Phase B0: experiment-derived two-branch OCP (pseudo-OCP)
-* [x] Graphite Phase B0.5: capacity-consistent eps_am (Q_model == measured Q_ref)
-* [x] Graphite Phase B0.6: high-fidelity OCP v2 (full-resolution, branch-aware sampling)
-* [x] Graphite Phase B1: GITT segmentation + apparent D_s(SOC) (consistency-checked)
-* [x] Graphite Phase B2: D_s diagnostics + constant-D sensitivity (when is it a valid model input)
-* [x] Graphite Phase B0.7: initial-state / window-start correction (lith 44.7 -> 1.6 mV)
-* [x] Graphite Phase B1.5: GITT pulse overpotential budget (why the D_s is biased)
-* [x] Graphite Phase B1.6: drift-corrected re-inversion of the whole D_s(SOC) table
-      (fit-form line closed; corrected table still below the reference, not adopted)
-
----
-
-# 🚀 Future Development
-
-## Phase I
-
-Experimental data
-
-↓
-
-Battery simulation
-
-## Phase II
-
-Literature data extraction
-
-↓
-
-Model parameter generation
-
-## Phase III
-
-AI-assisted battery research workflow
-
-```
-Literature
-     ↓
-AI Agent
-     ↓
-Simulation
-     ↓
-Optimization
-     ↓
-Experiment
-```
-
----
-
-# 🎯 Project Goal
-
-构建一个面向电池数字化研究的数据—模型集成基础设施：
-
-**Battery Data → Physics Model → Simulation → Analysis → Design**
-
-为电池模型验证、材料研究和智能化实验设计提供基础平台。
-
----
-
-# 🚀 Quick Start
-
-**先跑这个。** `examples/half_cell_demo/` 是自包含案例，clone 后即可运行，
-不需要 13 GB 的 `data/` 原始库：实验 CSV → 13 项导入校验 → zero-fit DFN baseline。
-
-```bash
-# 1) 环境（详见 HANDOFF.md：WSL Ubuntu + conda + pip install -r requirements.txt）
-conda activate pybamm
-
-# 2) 自包含案例：导入校验 + zero-fit baseline（预期结果已固化在 result/）
 python -m user_tools.import_dataset --package examples/half_cell_demo
-python -m user_tools.run_baseline    --package examples/half_cell_demo --models DFN
+python -m user_tools.run_baseline --package examples/half_cell_demo --models DFN
+```
 
-# 3) 平台本体（以下命令需要先准备 data/ 原始库；该目录不在仓库内，见 HANDOFF.md）
+这会走完实验 CSV 导入校验与 zero-fit DFN 基线。完整数据集列表及 YAML 流水线需要另行准备本地数据：
+
+```bash
 python run_pipeline.py --list-datasets
 python run_pipeline.py --config configs/example.yaml
 ```
 
-> ⚠️ **`python -m pytest -q` 在新 clone 里不会全绿，这是预期的。**
-> 实测（全新 clone、无 `data/`）：`44 failed, 495 passed, 4 skipped, 70 errors`，
-> 失败全部是 `FileNotFoundError` 指向 `data/...`（原始数据集不在仓库内）。
-> `STATUS.md` 的 613 passed 是**带 `data/` 的完整环境**下的数字。
-> 只想看结论走上面第 2 步；要看历史结果直接翻 `outputs/analysis/`（见 `HANDOFF.md` §4.1）。
+`data/` 不随仓库发布，因此在全新 clone 上直接运行完整测试集会遇到依赖本地原始数据的用例；请按 [STATUS.md](STATUS.md) 区分软件回归与带数据的研究验收。
 
-化学体系显式注册表：`configs/chemistry.yaml` —— 化学体系 → 正负极/电解液/
-电池形式/参数集 + 溯源等级（A-exact / B-compatible_surrogate），可直接对接
-文献抽取输出（如 `NMC811||graphite`）。
+### 2 · 打开本地研究工作站
 
-石墨半电池（Phase A）：`python run_pipeline.py baseline --dataset sintef_graphite --model SPM`
-—— SINTEF graphite R2032 半电池 p-OCV 脱锂支的 zero-fit replay。
-注意其 RMSE 由参考参数集与目标电芯的**尺度失配**主导（面积 55.8×），
-只作通路验证，见 `docs/graphite_platform_integration_plan.md`。
+在已配置项目依赖的 Windows 电脑上，双击 `启动科研工作站.bat`；它优先打开本机已有的 v0.3.10 打包版，GitHub clone 中没有打包版时会改用源码启动。也可以直接执行：
 
-> 措辞约定：surrogate 参数集结果为**代理基线**，不称 validation；
-> baseline 为 **zero-fit**，不称 fitting。
+```powershell
+python -m user_tools.research_workbench
+```
+
+工作站自动打开本机浏览器。Windows 打包命令是 `./user_tools/build_workbench.ps1`；生成的 EXE 留在本机 `outputs/`，不纳入 GitHub 源码仓库。工作站的物理/ML 任务仍需可访问项目的 WSL 环境，Excel 导出及环境经济分析还需各自的本机依赖，详见[工作站说明](docs/workbench_v03.md)和[环境与经济说明](docs/workbench_v036.md)。
+
+在“仿真诊断与参数探索”中可直接用规则策略。若使用可选模型服务，展开“模型API地址与端口”，填写基础地址（例如 `http://localhost:11434/v1`）、模型名和可选密钥，保存后检查接口。配置写入本机忽略文件 `data/agent_llm.local.json`；界面检查 `/models`，实际建议任务从 WSL 调用 `/chat/completions`，两者需分别保证可达。详见 [Agent 接入说明](docs/battery_agent_adaptation.md)。
+
+## 项目路线图
+
+实线阶段表示软件已经实现；虚线阶段是还需要真实材料数据与独立实验的研究目标，没有把未来目标写成已验收能力。
+
+```mermaid
+flowchart LR
+    core["v0.1 · 已完成<br/>仿真平台冻结"] --> loop["v0.2 · 已完成<br/>研究数据闭环"]
+    loop --> workbench["v0.3.10 · 已实现<br/>本地研究工作站"]
+    workbench --> validation["下一阶段<br/>真实材料独立验证"]
+    validation --> decision["研究目标<br/>跨协议可迁移预测"]
+
+    classDef done fill:#E7F4F1,stroke:#178B78,color:#153B36,stroke-width:2px;
+    classDef current fill:#EAF0FF,stroke:#4A69C6,color:#1E315D,stroke-width:3px;
+    classDef future fill:#F5F2FA,stroke:#8D79B6,color:#44385C,stroke-width:2px,stroke-dasharray:5 4;
+    class core,loop done;
+    class workbench current;
+    class validation,decision future;
+```
+
+图源与独立预览：[项目路线图](figures/project-roadmap.md) · [Mermaid 源码](figures/project-roadmap.mmd)
+
+| 阶段 | 可检查的交付 | 当前结论 |
+| --- | --- | --- |
+| **v0.1 冻结平台** | 数据适配、参数来源矩阵、尺度对齐门、PyBaMM 回放与报告 | 冻结标签 `v0.1.0-platform`；详见[预注册判据](docs/preregistration_2026-09-18.md) |
+| **v0.2 模拟闭环** | Excel 研究任务、受控约束、公开/合成回放、模拟工艺比较 | 软件闭环通过；[验收报告](docs/v02_simulation_loop.md)保留科学失败门 |
+| **v0.3.10 本地工作站** | 数据版本、仿真诊断、描述符/多目标研究、清单评价与本机 API 配置 | 已完成工程接入；[Agent 说明](docs/battery_agent_adaptation.md)与[状态页](STATUS.md)列明限制 |
+| **下一阶段** | 真实材料数据、独立协议/批次、前瞻实验和来源完整的环境清单 | 待采集与验证；不能由软件演示结果代替 |
+
+## 复现与判断边界
+
+- **输入来源可追踪**：样品、实验协议、数据用途、单位及参数来源要留档。数据接入方法见[新增数据集](docs/adding_a_dataset.md)；运行前先看[尺度对齐门](docs/scale_alignment_gate.md)。
+- **仿真与辨识分开**：zero-fit 回放、同一曲线上的参数探索、独立留出预测是不同证据等级。固定比较窗口和候选覆盖检查防止“少算一段”获得较低误差。
+- **真实材料结论尚未过门**：历史 G5/G6、Chen 留出、石墨代理参数等结果和失败条件均在 [STATUS.md](STATUS.md)，不因新界面或新 Agent 上线而改变。
+- **环境经济口径单列**：当前石墨清单提供声明边界内的 GWP 与成本筛选；EverBatt 参考预设使用不同原料与功能单位。文献、实现和限制见[环境与经济评价](docs/workbench_v036.md)。
+
+## 仓库导览
+
+```text
+battery_sim/           数据集适配、模型和仿真核心
+governance/            数据用途、尺度、参数来源等研究约束
+identification/        参数辨识与留出预测
+user_tools/rg_loop/    Excel 研究记录与模拟闭环
+user_tools/workbench/  本地工作站、Agent、ML 与环境经济入口
+configs/               模型、化学体系和数据集配置
+examples/              可随仓库复现的最小案例
+tests/                 自动化回归
+docs/                  方法、版本说明与验收记录
+figures/               首页图示的 Mermaid 源码与预览
+```
+
+本地实验数据、作业记录、打包程序和大体积运行结果不作为源码发布。可复现的少量历史数值产物保留在仓库中；其意义和限制由 [STATUS.md](STATUS.md) 解释。

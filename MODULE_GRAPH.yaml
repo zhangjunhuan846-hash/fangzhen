@@ -26,10 +26,10 @@ meta:
 # 一、真核心：按被依赖次数（in-degree）排序 —— 这才是代码说的核心
 # ==============================================================================
 # ⚠️ 这一节直接推翻目录级判断：目录级把整个 battery_sim/（38 模块）列为一条 core，
-#    但单模块级显示，真正被全平台依赖的只有下面这 8 个。
+#    v0.2 新增科研闭环后，治理角色门也进入实测前列，下面记录 9 个 hub。
 hubs:
   - module: battery_sim.paths
-    in_degree: 16
+    in_degree: 17
     lines: 53
     role: "仓库内所有路径的唯一来源"
     why_hub: >
@@ -47,7 +47,7 @@ hubs:
     delete_consequence: "7 个 adapter 全部报错（判据性命中）"
 
   - module: battery_sim.models.pybamm_factory
-    in_degree: 11
+    in_degree: 12
     lines: 246
     role: "PyBaMM 模型工厂 + 参数加载"
     why_hub: "所有仿真入口都要经它构造模型"
@@ -62,7 +62,7 @@ hubs:
     tier: core
 
   - module: battery_sim.registry
-    in_degree: 7
+    in_degree: 8
     lines: 137
     role: "数据集注册与解析"
     tier: core
@@ -77,7 +77,7 @@ hubs:
     tier: core
 
   - module: battery_sim.simulation.baseline
-    in_degree: 5
+    in_degree: 6
     role: "基线回放主循环"
     tier: core
 
@@ -85,6 +85,11 @@ hubs:
     in_degree: 4
     role: "材料元数据 schema 与校验"
     note: "被 governance.geometry_channel 依赖 —— 这是反向依赖的成因，见 cross_layer"
+    tier: core
+
+  - module: governance.dataset_roles
+    in_degree: 5
+    role: "来源/辨识/留出用途门；v0.2 物理任务新增调用后进入实测前 8"
     tier: core
 
 # ==============================================================================
@@ -147,12 +152,12 @@ leaves:
     叶子是最安全的模块：改它不会波及别人。但其中几个被依赖次数很高，
     所以"安全"是相对的 —— 见下面标注。
   items:
-    - {module: battery_sim.paths, in_degree: 16, tier: core,
+    - {module: battery_sim.paths, in_degree: 17, tier: core,
        warn: "叶子但高依赖：改它波及全平台"}
     - {module: battery_sim.schemas, in_degree: 8, tier: core,
        warn: "同上，数据形状定义"}
     - {module: battery_sim.logging_utils, in_degree: 4, tier: core}
-    - {module: governance.dataset_roles, in_degree: 4, tier: core,
+    - {module: governance.dataset_roles, in_degree: 5, tier: core,
        note: "被 identification 与 user_tools 依赖 —— 治理层里最核心的一个"}
     - {module: battery_sim.datasets.chemistry_windows, in_degree: 3, tier: core}
     - {module: battery_sim.excitation.protocol, in_degree: 3, tier: optional}
@@ -164,6 +169,8 @@ leaves:
     - {module: battery_sim.evaluation.plotting, in_degree: 2, tier: optional}
     - {module: battery_sim.datasets.ocp_lookup, in_degree: 2, tier: optional}
     - {module: governance.scale_alignment, in_degree: 2, tier: core}
+    - {module: user_tools.rg_workstation, in_degree: 2, tier: optional,
+       note: "由 rg_loop 的约束与工作簿编排复用；不再是孤立 CLI"}
     - {module: user_tools.report, in_degree: 1, tier: optional}
     - {module: battery_sim.rates, in_degree: 1, tier: core,
        note: "冻结表；虽只被 1 个模块依赖，但 sintef adapter 因它不含 C/50 而自带一张表"}

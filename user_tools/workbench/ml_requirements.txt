@@ -1,0 +1,7 @@
+# Tested optional ML additions to this project's existing WSL scientific runtime.
+# Keep its NumPy/SciPy/Pandas/PyBaMM versions unchanged; do not install upstream
+# paper repositories into this environment to reproduce their old dependencies.
+scikit-learn==1.9.1
+joblib==1.6.0
+cloudpickle==3.1.2
+threadpoolctl==3.6.0

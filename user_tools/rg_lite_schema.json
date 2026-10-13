@@ -1,0 +1,573 @@
+{
+  "version": "scalar-3",
+  "header_row": 4,
+  "first_data_row": 5,
+  "tables": [
+    {
+      "sheet": "原料",
+      "note": "一行一批原料；不知道的数值留空。",
+      "fields": [
+        [
+          "batch_id",
+          "原料编号",
+          "id"
+        ],
+        [
+          "source",
+          "原料来源",
+          "text"
+        ],
+        [
+          "mass_g",
+          "原料质量 (g)",
+          "number"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    },
+    {
+      "sheet": "处理工艺",
+      "note": "一行一个独立制备样品；同条件重做也用新样品编号。",
+      "fields": [
+        [
+          "sample_id",
+          "样品编号",
+          "id"
+        ],
+        [
+          "batch_id",
+          "原料编号",
+          "ref:原料"
+        ],
+        [
+          "method",
+          "处理方法",
+          "text"
+        ],
+        [
+          "temperature_C",
+          "处理温度 (°C)",
+          "temperature"
+        ],
+        [
+          "reagent",
+          "试剂 / 气氛",
+          "text"
+        ],
+        [
+          "concentration",
+          "试剂浓度",
+          "number"
+        ],
+        [
+          "concentration_unit",
+          "浓度单位",
+          "text"
+        ],
+        [
+          "solid_liquid_ratio_ml_g",
+          "液固比 (mL/g)",
+          "positive"
+        ],
+        [
+          "mass_before_g",
+          "处理前质量 (g)",
+          "number"
+        ],
+        [
+          "mass_after_g",
+          "处理后质量 (g)",
+          "number"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    },
+    {
+      "sheet": "表征",
+      "note": "一行一组表征；真密度与振实密度分开；模型有效半径未知则留空，不自动取D50/2。",
+      "fields": [
+        [
+          "sample_id",
+          "样品编号",
+          "ref:处理工艺"
+        ],
+        [
+          "carbon_fraction",
+          "碳含量 (%)",
+          "fraction"
+        ],
+        [
+          "ash_fraction",
+          "灰分 (%)",
+          "fraction"
+        ],
+        [
+          "moisture_fraction",
+          "水分 (%)",
+          "fraction"
+        ],
+        [
+          "li_mg_kg",
+          "Li含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "ni_mg_kg",
+          "Ni含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "co_mg_kg",
+          "Co含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "mn_mg_kg",
+          "Mn含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "cu_mg_kg",
+          "Cu含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "al_mg_kg",
+          "Al含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "fe_mg_kg",
+          "Fe含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "d10_um",
+          "D10 (μm)",
+          "positive"
+        ],
+        [
+          "d50_um",
+          "D50 (μm)",
+          "positive"
+        ],
+        [
+          "d90_um",
+          "D90 (μm)",
+          "positive"
+        ],
+        [
+          "bet_m2_g",
+          "BET (m²/g)",
+          "number"
+        ],
+        [
+          "id_ig",
+          "拉曼 ID/IG",
+          "number"
+        ],
+        [
+          "d002_nm",
+          "XRD d002 (nm)",
+          "positive"
+        ],
+        [
+          "lc_nm",
+          "XRD Lc (nm)",
+          "positive"
+        ],
+        [
+          "la_nm",
+          "XRD La (nm)",
+          "positive"
+        ],
+        [
+          "conductivity_S_cm",
+          "电导率 (S/cm)",
+          "number"
+        ],
+        [
+          "true_density_g_cm3",
+          "石墨粉体真密度 (g/cm³)",
+          "positive"
+        ],
+        [
+          "effective_radius_um",
+          "模型有效颗粒半径 (μm)",
+          "positive"
+        ],
+        [
+          "radius_basis",
+          "半径定义 / 依据",
+          "text"
+        ],
+        [
+          "tap_density_g_cm3",
+          "振实密度 (g/cm³)",
+          "positive"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    },
+    {
+      "sheet": "极片",
+      "note": "一行一片极片；涂层质量不含铜箔；石墨比例填90%这样的百分数。",
+      "fields": [
+        [
+          "electrode_id",
+          "极片编号",
+          "id"
+        ],
+        [
+          "sample_id",
+          "样品编号",
+          "ref:处理工艺"
+        ],
+        [
+          "area_cm2",
+          "面积 (cm²)",
+          "positive"
+        ],
+        [
+          "coating_mass_mg",
+          "干涂层质量 (mg)",
+          "positive"
+        ],
+        [
+          "graphite_fraction",
+          "石墨质量比例 (%)",
+          "fraction"
+        ],
+        [
+          "conductive_fraction",
+          "导电剂比例 (%)",
+          "fraction"
+        ],
+        [
+          "binder_fraction",
+          "粘结剂比例 (%)",
+          "fraction"
+        ],
+        [
+          "thickness_um",
+          "涂层厚度 (μm)",
+          "positive"
+        ],
+        [
+          "porosity",
+          "孔隙率 (%)",
+          "fraction"
+        ],
+        [
+          "bulk_density_g_cm3",
+          "干涂层密度 (g/cm³)",
+          "positive"
+        ],
+        [
+          "foil_thickness_um",
+          "铜箔厚度 (μm)",
+          "positive"
+        ],
+        [
+          "conductive_true_density_g_cm3",
+          "导电剂真密度 (g/cm³)",
+          "positive"
+        ],
+        [
+          "binder_true_density_g_cm3",
+          "粘结剂有效真密度 (g/cm³)",
+          "positive"
+        ],
+        [
+          "electrode_conductivity_S_m",
+          "极片电导率 (S/m)",
+          "number"
+        ],
+        [
+          "conductive_type",
+          "导电剂种类",
+          "text"
+        ],
+        [
+          "binder_type",
+          "粘结剂种类 / 配比",
+          "text"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    },
+    {
+      "sheet": "半电池",
+      "note": "一行一颗电芯的一组结果；首次两种比容量采用同一质量口径；ICE自动计算。",
+      "fields": [
+        [
+          "cell_id",
+          "电芯编号",
+          "id"
+        ],
+        [
+          "sample_id",
+          "样品编号",
+          "ref:处理工艺"
+        ],
+        [
+          "electrode_id",
+          "极片编号",
+          "ref:极片"
+        ],
+        [
+          "first_lithiation",
+          "首次嵌锂 (mAh/g)",
+          "number"
+        ],
+        [
+          "first_delithiation",
+          "首次脱锂 (mAh/g)",
+          "number"
+        ],
+        [
+          "ice",
+          "ICE",
+          "derived"
+        ],
+        [
+          "c_rate",
+          "测试倍率 (C)",
+          "positive"
+        ],
+        [
+          "capacity",
+          "可逆比容量 (mAh/g)",
+          "number"
+        ],
+        [
+          "cycle",
+          "循环次数",
+          "integer"
+        ],
+        [
+          "retention",
+          "容量保持率 (%)",
+          "fraction"
+        ],
+        [
+          "temperature_C",
+          "测试温度 (°C)",
+          "temperature"
+        ],
+        [
+          "current_mA",
+          "实际电流 (mA)",
+          "signed"
+        ],
+        [
+          "voltage_lower_V",
+          "下限电位 (V vs Li/Li⁺)",
+          "number"
+        ],
+        [
+          "voltage_upper_V",
+          "上限电位 (V vs Li/Li⁺)",
+          "positive"
+        ],
+        [
+          "separator_type",
+          "隔膜型号",
+          "text"
+        ],
+        [
+          "separator_thickness_um",
+          "隔膜厚度 (μm)",
+          "positive"
+        ],
+        [
+          "separator_porosity",
+          "隔膜孔隙率 (%)",
+          "fraction"
+        ],
+        [
+          "electrolyte_recipe",
+          "电解液配方",
+          "text"
+        ],
+        [
+          "electrolyte_concentration_mol_L",
+          "电解液盐浓度 (mol/L)",
+          "positive"
+        ],
+        [
+          "electrolyte_volume_uL",
+          "注液量 (μL)",
+          "positive"
+        ],
+        [
+          "lithium_thickness_um",
+          "锂片厚度 (μm)",
+          "positive"
+        ],
+        [
+          "rate_reference_capacity_mAh",
+          "倍率参考容量 (mAh)",
+          "positive"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    },
+    {
+      "sheet": "仿真输入",
+      "note": "可选高级表；未辨识参数留空。OCP/Ds/i0可用曲线文件；常数与函数必须明确采用何种近似。记录不等于已校准或已接入仿真。",
+      "fields": [
+        [
+          "model_input_id",
+          "模型配置编号",
+          "id"
+        ],
+        [
+          "sample_id",
+          "样品编号",
+          "ref:处理工艺"
+        ],
+        [
+          "parameter_set",
+          "参考参数集",
+          "text"
+        ],
+        [
+          "initial_x0",
+          "初始锂化度 x0 (%)",
+          "fraction"
+        ],
+        [
+          "c_max_mol_m3",
+          "最大固相锂浓度 (mol/m³)",
+          "positive"
+        ],
+        [
+          "active_volume_fraction",
+          "活性材料体积分数 (%)",
+          "fraction"
+        ],
+        [
+          "ds_m2_s",
+          "有效Ds常数近似 (m²/s)",
+          "positive"
+        ],
+        [
+          "i0_A_m2",
+          "交换电流密度常数近似 (A/m²)",
+          "positive"
+        ],
+        [
+          "particle_diffusion_Ea_J_mol",
+          "扩散活化能 (J/mol)",
+          "number"
+        ],
+        [
+          "electrolyte_diffusivity_m2_s",
+          "电解液扩散率常数近似 (m²/s)",
+          "positive"
+        ],
+        [
+          "electrolyte_conductivity_S_m",
+          "电解液电导率常数近似 (S/m)",
+          "positive"
+        ],
+        [
+          "transference_number",
+          "阳离子迁移数 (%)",
+          "fraction"
+        ],
+        [
+          "bruggeman_electrode",
+          "电极电解液Bruggeman指数",
+          "positive"
+        ],
+        [
+          "bruggeman_separator",
+          "隔膜Bruggeman指数",
+          "positive"
+        ],
+        [
+          "contact_resistance_ohm",
+          "接触电阻 (Ω)",
+          "number"
+        ],
+        [
+          "ocp_curve_file",
+          "OCP曲线文件",
+          "text"
+        ],
+        [
+          "ds_curve_file",
+          "Ds曲线文件",
+          "text"
+        ],
+        [
+          "i0_curve_file",
+          "i0 / 动力学函数文件",
+          "text"
+        ],
+        [
+          "thermodynamic_factor",
+          "电解液热力学因子常数近似",
+          "positive"
+        ],
+        [
+          "reference_temperature_C",
+          "参数参考温度 (°C)",
+          "temperature"
+        ],
+        [
+          "ocp_entropic_V_K",
+          "OCP熵变系数 (V/K)",
+          "signed"
+        ],
+        [
+          "nominal_capacity_mAh",
+          "模型名义容量 (mAh)",
+          "positive"
+        ],
+        [
+          "electrolyte_functions_file",
+          "电解液输运函数文件",
+          "text"
+        ],
+        [
+          "lithium_kinetics_file",
+          "锂对电极动力学函数文件",
+          "text"
+        ],
+        [
+          "source",
+          "模型参数来源 / 近似说明",
+          "text"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    }
+  ]
+}

@@ -54,3 +54,12 @@ outputs/analysis/graphite_phaseB2/cc_rate_curves.csv
 # 汇总表和 runs/ 里的精选副本承载，这里不入库
 outputs/analysis/*/platform_runs/
 outputs/analysis/graphite_phaseB16/runs/**/*_Vt.png
+# Local agent credentials must never enter version control.
+data/agent_llm.local.json
+
+# Local desktop packages and disposable workbench checks.
+/outputs/fangzhen_workbench_ui_*/
+/outputs/fangzhen_desktop*/
+/outputs/battery_agent_*/
+/outputs/workbench_*tests*/
+/outputs/github_backend_probe_*/

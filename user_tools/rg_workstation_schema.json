@@ -1,0 +1,959 @@
+{
+  "version": "0.1.0",
+  "header_row": 6,
+  "first_data_row": 7,
+  "last_data_row": 206,
+  "design": {
+    "sheet": "设计计算",
+    "inputs": {
+      "area_cm2": "B6",
+      "total_loading_mg_cm2": "B7",
+      "active_fraction": "B8",
+      "q_ref_mAh_g": "B9",
+      "c_rate": "B10",
+      "thickness_um": "B11",
+      "target_capacity_mAh": "B12",
+      "loading_min_mg_cm2": "B13",
+      "loading_max_mg_cm2": "B14",
+      "active_mass_mg": "B15",
+      "current_mA": "B16",
+      "bulk_density_g_cm3": "B17"
+    },
+    "mode_cell": "B5"
+  },
+  "tables": [
+    {
+      "sheet": "原料",
+      "id": "batch_id",
+      "note": "一行一批原料。来源和原始文件路径保留原样；不知道的数字留空。",
+      "fields": [
+        {
+          "key": "batch_id",
+          "label": "料源批次编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "source",
+          "label": "原料来源",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "received_date",
+          "label": "接收日期",
+          "type": "date"
+        },
+        {
+          "key": "dry_mass_g",
+          "label": "收到干料质量 (g)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "storage",
+          "label": "储存条件",
+          "type": "text"
+        },
+        {
+          "key": "source_path",
+          "label": "原始资料路径",
+          "type": "text"
+        },
+        {
+          "key": "operator",
+          "label": "记录人",
+          "type": "text"
+        },
+        {
+          "key": "notes",
+          "label": "备注",
+          "type": "text"
+        },
+        {
+          "key": "check",
+          "label": "填写提示",
+          "type": "derived"
+        }
+      ]
+    },
+    {
+      "sheet": "样品工艺",
+      "id": "prepare_id",
+      "note": "一行一次独立制备。同条件重做用新制备编号；计划值和实际值分开。百分数填写 90%。",
+      "fields": [
+        {
+          "key": "prepare_id",
+          "label": "独立制备编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "sample_id",
+          "label": "条件样品编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "batch_id",
+          "label": "料源批次编号",
+          "type": "text",
+          "required": true,
+          "ref": [
+            "原料",
+            "batch_id"
+          ]
+        },
+        {
+          "key": "status",
+          "label": "执行状态",
+          "type": "text",
+          "required": true,
+          "choices": [
+            "计划中",
+            "已完成",
+            "未再生对照",
+            "已取消"
+          ]
+        },
+        {
+          "key": "method",
+          "label": "处理方法",
+          "type": "text"
+        },
+        {
+          "key": "planned_temperature_C",
+          "label": "计划温度 (°C)",
+          "type": "number"
+        },
+        {
+          "key": "actual_temperature_C",
+          "label": "实际温度 (°C)",
+          "type": "number"
+        },
+        {
+          "key": "planned_duration_h",
+          "label": "计划时长 (h)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "actual_duration_h",
+          "label": "实际时长 (h)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "atmosphere",
+          "label": "实际气氛",
+          "type": "text"
+        },
+        {
+          "key": "mass_before_g",
+          "label": "处理前干基质量 (g)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "mass_after_g",
+          "label": "处理后干基质量 (g)",
+          "type": "number",
+          "min": 0
+        },
+        {
+          "key": "mass_yield",
+          "label": "质量收率",
+          "type": "derived"
+        },
+        {
+          "key": "carbon_before_fraction",
+          "label": "处理前碳质量分数",
+          "type": "fraction"
+        },
+        {
+          "key": "carbon_after_fraction",
+          "label": "处理后碳质量分数",
+          "type": "fraction"
+        },
+        {
+          "key": "carbon_yield",
+          "label": "碳收率",
+          "type": "derived"
+        },
+        {
+          "key": "process_date",
+          "label": "实际处理日期",
+          "type": "date"
+        },
+        {
+          "key": "source_path",
+          "label": "工艺记录路径",
+          "type": "text"
+        },
+        {
+          "key": "notes",
+          "label": "偏差原因 / 备注",
+          "type": "text"
+        },
+        {
+          "key": "check",
+          "label": "填写提示",
+          "type": "derived"
+        }
+      ]
+    },
+    {
+      "sheet": "表征",
+      "id": "measurement_id",
+      "note": "一行一个实测指标。例如同一样品 Raman 的 ID/IG 与 G 峰位置分别占一行；值与单位分列。",
+      "fields": [
+        {
+          "key": "measurement_id",
+          "label": "表征记录编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "prepare_id",
+          "label": "独立制备编号",
+          "type": "text",
+          "required": true,
+          "ref": [
+            "样品工艺",
+            "prepare_id"
+          ]
+        },
+        {
+          "key": "technique",
+          "label": "表征方法",
+          "type": "text",
+          "required": true,
+          "choices": [
+            "ICP",
+            "XRD",
+            "Raman",
+            "BET",
+            "SEM",
+            "粒径",
+            "其他"
+          ]
+        },
+        {
+          "key": "metric",
+          "label": "指标名称",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "value",
+          "label": "实测值",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "unit",
+          "label": "单位",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "measurement_date",
+          "label": "测量日期",
+          "type": "date"
+        },
+        {
+          "key": "instrument",
+          "label": "仪器 / 测量方法",
+          "type": "text"
+        },
+        {
+          "key": "file_path",
+          "label": "原始文件路径",
+          "type": "text"
+        },
+        {
+          "key": "operator",
+          "label": "测量人",
+          "type": "text"
+        },
+        {
+          "key": "notes",
+          "label": "备注",
+          "type": "text"
+        },
+        {
+          "key": "check",
+          "label": "填写提示",
+          "type": "derived"
+        }
+      ]
+    },
+    {
+      "sheet": "极片",
+      "id": "electrode_id",
+      "note": "质量均为单片。干涂层质量不含集流体；活性质量 = 干涂层质量 × 活性分数。面积、厚度、粒径填实测值。",
+      "fields": [
+        {
+          "key": "electrode_id",
+          "label": "极片编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "prepare_id",
+          "label": "独立制备编号",
+          "type": "text",
+          "required": true,
+          "ref": [
+            "样品工艺",
+            "prepare_id"
+          ]
+        },
+        {
+          "key": "area_cm2",
+          "label": "有效面积 (cm²)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "dry_coating_mass_mg",
+          "label": "干涂层质量 (mg)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "active_fraction",
+          "label": "活性石墨质量分数",
+          "type": "fraction"
+        },
+        {
+          "key": "active_mass_mg",
+          "label": "活性石墨质量 (mg)",
+          "type": "derived"
+        },
+        {
+          "key": "total_loading_mg_cm2",
+          "label": "总干涂层面载量 (mg/cm²)",
+          "type": "derived"
+        },
+        {
+          "key": "active_loading_mg_cm2",
+          "label": "活性石墨面载量 (mg/cm²)",
+          "type": "derived"
+        },
+        {
+          "key": "coating_thickness_um",
+          "label": "涂层厚度 (µm)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "d50_um",
+          "label": "该样品 D50 (µm)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "porosity",
+          "label": "实测 / 派生孔隙率",
+          "type": "fraction"
+        },
+        {
+          "key": "porosity_source",
+          "label": "孔隙率依据",
+          "type": "text"
+        },
+        {
+          "key": "binder_recipe",
+          "label": "粘结剂 / 导电剂 / 配方",
+          "type": "text"
+        },
+        {
+          "key": "q_ref_mAh_g",
+          "label": "参考比容量 (mAh/g)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "capacity_ref_mAh",
+          "label": "极片参考容量 (mAh)",
+          "type": "derived"
+        },
+        {
+          "key": "fabrication_date",
+          "label": "制片日期",
+          "type": "date"
+        },
+        {
+          "key": "notes",
+          "label": "备注",
+          "type": "text"
+        },
+        {
+          "key": "check",
+          "label": "填写提示",
+          "type": "derived"
+        }
+      ]
+    },
+    {
+      "sheet": "电芯",
+      "id": "cell_id",
+      "note": "一行一颗电芯。电芯平行重复不等于材料独立制备重复。物理工作电极填写石墨。",
+      "fields": [
+        {
+          "key": "cell_id",
+          "label": "电芯编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "electrode_id",
+          "label": "极片编号",
+          "type": "text",
+          "required": true,
+          "ref": [
+            "极片",
+            "electrode_id"
+          ]
+        },
+        {
+          "key": "prepare_id",
+          "label": "制备编号（自动）",
+          "type": "derived"
+        },
+        {
+          "key": "assembly_date",
+          "label": "组装日期",
+          "type": "date"
+        },
+        {
+          "key": "format",
+          "label": "电芯形式",
+          "type": "text",
+          "choices": [
+            "CR2032",
+            "其他"
+          ]
+        },
+        {
+          "key": "working_material",
+          "label": "工作电极材料",
+          "type": "text",
+          "choices": [
+            "石墨",
+            "其他"
+          ]
+        },
+        {
+          "key": "counter_electrode",
+          "label": "对电极规格",
+          "type": "text"
+        },
+        {
+          "key": "electrolyte",
+          "label": "电解液配方",
+          "type": "text"
+        },
+        {
+          "key": "separator",
+          "label": "隔膜",
+          "type": "text"
+        },
+        {
+          "key": "assembly_environment",
+          "label": "组装环境",
+          "type": "text"
+        },
+        {
+          "key": "operator",
+          "label": "组装人",
+          "type": "text"
+        },
+        {
+          "key": "notes",
+          "label": "备注",
+          "type": "text"
+        },
+        {
+          "key": "check",
+          "label": "填写提示",
+          "type": "derived"
+        }
+      ]
+    },
+    {
+      "sheet": "测试",
+      "id": "test_id",
+      "note": "一行一次测试。先声明物理方向、数据用途、单位与电流符号；原始曲线保存在独立文件。",
+      "fields": [
+        {
+          "key": "test_id",
+          "label": "测试编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "cell_id",
+          "label": "电芯编号",
+          "type": "text",
+          "required": true,
+          "ref": [
+            "电芯",
+            "cell_id"
+          ]
+        },
+        {
+          "key": "protocol",
+          "label": "测试类型",
+          "type": "text",
+          "required": true,
+          "choices": [
+            "formation",
+            "GCD",
+            "pOCV",
+            "GITT",
+            "EIS",
+            "rate_capability",
+            "cycling",
+            "other"
+          ]
+        },
+        {
+          "key": "physics_role",
+          "label": "物理模型用途",
+          "type": "text",
+          "required": true,
+          "choices": [
+            "identification",
+            "validation",
+            "benchmark",
+            "exploration"
+          ]
+        },
+        {
+          "key": "campaign_role",
+          "label": "工艺优化用途",
+          "type": "text",
+          "required": true,
+          "choices": [
+            "exploration",
+            "optimization",
+            "final_confirmation"
+          ]
+        },
+        {
+          "key": "direction",
+          "label": "物理方向",
+          "type": "text",
+          "choices": [
+            "嵌锂",
+            "脱锂",
+            "双向",
+            "静置",
+            "不适用"
+          ]
+        },
+        {
+          "key": "c_rate",
+          "label": "声明倍率 (C)",
+          "type": "number",
+          "min": 0
+        },
+        {
+          "key": "current_mA",
+          "label": "实际电流绝对值 (mA)",
+          "type": "number",
+          "min": 0
+        },
+        {
+          "key": "voltage_lower_V",
+          "label": "下限电压 (V)",
+          "type": "number"
+        },
+        {
+          "key": "voltage_upper_V",
+          "label": "上限电压 (V)",
+          "type": "number"
+        },
+        {
+          "key": "temperature_C",
+          "label": "实际测试温度 (°C)",
+          "type": "number"
+        },
+        {
+          "key": "pulse_duration_s",
+          "label": "GITT 脉冲时长 (s)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "rest_duration_s",
+          "label": "GITT 静置时长 (s)",
+          "type": "number",
+          "min": 0,
+          "exclusive_min": true
+        },
+        {
+          "key": "current_sign",
+          "label": "原始电流符号",
+          "type": "text",
+          "choices": [
+            "discharge_positive",
+            "discharge_negative",
+            "待核对"
+          ]
+        },
+        {
+          "key": "raw_file_path",
+          "label": "原始曲线路径",
+          "type": "text"
+        },
+        {
+          "key": "test_date",
+          "label": "测试日期",
+          "type": "date"
+        },
+        {
+          "key": "notes",
+          "label": "协议 / 循环号备注",
+          "type": "text"
+        },
+        {
+          "key": "check",
+          "label": "填写提示",
+          "type": "derived"
+        }
+      ]
+    },
+    {
+      "sheet": "性能记录",
+      "id": "result_id",
+      "note": "一行一颗电芯的一组实测性能。电荷单位 mAh；首次嵌锂/脱锂要配对。1C 容量只能填实际 1C 测试结果。",
+      "fields": [
+        {
+          "key": "result_id",
+          "label": "性能记录编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "cell_id",
+          "label": "电芯编号",
+          "type": "text",
+          "required": true,
+          "ref": [
+            "电芯",
+            "cell_id"
+          ]
+        },
+        {
+          "key": "formation_test_id",
+          "label": "首圈测试编号",
+          "type": "text",
+          "ref": [
+            "测试",
+            "test_id"
+          ]
+        },
+        {
+          "key": "rate_test_id",
+          "label": "1C 测试编号",
+          "type": "text",
+          "ref": [
+            "测试",
+            "test_id"
+          ]
+        },
+        {
+          "key": "electrode_id",
+          "label": "极片编号（自动）",
+          "type": "derived"
+        },
+        {
+          "key": "active_mass_mg",
+          "label": "活性质量 (mg，自动)",
+          "type": "derived"
+        },
+        {
+          "key": "first_lithiation_mAh",
+          "label": "首次嵌锂电荷 (mAh)",
+          "type": "number",
+          "min": 0
+        },
+        {
+          "key": "first_delithiation_mAh",
+          "label": "首次脱锂电荷 (mAh)",
+          "type": "number",
+          "min": 0
+        },
+        {
+          "key": "ice",
+          "label": "首效 ICE",
+          "type": "derived"
+        },
+        {
+          "key": "q_1C_mAh",
+          "label": "实测 1C 脱锂容量 (mAh)",
+          "type": "number",
+          "min": 0
+        },
+        {
+          "key": "q_1C_mAh_g",
+          "label": "1C 比容量 (mAh/g)",
+          "type": "derived"
+        },
+        {
+          "key": "rate_cycle",
+          "label": "1C 取值循环号",
+          "type": "number",
+          "min": 1
+        },
+        {
+          "key": "quality_status",
+          "label": "数据状态",
+          "type": "text",
+          "choices": [
+            "待核对",
+            "可用",
+            "排除"
+          ]
+        },
+        {
+          "key": "exclusion_reason",
+          "label": "排除原因 / 备注",
+          "type": "text"
+        },
+        {
+          "key": "check",
+          "label": "填写提示",
+          "type": "derived"
+        }
+      ]
+    },
+    {
+      "sheet": "目标约束",
+      "id": "constraint_id",
+      "note": "一行一条目标或约束。路线未定时保留待定；不要把示例阈值当实验标准。区间上下限按单位填写数值。",
+      "fields": [
+        {
+          "key": "constraint_id",
+          "label": "约束编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "batch_id",
+          "label": "适用料源批次",
+          "type": "text",
+          "ref": [
+            "原料",
+            "batch_id"
+          ]
+        },
+        {
+          "key": "kind",
+          "label": "类型",
+          "type": "text",
+          "choices": [
+            "主目标",
+            "性能约束",
+            "工艺边界",
+            "固定条件"
+          ]
+        },
+        {
+          "key": "variable",
+          "label": "指标 / 工艺变量",
+          "type": "text"
+        },
+        {
+          "key": "variable_role",
+          "label": "参数角色",
+          "type": "text",
+          "choices": [
+            "fixed",
+            "free",
+            "target",
+            "bounded"
+          ]
+        },
+        {
+          "key": "unit",
+          "label": "单位",
+          "type": "text"
+        },
+        {
+          "key": "lower",
+          "label": "下限",
+          "type": "number"
+        },
+        {
+          "key": "upper",
+          "label": "上限",
+          "type": "number"
+        },
+        {
+          "key": "fixed_value",
+          "label": "固定值 / 类别",
+          "type": "text"
+        },
+        {
+          "key": "status",
+          "label": "确认状态",
+          "type": "text",
+          "choices": [
+            "待定",
+            "已确认"
+          ]
+        },
+        {
+          "key": "source",
+          "label": "依据 / 确认人",
+          "type": "text"
+        },
+        {
+          "key": "notes",
+          "label": "备注",
+          "type": "text"
+        },
+        {
+          "key": "check",
+          "label": "填写提示",
+          "type": "derived"
+        }
+      ]
+    },
+    {
+      "sheet": "推荐记录",
+      "id": "suggestion_id",
+      "note": "一行一条建议。当前版本用于记录人工选点；模型预测暂留空。建议值与执行记录分别保存。",
+      "fields": [
+        {
+          "key": "suggestion_id",
+          "label": "建议编号",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "round_id",
+          "label": "轮次编号",
+          "type": "text"
+        },
+        {
+          "key": "batch_id",
+          "label": "料源批次编号",
+          "type": "text",
+          "ref": [
+            "原料",
+            "batch_id"
+          ]
+        },
+        {
+          "key": "mode",
+          "label": "建议方式",
+          "type": "text",
+          "choices": [
+            "人工选点",
+            "cold_start",
+            "exploratory",
+            "model_based",
+            "confirmatory"
+          ]
+        },
+        {
+          "key": "process",
+          "label": "建议条件 / 方法",
+          "type": "text"
+        },
+        {
+          "key": "reason",
+          "label": "选点理由",
+          "type": "text"
+        },
+        {
+          "key": "predicted_q_1C",
+          "label": "预测 1C 比容量 (mAh/g)",
+          "type": "number"
+        },
+        {
+          "key": "interval_lower",
+          "label": "预测区间下界",
+          "type": "number"
+        },
+        {
+          "key": "interval_upper",
+          "label": "预测区间上界",
+          "type": "number"
+        },
+        {
+          "key": "model_version",
+          "label": "模型版本",
+          "type": "text"
+        },
+        {
+          "key": "training_snapshot",
+          "label": "训练快照路径 / 哈希",
+          "type": "text"
+        },
+        {
+          "key": "issued_date",
+          "label": "建议冻结日期",
+          "type": "date"
+        },
+        {
+          "key": "actual_prepare_id",
+          "label": "实际执行制备编号",
+          "type": "text",
+          "ref": [
+            "样品工艺",
+            "prepare_id"
+          ]
+        },
+        {
+          "key": "status",
+          "label": "执行状态",
+          "type": "text",
+          "choices": [
+            "待执行",
+            "执行中",
+            "已完成",
+            "已取消"
+          ]
+        },
+        {
+          "key": "notes",
+          "label": "备注",
+          "type": "text"
+        },
+        {
+          "key": "check",
+          "label": "填写提示",
+          "type": "derived"
+        }
+      ]
+    }
+  ],
+  "constraint_variables": [
+    "area_cm2",
+    "total_loading_mg_cm2",
+    "active_fraction",
+    "q_ref_mAh_g",
+    "c_rate",
+    "thickness_um",
+    "capacity_mAh",
+    "active_mass_mg",
+    "current_mA",
+    "bulk_density_g_cm3"
+  ]
+}

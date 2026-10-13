@@ -46,7 +46,7 @@ def test_graph_records_the_single_module_granularity(graph_text):
 def test_graph_names_the_top_hub(graph_text):
     """最高被依赖的模块必须被点名 —— 它是 paths.py，不是整个 battery_sim/。"""
     assert "battery_sim.paths" in graph_text
-    assert re.search(r"in_degree:\s*16", graph_text), "paths.py 的 in-degree 应为 16"
+    assert re.search(r"in_degree:\s*17", graph_text), "paths.py 的 in-degree 应为 17"
 
 
 def test_graph_records_cross_layer_direction(graph_text):
@@ -105,7 +105,11 @@ def test_scanner_json_mode_is_valid():
     data = json.loads(proc.stdout)
     for key in ("modules", "graph", "in_degree", "cycles", "isolated", "leaves"):
         assert key in data, f"JSON 缺少字段：{key}"
-    assert data["in_degree"]["battery_sim.paths"] == 16
+    # v0.2 adds a legitimate isolated-output caller; count comes from the graph,
+    # rather than freezing the number of consumers to the v0.1 checkout.
+    callers = [name for name, deps in data["graph"].items() if "battery_sim.paths" in deps]
+    assert data["in_degree"]["battery_sim.paths"] == len(callers)
+    assert "user_tools.rg_loop.physics" in callers
 
 
 def test_checker_passes_on_current_tree():

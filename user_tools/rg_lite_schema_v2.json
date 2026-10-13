@@ -1,0 +1,332 @@
+{
+  "version": "scalar-2",
+  "header_row": 4,
+  "first_data_row": 5,
+  "tables": [
+    {
+      "sheet": "原料",
+      "note": "一行一批原料；不知道的数值留空。",
+      "fields": [
+        [
+          "batch_id",
+          "原料编号",
+          "id"
+        ],
+        [
+          "source",
+          "原料来源",
+          "text"
+        ],
+        [
+          "mass_g",
+          "原料质量 (g)",
+          "number"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    },
+    {
+      "sheet": "处理工艺",
+      "note": "一行一个独立制备样品；同条件重做也用新样品编号。",
+      "fields": [
+        [
+          "sample_id",
+          "样品编号",
+          "id"
+        ],
+        [
+          "batch_id",
+          "原料编号",
+          "ref:原料"
+        ],
+        [
+          "method",
+          "处理方法",
+          "text"
+        ],
+        [
+          "temperature_C",
+          "处理温度 (°C)",
+          "temperature"
+        ],
+        [
+          "reagent",
+          "试剂 / 气氛",
+          "text"
+        ],
+        [
+          "concentration",
+          "试剂浓度",
+          "number"
+        ],
+        [
+          "concentration_unit",
+          "浓度单位",
+          "text"
+        ],
+        [
+          "solid_liquid_ratio_ml_g",
+          "液固比 (mL/g)",
+          "positive"
+        ],
+        [
+          "mass_before_g",
+          "处理前质量 (g)",
+          "number"
+        ],
+        [
+          "mass_after_g",
+          "处理后质量 (g)",
+          "number"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    },
+    {
+      "sheet": "表征",
+      "note": "一行一组样品表征；各标量按列填写，没测的留空；重复测量另起一行。",
+      "fields": [
+        [
+          "sample_id",
+          "样品编号",
+          "ref:处理工艺"
+        ],
+        [
+          "carbon_fraction",
+          "碳含量 (%)",
+          "fraction"
+        ],
+        [
+          "ash_fraction",
+          "灰分 (%)",
+          "fraction"
+        ],
+        [
+          "moisture_fraction",
+          "水分 (%)",
+          "fraction"
+        ],
+        [
+          "li_mg_kg",
+          "Li含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "ni_mg_kg",
+          "Ni含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "co_mg_kg",
+          "Co含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "mn_mg_kg",
+          "Mn含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "cu_mg_kg",
+          "Cu含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "al_mg_kg",
+          "Al含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "fe_mg_kg",
+          "Fe含量 (mg/kg)",
+          "number"
+        ],
+        [
+          "d10_um",
+          "D10 (μm)",
+          "positive"
+        ],
+        [
+          "d50_um",
+          "D50 (μm)",
+          "positive"
+        ],
+        [
+          "d90_um",
+          "D90 (μm)",
+          "positive"
+        ],
+        [
+          "bet_m2_g",
+          "BET (m²/g)",
+          "number"
+        ],
+        [
+          "id_ig",
+          "拉曼 ID/IG",
+          "number"
+        ],
+        [
+          "d002_nm",
+          "XRD d002 (nm)",
+          "positive"
+        ],
+        [
+          "lc_nm",
+          "XRD Lc (nm)",
+          "positive"
+        ],
+        [
+          "la_nm",
+          "XRD La (nm)",
+          "positive"
+        ],
+        [
+          "conductivity_S_cm",
+          "电导率 (S/cm)",
+          "number"
+        ],
+        [
+          "tap_density_g_cm3",
+          "振实密度 (g/cm³)",
+          "positive"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    },
+    {
+      "sheet": "极片",
+      "note": "一行一片极片；涂层质量不含铜箔；石墨比例填90%这样的百分数。",
+      "fields": [
+        [
+          "electrode_id",
+          "极片编号",
+          "id"
+        ],
+        [
+          "sample_id",
+          "样品编号",
+          "ref:处理工艺"
+        ],
+        [
+          "area_cm2",
+          "面积 (cm²)",
+          "positive"
+        ],
+        [
+          "coating_mass_mg",
+          "干涂层质量 (mg)",
+          "positive"
+        ],
+        [
+          "graphite_fraction",
+          "石墨质量比例 (%)",
+          "fraction"
+        ],
+        [
+          "conductive_fraction",
+          "导电剂比例 (%)",
+          "fraction"
+        ],
+        [
+          "binder_fraction",
+          "粘结剂比例 (%)",
+          "fraction"
+        ],
+        [
+          "thickness_um",
+          "涂层厚度 (μm)",
+          "positive"
+        ],
+        [
+          "porosity",
+          "孔隙率 (%)",
+          "fraction"
+        ],
+        [
+          "bulk_density_g_cm3",
+          "干涂层密度 (g/cm³)",
+          "positive"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    },
+    {
+      "sheet": "半电池",
+      "note": "一行一颗电芯的一组结果；首次两种比容量采用同一质量口径；ICE自动计算。",
+      "fields": [
+        [
+          "cell_id",
+          "电芯编号",
+          "id"
+        ],
+        [
+          "sample_id",
+          "样品编号",
+          "ref:处理工艺"
+        ],
+        [
+          "electrode_id",
+          "极片编号",
+          "ref:极片"
+        ],
+        [
+          "first_lithiation",
+          "首次嵌锂 (mAh/g)",
+          "number"
+        ],
+        [
+          "first_delithiation",
+          "首次脱锂 (mAh/g)",
+          "number"
+        ],
+        [
+          "ice",
+          "ICE",
+          "derived"
+        ],
+        [
+          "c_rate",
+          "测试倍率 (C)",
+          "positive"
+        ],
+        [
+          "capacity",
+          "可逆比容量 (mAh/g)",
+          "number"
+        ],
+        [
+          "cycle",
+          "循环次数",
+          "integer"
+        ],
+        [
+          "retention",
+          "容量保持率 (%)",
+          "fraction"
+        ],
+        [
+          "notes",
+          "备注",
+          "text"
+        ]
+      ]
+    }
+  ]
+}

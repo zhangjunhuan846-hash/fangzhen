@@ -1341,3 +1341,22 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 > 换掉的是模型形式与噪声，**不是数据来源**；真实实验辨识是 G5.4，尚未开始。
 > **G6.1b-1 同样是合成数据**（观测就是同一模型在真值处的输出，**inverse crime**），
 > 所以它的可辨识带宽是**理想条件下的最好情况**。
+
+---
+
+## 2026-10-13：工作站 v0.3.9 仿真诊断与参数探索
+
+此节记录新桌面工作站的独立工程验收；上文 v0.1 平台冻结基线与历史实验门状态不变。
+
+- **PASS，固定窗口参数探索**：复用公开数据 PyBaMM 回放。只允许扩散系数和交换电流密度按声明范围乘倍数；几何、OCP、初始状态冻结。每轮记录误差及失败原因，窗口覆盖不足不能参与最优候选排序。
+- **PASS，真实公开数据烟测**：2026-10-13，WSL PyBaMM 26.8.0.0。SINTEF 石墨 pOCV-deli，SPM，7 次预算，RMSE 从 116.035 mV 至 115.958 mV，仅改善 0.0775 mV；界面显示弱响应与补测建议。Chen2020 C10，SPM，3 次预算，从 75.379 mV 至 61.100 mV。均为同一曲线的探索误差，不是独立留出验证或材料参数真实性结论。记录见 `outputs/battery_agent_checks/`。
+- **PASS，桌面打包与端到端界面**：PyInstaller 6.22.3 在 Windows 生成 `outputs/fangzhen_workbench_ui_v039_release/FangzhenResearch/FangzhenResearch.exe`；从打包界面提交石墨 7 轮任务，状态变为已运行，显示曲线、逐轮记录、参数倍率和弱响应提醒。截图见 `outputs/battery_agent_checks/agent_ui.png`。
+- **PASS，受控输入与失败门**：2026-10-13，Windows 回归 `21 passed, 1 skipped`；WSL 目标测试 `7 passed`，含短曲线不可获胜以及本机兼容接口的 LLM 请求/凭据隔离。真实外部 LLM 服务未配置，未作实际模型效果验收。
+- **PASS，默认目录迁移**：2026-10-13 运行 v0.3.9 打包版，创建 `data/workbench_scalar10/workbench.sqlite` 与 `升级前备份.sqlite`。源库、目标库 `PRAGMA integrity_check` 均为 `ok`，均含 `experiment_events`、`experiments`、`jobs`、`versions`、`workspaces` 五张表。根目录 `启动科研工作站.bat` 指向 v0.3.9 打包版；原目录保留。
+
+## 2026-10-13：工作站 v0.3.10 模型 API 配置
+
+- **PASS，本机配置接口与界面**：仿真诊断页可填写模型基础地址（含端口）、模型名和可选密钥，保存到 Git 忽略的 `data/agent_llm.local.json`；读取配置不回传密钥。提供 `/models` 连通性检查，LLM 任务启动前校验地址及配置。远程地址要求 HTTPS，本机可用 HTTP。
+- **PASS，旧版并存启动**：打包版位于 `outputs/fangzhen_workbench_ui_v0310_ready/FangzhenResearch/FangzhenResearch.exe`，根目录启动脚本已指向该版本。旧 v0.3.9 会话仍在时，实际新启动 PID 54444、端口 58086，`session.json` 与 `/api/environment` 均报告 `entry_version=0.3.10`。
+- **PASS，测试**：Windows 目标回归 `23 passed, 2 skipped`，WSL 目标回归 `9 passed`。界面保存与回读使用临时占位模型验收，截图见 `outputs/battery_agent_api_checks/api_settings_ui.png`；占位配置已删除。真实模型服务尚未提供，因此未声称实际 LLM 推理连通或建议质量通过。
+- **PASS，源码发布范围与回归**：本次只选入工作站及研究闭环源码、对应测试、说明文档和首页图示；不选入 `data/`、新的 `outputs/`、数据库或打包二进制。发布前 WSL 相关回归 `157 passed, 1 skipped`；Windows 环境与经济独立任务 `20 passed`；源码启动烟测报告 `entry_version=0.3.10`。完整回归发现并修复了简版/完整版工作簿读取器的循环依赖，依赖图检查已通过。

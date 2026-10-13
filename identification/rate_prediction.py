@@ -360,10 +360,10 @@ def _initial_offset_mV(output_dir: Path, rate: str) -> Optional[float]:
     看上去像"模型差 60 mV"，其实是初值没接上（2026-09-17 在本平台的
     合成倍率梯夹具上实测到：记录 0.745 V vs 仿真 1.453 V）。
     """
-    files = sorted(Path(output_dir).glob("*_time_aligned.csv"))
-    if not files:
+    table = Path(output_dir) / f"{rate}_time_aligned.csv"
+    if not table.is_file():
         return None
-    df = pd.read_csv(files[0])
+    df = pd.read_csv(table)
     for exp_col, sim_col in (("voltage_exp_V", "voltage_sim_V"),
                              ("V_exp", "V_sim")):
         if exp_col in df.columns and sim_col in df.columns:
@@ -397,12 +397,18 @@ def _run_one(
     )
     row = res["metrics"].iloc[0].to_dict()
     out_dir = Path(res["output_dir"])
+    rate_slug = str(adapter.rate_info(rate)["rate_slug"])
+    metadata_source = out_dir / "run_metadata.json"
+    metadata_path = out_dir / f"{rate_slug}_l4_metadata.json"
+    if metadata_source.is_file():
+        metadata_path.write_bytes(metadata_source.read_bytes())
     return {
         "metrics": {k: row.get(k) for k in _SCALAR_METRICS},
         "output_dir": str(out_dir),
         "runtime_s": float(res.get("runtime_s") or float("nan")),
         "applied_overrides": res.get("parameter_overrides_applied"),
-        "initial_offset_mV": _initial_offset_mV(out_dir, rate),
+        "initial_offset_mV": _initial_offset_mV(out_dir, rate_slug),
+        "metadata_path": str(metadata_path) if metadata_path.is_file() else None,
     }
 
 

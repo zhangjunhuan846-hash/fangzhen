@@ -253,6 +253,27 @@ optional:
     swap_how: "sigma_noise.py 的 k 必须走预注册文件，不许有默认值"
     pack: included
 
+  - path: user_tools/rg_workstation.py
+    layer: "② 科研工作台接入 + 受控约束工具"
+    role: "XLSX 原值读取、10 个变量的 4 条代数关系传播、关联校验与不可覆盖归档"
+    test_hook: "test_rg_workstation.py"
+    swap_how: "只消费 rg_workstation_schema.json 登记的字段与受控公式；不执行工作簿表达式"
+    note: "独立 CLI；尚未接 PyBaMM 或 GP/BO，不改变冻结仿真内核"
+    pack: included
+
+  - path: user_tools/rg_workstation_schema.json
+    layer: "② 输入契约"
+    role: "科研工作台中文列名、单位、数据类型、编号关系与枚举"
+    test_hook: "test_rg_workstation.py"
+    pack: included
+
+  - path: user_tools/rg_loop/
+    layer: "② 输入编排 → ④ 物理内核 / ⑤ 判定与模拟优化"
+    role: "Excel 任务、受控约束、PyBaMM/PyBOP/L4 桥、可信性门与合成工艺 GP/约束 EI"
+    test_hook: "test_rg_loop.py / test_rate_prediction.py / 本轮公开与合成端到端产物"
+    note: "真实材料验证尚未开展；旧 G5/G6 数值产物保持，L4 初值读取已按真实 rate_slug 修复"
+    pack: included
+
   - path: templates/
     layer: "① 数据来源"
     role: "用户数据模板"

@@ -204,6 +204,15 @@ def test_initial_offset_none_when_table_missing(tmp_path: Path):
     assert _initial_offset_mV(d, "C1") is None
 
 
+def test_initial_offset_uses_exact_target_rate(tmp_path: Path):
+    # C10 sorts before C2, but a C2 target must never read C10.
+    for slug, offset in (("C10", .004), ("C2", .080)):
+        pd.DataFrame({"voltage_exp_V": [1.0], "voltage_sim_V": [1.0+offset]}).to_csv(
+            tmp_path / f"{slug}_time_aligned.csv", index=False)
+    assert _initial_offset_mV(tmp_path, "C2") == pytest.approx(80)
+    assert _initial_offset_mV(tmp_path, "C1") is None
+
+
 # ------------------------------------------------------------------
 # 报告措辞（红线）
 # ------------------------------------------------------------------

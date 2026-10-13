@@ -1,0 +1,29 @@
+# 研究工作流
+
+从有来源的数据进入仿真、诊断与独立验证；环境和经济筛选使用同一套明确声明的工艺边界。
+
+```mermaid
+flowchart LR
+    input["实验记录 / 公开数据"] --> contract["数据契约<br/>单位 · 协议 · 来源"]
+    contract --> gate{"尺度与用途<br/>检查通过?"}
+    gate -- 否 --> repair["补齐记录或修正输入"]
+    repair --> contract
+    gate -- 是 --> physics["PyBaMM 回放<br/>SPM · SPMe · DFN"]
+    physics --> evaluate["固定窗口评价<br/>误差 · 覆盖 · 残差"]
+    evaluate --> evidence{"独立验证<br/>是否充分?"}
+    evidence -- 否 --> design["诊断 / 参数探索<br/>提出下轮实验"]
+    design --> input
+    evidence -- 是 --> report["版本化报告<br/>写明适用范围"]
+    contract --> inventory["工艺清单<br/>能耗 · 物料 · 价格"]
+    inventory --> sustainability["碳足迹 / 成本<br/>同一功能单位"]
+    sustainability --> report
+
+    classDef source fill:#E7F4F1,stroke:#178B78,color:#153B36,stroke-width:2px;
+    classDef process fill:#EAF0FF,stroke:#4A69C6,color:#1E315D,stroke-width:2px;
+    classDef decision fill:#FFF3DA,stroke:#C28B25,color:#533A13,stroke-width:2px;
+    classDef result fill:#F0EAFE,stroke:#8061BE,color:#38265B,stroke-width:2px;
+    class input,contract,inventory source;
+    class physics,evaluate,repair,design,sustainability process;
+    class gate,evidence decision;
+    class report result;
+```
