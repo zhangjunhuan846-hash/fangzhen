@@ -31,35 +31,11 @@
 
 数据能否进入模型、模型输出能否支持结论，在流程里是两道不同的关。诊断或 Agent 发现问题时回到数据与实验设计，而不是直接把最低误差写成验证结论。
 
-```mermaid
-flowchart LR
-    input["实验记录 / 公开数据"] --> contract["数据契约<br/>单位 · 协议 · 来源"]
-    contract --> gate{"尺度与用途<br/>检查通过?"}
-    gate -- 否 --> repair["补齐记录或修正输入"]
-    repair --> contract
-    gate -- 是 --> physics["PyBaMM 回放<br/>SPM · SPMe · DFN"]
-    physics --> evaluate["固定窗口评价<br/>误差 · 覆盖 · 残差"]
-    evaluate --> evidence{"独立验证<br/>是否充分?"}
-    evidence -- 否 --> design["诊断 / 参数探索<br/>提出下轮实验"]
-    design --> input
-    evidence -- 是 --> report["版本化报告<br/>写明适用范围"]
-    contract --> inventory["工艺清单<br/>能耗 · 物料 · 价格"]
-    inventory --> sustainability["碳足迹 / 成本<br/>同一功能单位"]
-    sustainability --> report
+![FANGZHEN 电池研究闭环：数据输入、治理、PyBaMM 仿真、证据评估、诊断 Agent 与下一轮实验计划；环境和经济评价为独立清单分支](figures/research-loop-illustrated.png)
 
-    classDef source fill:#E7F4F1,stroke:#178B78,color:#153B36,stroke-width:2px;
-    classDef process fill:#EAF0FF,stroke:#4A69C6,color:#1E315D,stroke-width:2px;
-    classDef decision fill:#FFF3DA,stroke:#C28B25,color:#533A13,stroke-width:2px;
-    classDef result fill:#F0EAFE,stroke:#8061BE,color:#38265B,stroke-width:2px;
-    class input,contract,inventory source;
-    class physics,evaluate,repair,design,sustainability process;
-    class gate,evidence decision;
-    class report result;
-```
+[查看高清原图](figures/research-loop-illustrated.png) · [可编辑的 Mermaid 流程图](figures/research-workflow.md) · [Mermaid 源码](figures/research-workflow.mmd)
 
-图源与独立预览：[研究流程](figures/research-workflow.md) · [Mermaid 源码](figures/research-workflow.mmd)
-
-这条链有三种常见输出：**公开数据回放**检验软件通路，**参数诊断**发现模型和数据哪里不一致，**独立实验**才检验结论能否迁移到新样品。碳足迹与成本使用另一套明确的工艺清单，不能与不同功能单位的参考结果混算。
+图中的“下一轮实验”带时钟，表示待开展的计划。**公开数据回放**检验软件通路，**参数诊断**发现模型和数据哪里不一致，**独立实验**才检验结论能否迁移到新样品。碳足迹与成本使用另一套明确的工艺清单，不能与不同功能单位的参考结果混算。
 
 ## 快速开始
 
@@ -97,22 +73,9 @@ python -m user_tools.research_workbench
 
 实线阶段表示软件已经实现；虚线阶段是还需要真实材料数据与独立实验的研究目标，没有把未来目标写成已验收能力。
 
-```mermaid
-flowchart LR
-    core["v0.1 · 已完成<br/>仿真平台冻结"] --> loop["v0.2 · 已完成<br/>研究数据闭环"]
-    loop --> workbench["v0.3.10 · 已实现<br/>本地研究工作站"]
-    workbench --> validation["下一阶段<br/>真实材料独立验证"]
-    validation --> decision["研究目标<br/>跨协议可迁移预测"]
+![FANGZHEN 项目路线图：v0.1 仿真平台、v0.2 研究数据闭环和 v0.3.10 本地工作站已实现；真实材料独立验证及跨协议可迁移预测仍待验证](figures/project-roadmap-illustrated.png)
 
-    classDef done fill:#E7F4F1,stroke:#178B78,color:#153B36,stroke-width:2px;
-    classDef current fill:#EAF0FF,stroke:#4A69C6,color:#1E315D,stroke-width:3px;
-    classDef future fill:#F5F2FA,stroke:#8D79B6,color:#44385C,stroke-width:2px,stroke-dasharray:5 4;
-    class core,loop done;
-    class workbench current;
-    class validation,decision future;
-```
-
-图源与独立预览：[项目路线图](figures/project-roadmap.md) · [Mermaid 源码](figures/project-roadmap.mmd)
+[查看高清原图](figures/project-roadmap-illustrated.png) · [可编辑的 Mermaid 路线图](figures/project-roadmap.md) · [Mermaid 源码](figures/project-roadmap.mmd)
 
 | 阶段 | 可检查的交付 | 当前结论 |
 | --- | --- | --- |
