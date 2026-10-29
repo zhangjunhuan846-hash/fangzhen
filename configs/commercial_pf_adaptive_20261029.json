@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "study": "PF temperature tables and prior-cycle aging calibration, v0.3.14",
+  "source": "https://data.mendeley.com/datasets/wykht8y7tg/1",
+  "seed": 42,
+  "baseline": "v0.3.13 frozen 25C 1RC model; no changes to the historical result",
+  "temperature_calibration": [
+    "10degC/pulses/*HPPC*.mat",
+    "0degC/pulses/*HPPC*.mat"
+  ],
+  "model_selection": [
+    "10degC/drives/*Cycle_1_*.mat",
+    "0degC/drives/*Cycle_1_*.mat",
+    "25degC original Cycle_1"
+  ],
+  "fresh_condition_holdouts": [
+    "10degC/drives/*US06_Pan*.mat",
+    "10degC/drives/*UDDS_Pan*.mat",
+    "10degC/drives/*LA92_Pan*.mat",
+    "0degC/drives/*US06_Pan*.mat",
+    "0degC/drives/*UDDS_Pan*.mat",
+    "0degC/drives/*LA92_Pan*.mat",
+    "25degC/*HWFTa_Pan*.mat",
+    "25degC/*HWFTb_Pan*.mat",
+    "25degC/*NN_Pan*.mat"
+  ],
+  "fresh_holdout_signals_opened_before_protocol": false,
+  "fresh_condition_claim_boundary": "same physical cell, independent records at calibrated temperatures; not cross-cell or chronological forecasting",
+  "aging_calibration": "07-22 Dis1C_1 complete discharge; use only this completed prior-cycle record for Q and resistance scaling",
+  "aging_selection": "07-23 Dis1C_Rp first recorded discharge segment only",
+  "aging_historical_regression": "Dis1C_Rp segments 2-10 and 07-24 Dis1C_2; already seen in v0.3.13, not newly independent",
+  "aging_parameters": [
+    "prior_discharge_capacity_Ah",
+    "R0_scale",
+    "R1_scale",
+    "tau_scale"
+  ],
+  "capacity_bounds_Ah": [
+    1.5,
+    3.5
+  ],
+  "resistance_scale_bounds": [
+    0.25,
+    6.0
+  ],
+  "tau_scale_bounds": [
+    0.25,
+    4.0
+  ],
+  "temperature_table_policy": "one RC branch, OCV and positive RC by SOC and calibration temperature; no fitting on fresh holdouts",
+  "model_candidates": [
+    "ambient_temperature_table",
+    "predicted_case_temperature_RC_table"
+  ],
+  "selection_rule": "mean voltage RMSE of the three Cycle_1 selection records; primary open-loop result remains separate from online filtering",
+  "observer": "SOX augmented EKF SOC, polarization and bounded log-R0 scale; parameter update gated by current excitation; measured case temperature is allowed only as observer input",
+  "observer_logR_process_candidates": [
+    0.0,
+    1e-07,
+    1e-06
+  ],
+  "observer_selection_rule": "minimum one-step voltage innovation RMSE on selection records, never posterior fitted voltage error",
+  "soc_reference": "current integral / fixed training capacity, a proxy, not independent absolute SOC; both baseline and updated observer use the same reference per comparison",
+  "eis_policy": "all 14 original25C spectra, no point deletion; compare original auto Lin-KK and add_cap=true with the same mu0.85; scale/phase/amplitude redundancies audited",
+  "eis_thresholds": {
+    "relative_rms": 0.02,
+    "relative_max": 0.05
+  },
+  "eis_unit_evidence": "manufacturer Digatron EIS-Meter mOhm axes and voltage/current amplitude consistency; not device calibration certification",
+  "screening_thresholds": {
+    "voltage_rmse_mV": 50.0,
+    "temperature_rmse_C": 3.0,
+    "soc_proxy_rmse": 0.03
+  },
+  "threshold_origin": "local engineering screening goals, not teacher or certification requirements",
+  "hardware": "unknown; enumerate configuration and read-only device inventory only, no physical actuator commands",
+  "calibration_data_audit_before_fresh_holdout": {
+    "finding": "0C/10C calibration/selection records have missing chamber-temperature fields; measured case temperatures are valid. Use declared nominal setpoint for missing chamber values, record missing fractions. No fresh heldout signals inspected.",
+    "ambient_policy": "replace only missing chamber values with0/10C dataset-folder nominal; retain measured case temperature for observer only"
+  },
+  "eis_unit_threshold_origin": "median amplitude-ratio scale discrepancy below manufacturer1percent magnitude specification; all per-point discrepancies retained separately",
+  "data_quality_amendment_before_complete_scoring": {
+    "finding": "0C LA92 has regular 60-second resting logs with millisecond timing jitter, not unrecorded charge gaps. Use>90s as disconnect guard; sparse voltage updates only at actual-neighbor time points. No frequency/record deletion.",
+    "development_exposed_records": [
+      "0degC_US06",
+      "0degC_UDDS"
+    ],
+    "new_scored_holdout_records": 7,
+    "aging_history_records": 10,
+    "all_original_9_condition_records_retained": true,
+    "original_frozen_before_exposure": "outputs/adaptive_pf_20261029/first_fresh_validation/adaptive_frozen_model.json",
+    "model_selection_still_uses_only_Cycle1_and_first_July_selection_segment": true
+  },
+  "measurement_policy": "simulate1Hz, but skip interpolated voltage updates over sample gaps>2s; score actual-neighbor resampled observations only, forward-hold observed case temperature for online EKF"
+}

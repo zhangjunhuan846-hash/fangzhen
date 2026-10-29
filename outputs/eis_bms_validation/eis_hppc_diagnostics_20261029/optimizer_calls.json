@@ -1,0 +1,1346 @@
+[
+  {
+    "nominal_soc": 0.8,
+    "call_index": 0,
+    "requested_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "passed_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "v0": 3.957021,
+    "final": [
+      0.0008911785589924536,
+      0.00023758790606897168,
+      0.2500000001118171
+    ],
+    "cost_sum_squared": 0.019522076494500967,
+    "nfev": 238,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": true,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 1,
+    "requested_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "passed_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "v0": 3.957021,
+    "final": [
+      0.0008911779471103683,
+      0.00023759571698354096,
+      0.250000004023663
+    ],
+    "cost_sum_squared": 0.019522076543384368,
+    "nfev": 31,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 2,
+    "requested_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "passed_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "v0": 3.957021,
+    "final": [
+      0.00089117863049809,
+      0.00023758596076526832,
+      0.2500000001556499
+    ],
+    "cost_sum_squared": 0.01952207649374501,
+    "nfev": 32,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": true,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 3,
+    "requested_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "passed_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "v0": 3.957021,
+    "final": [
+      0.0010572711294595096,
+      0.0006956939436581874,
+      23.843597772844145
+    ],
+    "cost_sum_squared": 0.49608951797125633,
+    "nfev": 6,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 4,
+    "requested_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "passed_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "v0": 3.957021,
+    "final": [
+      0.0010572708221084524,
+      0.0006956919422530541,
+      23.843493092104747
+    ],
+    "cost_sum_squared": 0.49608951796303763,
+    "nfev": 11,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 5,
+    "requested_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "passed_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "v0": 3.957021,
+    "final": [
+      0.0010572692462968163,
+      0.0006956823195491895,
+      23.842973767259377
+    ],
+    "cost_sum_squared": 0.49608951796617706,
+    "nfev": 7,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 6,
+    "requested_start": [
+      0.00089117863049809,
+      0.00023758596076526832,
+      0.2500000001556499
+    ],
+    "passed_start": [
+      0.00089117863049809,
+      0.00023758596076526832,
+      0.2500000025
+    ],
+    "v0": 3.957021,
+    "final": [
+      0.0010572716348579499,
+      0.0006956968987459164,
+      23.84376048582022
+    ],
+    "cost_sum_squared": 0.49608951798993217,
+    "nfev": 8,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 7,
+    "requested_start": [
+      0.000445589315249045,
+      0.00011879298038263416,
+      0.12500000007782494
+    ],
+    "passed_start": [
+      0.00044558931524904495,
+      0.00011879298038263415,
+      0.2500000025
+    ],
+    "v0": 3.957021,
+    "final": [
+      0.0010572706944029363,
+      0.0006956912950514196,
+      23.843453878525892
+    ],
+    "cost_sum_squared": 0.49608951796072165,
+    "nfev": 9,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 8,
+    "requested_start": [
+      0.00178235726099618,
+      0.00047517192153053665,
+      0.5000000003112998
+    ],
+    "passed_start": [
+      0.00178235726099618,
+      0.0004751719215305367,
+      0.5000000003112998
+    ],
+    "v0": 3.957021,
+    "final": [
+      0.0010572693965591252,
+      0.0006956831033557978,
+      23.84301906092195
+    ],
+    "cost_sum_squared": 0.496089517963,
+    "nfev": 9,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 9,
+    "requested_start": [
+      0.0010572711294595096,
+      0.0006956939436581874,
+      23.843597772844145
+    ],
+    "passed_start": [
+      0.0010572711294595096,
+      0.0006956939436581874,
+      23.843597772844145
+    ],
+    "v0": 3.9513215032608713,
+    "final": [
+      0.001029036050056147,
+      0.0006589348191458563,
+      20.703739330549613
+    ],
+    "cost_sum_squared": 0.2709577562124496,
+    "nfev": 5,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 10,
+    "requested_start": [
+      0.0010572708221084524,
+      0.0006956919422530541,
+      23.843493092104747
+    ],
+    "passed_start": [
+      0.0010572708221084524,
+      0.0006956919422530541,
+      23.843493092104747
+    ],
+    "v0": 3.9513214927842535,
+    "final": [
+      0.0010290361056602465,
+      0.0006589350666758562,
+      20.703754143210247
+    ],
+    "cost_sum_squared": 0.2709577562124443,
+    "nfev": 5,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.8,
+    "call_index": 11,
+    "requested_start": [
+      0.0010572692462968163,
+      0.0006956823195491895,
+      23.842973767259377
+    ],
+    "passed_start": [
+      0.0010572692462968163,
+      0.0006956823195491895,
+      23.842973767259377
+    ],
+    "v0": 3.9513214420072305,
+    "final": [
+      0.0010290360843921743,
+      0.0006589349686027178,
+      20.703748541730132
+    ],
+    "cost_sum_squared": 0.2709577562124433,
+    "nfev": 5,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 0,
+    "requested_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "passed_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "v0": 3.722213,
+    "final": [
+      0.0008993304845829229,
+      0.0002144976898643676,
+      0.25000000418413554
+    ],
+    "cost_sum_squared": 0.020851506089441176,
+    "nfev": 250,
+    "status": 0,
+    "message": "The maximum number of function evaluations is exceeded.",
+    "success": false,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 1,
+    "requested_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "passed_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "v0": 3.722213,
+    "final": [
+      0.0008993371636485707,
+      0.00021437914193656819,
+      0.2500000002099487
+    ],
+    "cost_sum_squared": 0.020851505428631397,
+    "nfev": 27,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": true,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 2,
+    "requested_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "passed_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "v0": 3.722213,
+    "final": [
+      0.0008993376253202477,
+      0.00021437293944144654,
+      0.25000000016000057
+    ],
+    "cost_sum_squared": 0.020851505442358583,
+    "nfev": 26,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": true,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 3,
+    "requested_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "passed_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "v0": 3.722213,
+    "final": [
+      0.0010442967810834537,
+      0.0005258404875010419,
+      24.459132498929787
+    ],
+    "cost_sum_squared": 0.5048637063622251,
+    "nfev": 9,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 4,
+    "requested_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "passed_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "v0": 3.722213,
+    "final": [
+      0.0010443040539333595,
+      0.0005258873044254114,
+      24.46247581673093
+    ],
+    "cost_sum_squared": 0.5048637068093556,
+    "nfev": 11,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 5,
+    "requested_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "passed_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "v0": 3.722213,
+    "final": [
+      0.0010443004953417608,
+      0.0005258645931607105,
+      24.460845791213437
+    ],
+    "cost_sum_squared": 0.504863706360449,
+    "nfev": 10,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 6,
+    "requested_start": [
+      0.0008993371636485707,
+      0.00021437914193656819,
+      0.2500000002099487
+    ],
+    "passed_start": [
+      0.0008993371636485707,
+      0.00021437914193656819,
+      0.2500000025
+    ],
+    "v0": 3.722213,
+    "final": [
+      0.0010442966627258548,
+      0.0005258398736891476,
+      24.459082024645536
+    ],
+    "cost_sum_squared": 0.5048637063696362,
+    "nfev": 10,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 7,
+    "requested_start": [
+      0.00044966858182428533,
+      0.00010718957096828409,
+      0.12500000010497436
+    ],
+    "passed_start": [
+      0.0004496685818242853,
+      0.00010718957096828408,
+      0.2500000025
+    ],
+    "v0": 3.722213,
+    "final": [
+      0.001044301854308717,
+      0.0005258731411876845,
+      24.46146376209021
+    ],
+    "cost_sum_squared": 0.5048637064789346,
+    "nfev": 11,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 8,
+    "requested_start": [
+      0.0017986743272971413,
+      0.00042875828387313637,
+      0.5000000004198975
+    ],
+    "passed_start": [
+      0.0017986743272971415,
+      0.0004287582838731364,
+      0.5000000004198975
+    ],
+    "v0": 3.722213,
+    "final": [
+      0.0010443011105791054,
+      0.0005258684402162673,
+      24.461124747089038
+    ],
+    "cost_sum_squared": 0.5048637064061039,
+    "nfev": 12,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 9,
+    "requested_start": [
+      0.0010442967810834537,
+      0.0005258404875010419,
+      24.459132498929787
+    ],
+    "passed_start": [
+      0.0010442967810834537,
+      0.0005258404875010419,
+      24.459132498929787
+    ],
+    "v0": 3.717771232800734,
+    "final": [
+      0.001021303918593427,
+      0.0004992642702608712,
+      21.245521525184653
+    ],
+    "cost_sum_squared": 0.27288282735307834,
+    "nfev": 6,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 10,
+    "requested_start": [
+      0.0010443040539333595,
+      0.0005258873044254114,
+      24.46247581673093
+    ],
+    "passed_start": [
+      0.0010443040539333595,
+      0.0005258873044254114,
+      24.46247581673093
+    ],
+    "v0": 3.717771476677699,
+    "final": [
+      0.0010213039228260058,
+      0.0004992642811431212,
+      21.245521951594093
+    ],
+    "cost_sum_squared": 0.2728828273530561,
+    "nfev": 6,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.6,
+    "call_index": 11,
+    "requested_start": [
+      0.0010443004953417608,
+      0.0005258645931607105,
+      24.460845791213437
+    ],
+    "passed_start": [
+      0.0010443004953417608,
+      0.0005258645931607105,
+      24.460845791213437
+    ],
+    "v0": 3.717771358282994,
+    "final": [
+      0.0010213037879435356,
+      0.0004992635771485073,
+      21.245469312675887
+    ],
+    "cost_sum_squared": 0.2728828273550116,
+    "nfev": 6,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 0,
+    "requested_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "passed_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "v0": 3.629743,
+    "final": [
+      0.0009124208574270131,
+      0.0002149353675691545,
+      0.25020942522910256
+    ],
+    "cost_sum_squared": 0.021448395733520115,
+    "nfev": 250,
+    "status": 0,
+    "message": "The maximum number of function evaluations is exceeded.",
+    "success": false,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 1,
+    "requested_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "passed_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "v0": 3.629743,
+    "final": [
+      0.0009115556556329404,
+      0.00022272398623757823,
+      0.2500000000434583
+    ],
+    "cost_sum_squared": 0.021442549966745852,
+    "nfev": 83,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": true,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 2,
+    "requested_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "passed_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "v0": 3.629743,
+    "final": [
+      0.0009115564291654044,
+      0.00022270977846708162,
+      0.25000000176573123
+    ],
+    "cost_sum_squared": 0.02144255000100276,
+    "nfev": 44,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": true,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 3,
+    "requested_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "passed_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "v0": 3.629743,
+    "final": [
+      0.0010574591677246137,
+      0.000517616535383376,
+      25.661433298168962
+    ],
+    "cost_sum_squared": 0.5280639987093871,
+    "nfev": 10,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 4,
+    "requested_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "passed_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "v0": 3.629743,
+    "final": [
+      0.0010574611010757298,
+      0.0005176301440513255,
+      25.66242619639786
+    ],
+    "cost_sum_squared": 0.5280639991037417,
+    "nfev": 16,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 5,
+    "requested_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "passed_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "v0": 3.629743,
+    "final": [
+      0.001057461923857409,
+      0.0005176359442725488,
+      25.66285031028178
+    ],
+    "cost_sum_squared": 0.5280639993144413,
+    "nfev": 10,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 6,
+    "requested_start": [
+      0.0009115556556329404,
+      0.00022272398623757823,
+      0.2500000000434583
+    ],
+    "passed_start": [
+      0.0009115556556329404,
+      0.00022272398623757823,
+      0.2500000025
+    ],
+    "v0": 3.629743,
+    "final": [
+      0.001057457948582905,
+      0.0005176079410305044,
+      25.66080621320902
+    ],
+    "cost_sum_squared": 0.5280639985317264,
+    "nfev": 12,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 7,
+    "requested_start": [
+      0.0004557778278164702,
+      0.00011136199311878912,
+      0.12500000002172915
+    ],
+    "passed_start": [
+      0.00045577782781647014,
+      0.0001113619931187891,
+      0.2500000025
+    ],
+    "v0": 3.629743,
+    "final": [
+      0.0010574578854516798,
+      0.0005176075272092867,
+      25.660775917008888
+    ],
+    "cost_sum_squared": 0.5280639985245447,
+    "nfev": 10,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 8,
+    "requested_start": [
+      0.0018231113112658808,
+      0.00044544797247515647,
+      0.5000000000869166
+    ],
+    "passed_start": [
+      0.0018231113112658808,
+      0.0004454479724751565,
+      0.5000000000869166
+    ],
+    "v0": 3.629743,
+    "final": [
+      0.0010574495841890702,
+      0.0005175491286750347,
+      25.656511315155104
+    ],
+    "cost_sum_squared": 0.5280639988015018,
+    "nfev": 10,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 9,
+    "requested_start": [
+      0.0010574591677246137,
+      0.000517616535383376,
+      25.661433298168962
+    ],
+    "passed_start": [
+      0.0010574591677246137,
+      0.000517616535383376,
+      25.661433298168962
+    ],
+    "v0": 3.62581277520591,
+    "final": [
+      0.0010354567210297924,
+      0.0004901300561101451,
+      22.33674278107449
+    ],
+    "cost_sum_squared": 0.2847568138847805,
+    "nfev": 7,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 10,
+    "requested_start": [
+      0.0010574611010757298,
+      0.0005176301440513255,
+      25.66242619639786
+    ],
+    "passed_start": [
+      0.0010574611010757298,
+      0.0005176301440513255,
+      25.66242619639786
+    ],
+    "v0": 3.625812844475747,
+    "final": [
+      0.0010354567920398878,
+      0.0004901305285334991,
+      22.33677818390765
+    ],
+    "cost_sum_squared": 0.28475681388694474,
+    "nfev": 7,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.4,
+    "call_index": 11,
+    "requested_start": [
+      0.001057461923857409,
+      0.0005176359442725488,
+      25.66285031028178
+    ],
+    "passed_start": [
+      0.001057461923857409,
+      0.0005176359442725488,
+      25.66285031028178
+    ],
+    "v0": 3.6258128739838615,
+    "final": [
+      0.0010354567384559725,
+      0.0004901302078018325,
+      22.336753676449042
+    ],
+    "cost_sum_squared": 0.28475681388543544,
+    "nfev": 7,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 0,
+    "requested_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "passed_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "v0": 3.575953,
+    "final": [
+      0.000926302208314458,
+      0.0002656926115107568,
+      0.2500000000000046
+    ],
+    "cost_sum_squared": 0.023632164742620813,
+    "nfev": 100,
+    "status": 4,
+    "message": "Both `ftol` and `xtol` termination conditions are satisfied.",
+    "success": true,
+    "at_bound": true,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 1,
+    "requested_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "passed_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "v0": 3.575953,
+    "final": [
+      0.0009262942815870311,
+      0.00026570129908403144,
+      0.250000002032018
+    ],
+    "cost_sum_squared": 0.023632164834304158,
+    "nfev": 63,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": true,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 2,
+    "requested_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "passed_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "v0": 3.575953,
+    "final": [
+      0.0009262996455390653,
+      0.0002657412497095767,
+      0.25000000388774796
+    ],
+    "cost_sum_squared": 0.023632164920183392,
+    "nfev": 27,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_only"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 3,
+    "requested_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "passed_start": [
+      0.0010000000000000002,
+      0.0005000000000000001,
+      10.000000000000002
+    ],
+    "v0": 3.575953,
+    "final": [
+      0.0010727603054689224,
+      0.0005582435695976675,
+      24.651498987790525
+    ],
+    "cost_sum_squared": 0.5442394903164766,
+    "nfev": 8,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 4,
+    "requested_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "passed_start": [
+      0.0020000000000000005,
+      0.0020000000000000005,
+      1.0
+    ],
+    "v0": 3.575953,
+    "final": [
+      0.0010727529784151319,
+      0.0005581957016943566,
+      24.648277412111128
+    ],
+    "cost_sum_squared": 0.5442394905379049,
+    "nfev": 12,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 5,
+    "requested_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "passed_start": [
+      0.0003000000000000001,
+      0.0003000000000000001,
+      100.00000000000004
+    ],
+    "v0": 3.575953,
+    "final": [
+      0.0010727536315218976,
+      0.000558199968733168,
+      24.648564403099762
+    ],
+    "cost_sum_squared": 0.5442394904432877,
+    "nfev": 9,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "hppc_only"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 6,
+    "requested_start": [
+      0.000926302208314458,
+      0.0002656926115107568,
+      0.2500000000000046
+    ],
+    "passed_start": [
+      0.000926302208314458,
+      0.0002656926115107568,
+      0.2500000025
+    ],
+    "v0": 3.575953,
+    "final": [
+      0.0010727596938966662,
+      0.0005582395015514951,
+      24.65122817871535
+    ],
+    "cost_sum_squared": 0.5442394902640377,
+    "nfev": 10,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 7,
+    "requested_start": [
+      0.000463151104157229,
+      0.0001328463057553784,
+      0.1250000000000023
+    ],
+    "passed_start": [
+      0.00046315110415722893,
+      0.00013284630575537837,
+      0.2500000025
+    ],
+    "v0": 3.575953,
+    "final": [
+      0.0010727611232308923,
+      0.0005582489676091898,
+      24.651860914430472
+    ],
+    "cost_sum_squared": 0.5442394904069041,
+    "nfev": 10,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 8,
+    "requested_start": [
+      0.001852604416628916,
+      0.0005313852230215136,
+      0.5000000000000092
+    ],
+    "passed_start": [
+      0.0018526044166289161,
+      0.0005313852230215136,
+      0.5000000000000092
+    ],
+    "v0": 3.575953,
+    "final": [
+      0.001072762311484551,
+      0.0005582567181596725,
+      24.65238252682824
+    ],
+    "cost_sum_squared": 0.544239490578228,
+    "nfev": 10,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "eis_initial_hppc"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 9,
+    "requested_start": [
+      0.0010727603054689224,
+      0.0005582435695976675,
+      24.651498987790525
+    ],
+    "passed_start": [
+      0.0010727603054689224,
+      0.0005582435695976675,
+      24.651498987790525
+    ],
+    "v0": 3.571241520742202,
+    "final": [
+      0.0010511031563460557,
+      0.0005316667492811256,
+      21.698334208634755
+    ],
+    "cost_sum_squared": 0.29392635161474495,
+    "nfev": 6,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 10,
+    "requested_start": [
+      0.0010727529784151319,
+      0.0005581957016943566,
+      24.648277412111128
+    ],
+    "passed_start": [
+      0.0010727529784151319,
+      0.0005581957016943566,
+      24.648277412111128
+    ],
+    "v0": 3.571241272256573,
+    "final": [
+      0.0010511031392662126,
+      0.0005316665692685827,
+      21.698325075446512
+    ],
+    "cost_sum_squared": 0.2939263516150954,
+    "nfev": 6,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  },
+  {
+    "nominal_soc": 0.2,
+    "call_index": 11,
+    "requested_start": [
+      0.0010727536315218976,
+      0.000558199968733168,
+      24.648564403099762
+    ],
+    "passed_start": [
+      0.0010727536315218976,
+      0.000558199968733168,
+      24.648564403099762
+    ],
+    "v0": 3.571241294414835,
+    "final": [
+      0.0010511031470012474,
+      0.0005316667701871413,
+      21.698332756050338
+    ],
+    "cost_sum_squared": 0.2939263516148052,
+    "nfev": 6,
+    "status": 2,
+    "message": "`ftol` termination condition is satisfied.",
+    "success": true,
+    "at_bound": false,
+    "fallback_used": false,
+    "stage": "joint"
+  }
+]

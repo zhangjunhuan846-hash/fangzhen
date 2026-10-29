@@ -1,4 +1,4 @@
-param([string]$ReleaseDirectory = 'outputs\fangzhen_workbench_ui_v0310')
+param([string]$ReleaseDirectory = 'outputs\fangzhen_workbench_ui_v0314')
 $ErrorActionPreference = 'Stop'
 $WorkbenchProject = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
     $WorkbenchRelease = Join-Path $WorkbenchProject $ReleaseDirectory

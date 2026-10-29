@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "source": "https://doi.org/10.17632/ycx459r5c3.2",
+  "development_cells": ["59294", "59485", "59627", "59690"],
+  "fresh_test_cells": ["60129", "60403"],
+  "temperature_setpoints_C": [10, 25, 40],
+  "drives": ["dv_wltp", "dv_udds", "dv_us06"],
+  "window_start_fraction_of_active_duration": [0.2, 0.6],
+  "window_duration_s": 600,
+  "initial_filter_soc_offset_from_proxy": -0.04,
+  "voltage_noise_V": 0.005,
+  "voltage_noise_selection": "selected using cell 59294, 25C WLTP and candidate values 0.005, 0.02, 0.05 V in the preceding experiment",
+  "previous_selection_artifact_sha256": "8ca0a443ce0cd27c3c3e4b65f4bd6196d824372554fbd7aefa568dc601dfb772",
+  "mode_selection": "minimum mean development EKF one-step prior voltage RMSE",
+  "soc_reference": "same-cell and temperature C20 discharge voltage anchor at each drive start plus current integration; proxy, not an independent SOC measurement",
+  "temperature": "nominal chamber setpoint, not surface temperature",
+  "calibration": "same-cell C20 and pre-driving HPPC 1C, including for held-out cells; no unseen-cell zero-shot claim",
+  "eis": "recorded after driving and audited only; not used to parameterize preceding driving"
+}

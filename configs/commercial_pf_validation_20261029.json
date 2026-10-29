@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "dataset": "Panasonic NCR18650PF 2.9Ah, Kollmeyer 2018 v1",
+  "source": "https://data.mendeley.com/datasets/wykht8y7tg/1",
+  "doi": "10.17632/wykht8y7tg.1",
+  "license": "CC BY 4.0",
+  "frozen_before_holdout_signal_inspection": true,
+  "identification": [
+    "25degC/C20 OCV and 1C discharge tests_start_of_tests/*C20*.mat",
+    "25degC/5 pulse disch/*5Pulse_HPPC*.mat"
+  ],
+  "model_selection": [
+    "25degC/Drive cycles/*Cycle_1_*.mat"
+  ],
+  "independent_voltage_temperature_holdout": [
+    "25degC/Drive cycles/*US06_*.mat",
+    "25degC/Drive cycles/*UDDS_*.mat",
+    "25degC/Drive cycles/*LA92_*.mat"
+  ],
+  "eis_role": "same-cell retrospective diagnostic; April EIS is not used to fit earlier March drive-cycle holdouts",
+  "resampling_s": 1.0,
+  "resampling_current": "preserve charge over each interval; voltage/temperature interpolated on time only",
+  "circuit_candidates": [
+    1,
+    2
+  ],
+  "model_selection_rule": "lowest Cycle_1 voltage RMSE; report both; never use held-out drive-cycle outcomes for selection",
+  "state_estimator_initial_soc_bias": -0.15,
+  "state_estimator_noise_policy": "tune voltage residual scale on Cycle_1, then freeze for all holdouts",
+  "metrics": [
+    "voltage_rmse_mV",
+    "voltage_mae_mV",
+    "voltage_p95_abs_mV",
+    "temperature_rmse_C",
+    "SOC_rmse_vs_coulomb_reference",
+    "coverage",
+    "constraint_events",
+    "elapsed_s"
+  ],
+  "engineering_screening_thresholds": {
+    "voltage_rmse_mV": 50,
+    "temperature_rmse_C": 3,
+    "SOC_rmse_vs_coulomb_reference": 0.03,
+    "minimum_coverage": 0.95
+  },
+  "threshold_origin": "task-specific engineering screening targets, not teacher requirements or product certification",
+  "soc_reference_boundary": "reference derived from recorded current/Ah and calibration capacity; not independent absolute SOC measurement",
+  "optimization_boundary": "new protocols evaluated in calibrated simulation only; no claim of measured fast-charge or lifetime gains",
+  "external_cell_validation": false,
+  "seed": 42,
+  "protocol_amendment_before_holdout": {
+    "reason": "C20 filename date is May, later than March drive tests. Use March HPPC rest OCV and published nominal2.9Ah for identification. May C20 is capacity diagnostic only. Add July1C as chronological aging holdouts.",
+    "holdout_signal_inspected": false
+  },
+  "ocv_policy": "March HPPC rest voltages versus recorded Ah/nominal2.9Ah",
+  "chronological_holdout": [
+    "25degC/C20 OCV Test_end_of_tests/*Dis1C*.mat"
+  ],
+  "input_audit_amendment": {
+    "reason": "July repeated file has9 unrecorded charge gaps and Ah counter jumps; split gaps >60s, retain all10 recorded segments; integrate measured current, not resetting Ah counters. No parameter tuning on holdout.",
+    "first_pass_preserved": "outputs/frontier_validation_20261029/commercial",
+    "holdout_already_evaluated": true
+  }
+}

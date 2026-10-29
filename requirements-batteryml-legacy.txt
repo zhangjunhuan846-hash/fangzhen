@@ -1,0 +1,15 @@
+# Isolated Python 3.11: archived BatteryML uses NumPy 1 APIs.
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.17.1
+scikit-learn==1.9.1
+numba==0.68.1
+h5py==3.16.0
+matplotlib==3.11.2
+openpyxl==3.1.5
+PyYAML==6.0.3
+tqdm==4.70.1
+requests==2.34.2
+addict==2.4.0
+fire==0.7.1
+xgboost-cpu==3.2.0

@@ -17,7 +17,7 @@ Tag:                    v0.1.0-platform -> ee2fb36
                         **此 tag 从 2026-09-17 起不再移动**（见下「版本号纪律」）
 origin/main:            **与本地同链，已 push**（2026-09-17；main 与 feat 分支同 SHA）
 Working tree:           见「已知限制 #1」
-STATUS.md last updated: 2026-09-18
+STATUS.md last updated: 2026-10-29
 ```
 
 ### 版本号纪律（2026-09-17 定）
@@ -1360,3 +1360,57 @@ command:       python -m pytest -q   (WSL, conda env pybamm)
 - **PASS，旧版并存启动**：打包版位于 `outputs/fangzhen_workbench_ui_v0310_ready/FangzhenResearch/FangzhenResearch.exe`，根目录启动脚本已指向该版本。旧 v0.3.9 会话仍在时，实际新启动 PID 54444、端口 58086，`session.json` 与 `/api/environment` 均报告 `entry_version=0.3.10`。
 - **PASS，测试**：Windows 目标回归 `23 passed, 2 skipped`，WSL 目标回归 `9 passed`。界面保存与回读使用临时占位模型验收，截图见 `outputs/battery_agent_api_checks/api_settings_ui.png`；占位配置已删除。真实模型服务尚未提供，因此未声称实际 LLM 推理连通或建议质量通过。
 - **PASS，源码发布范围与回归**：本次只选入工作站及研究闭环源码、对应测试、说明文档和首页图示；不选入 `data/`、新的 `outputs/`、数据库或打包二进制。发布前 WSL 相关回归 `157 passed, 1 skipped`；Windows 环境与经济独立任务 `20 passed`；源码启动烟测报告 `entry_version=0.3.10`。完整回归发现并修复了简版/完整版工作簿读取器的循环依赖，依赖图检查已通过。
+
+
+## 2026-10-29：工作站 v0.3.11 EIS局部诊断
+
+- **PASS，独立EIS适配器与数值恢复**：通过impedance 1.7.1完成1RC/2RC拟合、Lin-KK残差诊断、原始文件与配置留档、逐点CSV/参数CSV/JSON导出。固定网格阶数按点数预先确定，也可选上游自动mu截止；结果保留mu和残差，不将阈值判定等同于线性、稳态或材料真实性。
+- **PASS，目标回归**：2026-10-29，在已有WSL pybamm环境执行 `python -m pytest tests/test_eis_fit.py tests/test_workbench.py tests/test_workbench_pipeline.py tests/test_paper_methods.py tests/test_module_manifest.py tests/test_module_graph.py -q`，最终 **61 passed**。包含独立解析RC谱参数恢复、单位/符号、多谱/重复频率拒绝、异常谱与提交后原始文件变动检查。
+- **PASS，实际打包程序HTTP→WSL任务与下载**：最终程序位于 `outputs/fangzhen_workbench_ui_v0311_ready/FangzhenResearch/FangzhenResearch.exe`。使用独立目录 `outputs/workbench_eis_tests_20261029` 运行 `python -m user_tools.workbench.smoke_eis outputs/workbench_eis_tests_20261029`，验证原始输入保持、实际WSL后端与三种下载。完整记录 `eis_verification.json`；最终任务 `94d735a89ad34d7a9859f4128eebb5e6`。合成1RC复阻抗RMSE为5.995044077694696e-15 Ω，固定网格Lin-KK归一RMS为0.004379107209740343；这些是软件算例结果。
+- **环境**：实际版本impedance 1.7.1、Altair 5.5.0、NumPy 2.3.5、SciPy 1.17.1；PyBaMM版本未升级。适配器处理impedance发布版在NumPy 2下的Lin-KK内部标量表达式兼容问题，安装包与冻结内核未改写。
+- **边界**：未完成真实目标电芯跨SOC/温度的参数表、BMS状态估计、控制器、电池包、硬件通信或材料独立验证。根目录启动脚本优先使用v0.3.11 ready版，沿用已有研究数据目录；合成验收仅使用独立outputs目录。
+- 本轮项目与论文检索、已有实验结果的重新核对及剩余工作见 `docs/teacher_gap_review_20261029.md`。检索结论不作为第三方算法已运行的证明。
+
+## 2026-10-29：工作站 v0.3.12 电池工程扩展
+
+- **PASS，软件接入与参数链**：新增9类工程任务：Thevenin电热/SOX CC-EKF-UKF、do-mpc充电、PyBOP多SOC联合1RC、liionpack电池包、BatteryML官方Dummy/Ridge/RF、车辆分组故障RF/SVM、PyProBE标准数据、foxBMS DBC/虚拟CAN、BoTorch选点。完成同方案EIS→RC→SOC/MPC及SOC/MPC电压→DBC毫伏信号→虚拟CAN；父任务来源与SHA-256保留。当前固定工况估计、联合RC辨识、文件标准化和虚拟通信的具体范围见 `docs/engineering_integrations_v0312_20261029.md`。
+- **PASS，9个选点入口实际执行**：qLogNEHVI、HVKG、PS-BAX有限双目标集合适配、MF-KG、MF-MES、GIBBON、qLogEI、DynMeanBO核心公式适配、SafeOpt单轮有限域适配。PS-BAX按后验采样目标集合后选择集合内最大后验熵；HVKG/MF-KG执行内层数值优化。SafeOpt默认池无可查询安全改进点时明确停止；额外构造的合成查询场景实际推荐`u0`，产物在 `outputs/engineering_probe_20261029/safeopt_query`。不将这些入口等同于全部原论文实验复现。
+- **PASS，工程测试**：在可选WSL `engineering`环境执行 `python -m pytest tests/test_engineering.py -q`，2026-10-29最终 **34 passed**。含独立解析RC时域对照、SOC初值偏差、无参考时不报SOC误差、留出谱扰动不影响拟合、未来标签/重复候选拒绝、真实BoTorch采集函数、MPC达到目标/不可行零电流回退，以及DBC单位和虚拟总线往返。PyTorch/BoTorch保留纯Python内核回退和单样本标准化警告，未作为数值成功以外的性能证明。
+- **PASS，既有相关回归**：在原WSL `pybamm`环境执行 `python -m pytest tests/test_eis_fit.py tests/test_workbench.py tests/test_workbench_pipeline.py tests/test_paper_methods.py tests/test_module_manifest.py tests/test_module_graph.py -q`，2026-10-29 **61 passed**。模块清单校验 **FAIL 0**，JavaScript语法检查及Git空白检查通过；未将该相关回归称为全仓全部测试通过。
+- **PASS，最终EXE端到端验收**：程序为 `outputs/fangzhen_workbench_ui_v0312_final/FangzhenResearch/FangzhenResearch.exe`，SHA-256 `738b8ace69fba09279835e8fa94035d7c73c486a88ac9a0e649c12955134b494`。使用独立目录 `outputs/workbench_engineering_final_tests_20261029` 运行 `python -m user_tools.workbench.smoke_engineering …`，**20个工程任务通过**，另完成EIS父任务。覆盖9类任务、9个选点算法、EIS参数桥接、CAN遥测桥接、公开CH生成数据及CSV/JSON下载；逐任务ID/版本/下载哈希见该目录 `engineering_verification.json`，20个任务的工程后端源码哈希均与最终文件一致，摘要见 `acceptance_summary.json`。
+- **PASS，实际界面核对**：最终EXE在浏览器中显示工程任务入口、来源配置、EIS来源、结果指标和下载按钮；MPC结果显示电压、电流、温度、SOC四条曲线及正确单位。截图 `outputs/workbench_engineering_final_tests_20261029/engineering_ui.png`。日常根目录启动脚本已优先选择v0.3.12 final版，继续使用原研究数据目录；本次合成验收未写入该目录。
+- **PASS，官方生成数据回放**：CH-BatteryGen v1.0归档SHA-256 `2bce2a26720519833f8a0b73e7af95bb6ab8ac997cc62afc3d320c67fd02be21`。固定种子选择LFP四类各6辆，共24辆，按车辆训练16/测试8，单次充电均匀取点后7112行。该小样本RF宏F1=0.3916667、SVM宏F1=0.5000000；属于官方AI生成数据回放与简易特征基线，不是全量论文复现或真实故障车队准确率。原文件/划分/采样索引留在忽略的 `data/vendor_assets/`。
+- **环境与边界**：工程、liionpack旧版PyBaMM、归档BatteryML使用三个可选环境；本机记录见 `data/engineering_runtime.local.json`，获取与源码锁见 `安装工程仿真扩展.bat`、`user_tools/install_engineering.py`、`configs/engineering_sources.lock.json`。原PyBaMM26.8/NumPy2.3.5内核保留。干净电脑重装仍未验收，G0继续PARTIAL。目标商业电芯独立工况验证、实际EIS仪/BMS板联调、跨材料和真实寿命/优化收益仍未完成；工程产物保留`material_validation=false`、`hardware_connected=false`。
+
+
+## 2026-10-29：工作站 v0.3.13 四项目与公开商用电芯
+
+- **PASS，真实源码接入**：MOBO-OSD、rMFBO、CAMO、BatteryLife四仓库固定commit并隔离旧依赖。MOBO执行作者正交子问题/Pareto/qHVI；rMFBO执行谱正则深核/ROI/熵成本分配的有限池轻量适配；CAMO执行作者FiDE/CAR核及有限池随机KG适配（非原论文BOCA全复现）；BatteryLife执行官方CPMLP/CPTransformer。原源码未改，兼容补丁、逐文件SHA和MIT许可证保留。未将入口接入称为全部论文基准复现。
+- **PASS，公开数据完整性与链路**：Panasonic NCR18650PF 2.9Ah（Kollmeyer2018v1，CC BY4.0）44个官方单文件、31,014,802字节，逐文件SHA与发布方相符；整包ZIP返回403，未声称整包校验完成。HPPC辨识、Cycle1选型后冻结，US06/UDDS/LA92及7月3文件共15段留出测试，保留79,642行输出。重复测试缺9段充电记录，按>60s断点拆分，全部已记录段保留；电流积分重采样，不把重置Ah当电流。首轮错误连接缺测区间的结果与更正说明均保留。
+- **PARTIAL，物理验证精度**：UDDS/LA92电压RMSE 13.73/24.85mV，US06 64.92mV；12段老化时间留出约120.67–188.78mV，15段中电压2段达到本次自定50mV目标。温度15段均小于3°C；SOC仅对电流积分/名义容量代理参考，3段小于3%，不等同独立绝对SOC真值。1颗主电芯不能算跨电芯验证，未按留出误差调参数。
+- **PASS，仿真闭环**：三种新选点各3轮，84次初始化+12次新增查询=96次冻结商业电芯仿真，未来实测测试标签不进入选点。多保真间隔60/20/5s和成本代理1:3:12均声明；不据3轮/单种子声称算法优越或真实快充收益。MPC最终模型SOC0.800134、估计0.800269，最高4.078956V/27.6413°C、回退0/仿真越界0；153帧经foxBMS DBC/python-can虚拟总线往返。未接硬件，也未证明失配下安全。
+- **PARTIAL，EIS**：4月公开全谱2RC拟合/Lin-KK执行；R0约22.92mΩ，Lin-KK RMS2.4863%、最大14.1474%，高于当前2%目标，可辨识性未评估。导出单位行仅[EIS]，按mΩ解释有量级依据但待核实；未将其强接入更早3月预测。
+- **PASS运行 / 未优于基线，BatteryLife**：HUST前10循环，排除官方指出首两循环问题的7-5电芯；45训练/15验证/16测试按物理电芯与协议组隔离，训练标准化、验证选epoch后测试。CPMLP测试MAE214.78循环、CPTransformer261.03，岭回归186.89，训练均值193.13。它们与Panasonic不是同一电芯体系，不当作PF寿命模型；不声称新模型提升。
+- **PASS，独立核验**：独立重算15段全部电压/SOC指标；完整US06独立RK4 ODE相对Thevenin最大电压差5.5384e-7V、温度差1.2366e-5°C；独立电芯划分、MAE、工程源码SHA和依赖清单快照均通过。证据 `outputs/frontier_validation_20261029/independent_evidence_audit.json`。
+- **PASS，检查与桌面验收**：WSL可选engineering环境 `pytest tests/test_engineering.py tests/test_frontier.py -q` 为42 passed；相关workbench/EIS/迁移/ML/研究闭环回归63 passed（未称全仓测试）。最终后端验收来自打包v0.3.13，9项HTTP→WSL→下载通过，输入/版本/下载SHA见 `outputs/frontier_validation_20261029/desktop_final_acceptance.json`；新方案保存在日常data/workbench_scalar10中，原研究方案保留。
+- **仍缺**：跨温度/跨SOH/跨电芯有效性，PF同体系寿命模型及SOH自适应，EIS单位/一致性问题排查，真实仪器/BMS/HIL与安全联锁，PF电池包差异/热耦合验证，以及自有材料到全电池的配对实验和实测优化收益。原liionpack仍为Chen2020参考。G0干净电脑重装仍未验收。所有工程结果保持material_validation=false、hardware_connected=false。
+- 使用根目录启动脚本进入v0.3.13 release；报告 `docs/frontier_commercial_validation_v0313_20261029.md`，可视报告 `outputs/frontier_validation_20261029/report.html`。最终UI与exe哈希见本节后续验收记录。
+
+- **PASS，release收尾**：最终入口 `outputs/fangzhen_workbench_ui_v0313_release/FangzhenResearch/FangzhenResearch.exe`，SHA-256 `78c954dee82e9da2b0a462eff39ea441436fda06ef7fad01e370b8c9c7160439`。release重新核对9个既有最终任务的全部38项下载哈希一致；实际界面核对公开数据最小配置、15段误差表和下载按钮，截图 `outputs/frontier_validation_20261029/desktop_final_ui.png`，收尾凭证 `release_verification.json`。模块清单/依赖图25项测试通过（Windows需UTF-8输出模式）；JavaScript语法与Git空白检查通过。
+
+## 2026-10-29：工作站 v0.3.14 温度/老化更新、EIS复核与保护SIL
+
+本节是当前工作站最新验收；v0.3.13数值保留为历史记录。冻结平台的科学内核 `battery_sim/` 未修改。
+
+- **PASS，温度参数与数据完整性**：新增10个发布方SHA256核对通过的0/10°C HPPC、Cycle1和行驶工况原文件。0/10°C HPPC辨识、3条Cycle1及7月重复放电首段选型后冻结。箱温字段缺失时显式使用标称设定温度；表面温度使用原始观测。公开数据仍来自同一颗Panasonic PF，不能称为跨电芯验证。配置与修正说明 `configs/commercial_pf_adaptive_20261029.json`。
+- **PASS，分角色评价与计分修正**：开发初轮已输出指标的0°C US06/UDDS标为2条开发已见回归；另7条为新评分工况，10段为老化历史回归。0°C LA92在初轮只做过时间轴结构检查。约60秒间隔属于稀疏休息日志；有效观测掩码避免将插值电压当作每秒传感器更新，在线温度使用已到达观测。新旧模型在同一掩码、输入及初态下比较，不能与v0.3.13均匀重采样指标直接混算。本轮19条共135,641个仿真点、93,034个有效观测，未按测试误差删记录。
+- **PARTIAL，电压与热精度**：最终桌面任务的7条新评分记录逐记录平均电压RMSE **61.30549→37.54729mV**，6/7达到本次自定50mV目标；10段老化历史回归 **147.98907→42.18819mV**，7/10达到目标。新评分10°C US06为74.82mV，后期3段老化仍超过50mV；最差温度RMSE **5.43557°C**，热参数仍来自25°C，未达到所有工况3°C目标。数字由最终逐点CSV独立重算，不作为硬件性能或跨电芯置信区间。
+- **PARTIAL，容量/SOH与在线估计**：上一完整循环交付容量2.43808076Ah，拟合模型容量2.58181300Ah；R0比例1.992015，R1与时间常数比例分别触及0.25与4.0边界，存在参数耦合。模型容量/额定容量不称为独立SOH真值。SOX增广EKF作SOC/极化/有激励R0修正，电压创新在当次电压更新前计算，SOC参考仍为电流积分代理。未证明无参考循环的盲容量估计或衰退机理。
+- **PASS诊断执行 / PARTIAL数据确认，EIS**：14条原始全谱共756点保留，幅值/相位与电压电流冗余及厂家资料支持mΩ转换，但有 **5个幅值字段异常点** 超过1%标称幅值精度、最大95.368%，未猜测修复。相同μ0.85和预声明阶数上限下，加入官方支持的低频串联电容后第1谱RMS2.486%→0.287313%，14谱最差0.751564%。**12/14满足RMS、最大残差和μ三条件**；第10、13谱μ在M27仍为0.8583/0.9170，属于阶数诊断待查，不能仅凭低残差判定通过。独立列缩放SVD复算与原方法最大差4.13395e-10Ω。详见最终任务 `physics/eis_audit.json`。
+- **PASS，更新参数→MPC→虚拟CAN**：同方案参数父任务读取及SHA校验通过，跨方案来源被拒绝，手填未经验证来源标记被拒绝。Thevenin仿真电芯使用SOC参数表，控制器/滤波器为固定工作点；本算例延伸25°C老化参数，未验证老化×温度联合面。MPC最终模型SOC **0.79086111**、估计SOC **0.80010539**，最高4.14114227V/28.39183551°C，回退0、仿真越界0；估计达到0.8不等于模型真SOC也达到0.8。随后 **134帧、1206个解码信号** 经foxBMS DBC与虚拟CAN往返，帧数与MPC输出行数一致。
+- **PASS，保护逻辑SIL / 尚未接硬件**：12项软件用例通过，包含正常放行及过欠压、过温、过流、陈旧/缺失观测、时间戳/序列、设备故障和命令越限。独立Thevenin保护算例锁存后6步请求电流为0，SOC变化0；不自动恢复。本机只读串口元数据枚举0项，设备型号未知、CAN/VISA未配置，不能据此断言没有设备；物理命令发送0，未测真实保护延迟。连接模板 `configs/hardware_connection.template.json`。
+- **PASS，独立核验**：`user_tools/validate_adaptive_evidence.py`从最终CSV重算19条有效观测指标，另写完整0°C US06的RK4与Thevenin最大电压差2.8842141e-7V；19条中点法/Thevenin最大电压差1.2134e-6V、温度差0.00061416°C。EIS独立SVD、SIL电流/状态、全部5任务代码副本及当前源码SHA、运行依赖清单原字节SHA均通过。凭证 `outputs/adaptive_pf_20261029/desktop_final/independent_audit.json`。
+- **PASS，检查与最终程序**：WSL可选engineering环境 `pytest tests/test_adaptive_pf.py tests/test_engineering.py tests/test_frontier.py -q` **62 passed**；相关工作站/EIS/迁移/ML回归 **63 passed**；Windows UTF-8下模块清单/依赖图 **25 passed**、清单FAIL0，JavaScript语法和Git空白检查通过。这些是明确范围的检查，不称全仓测试。最终程序 `outputs/fangzhen_workbench_ui_v0314_final/FangzhenResearch/FangzhenResearch.exe`，SHA256 **e262153ec3344ce101773074eafada6ff7605fc3e9d4c3a46660c91d2983afb2**。
+- **PASS，最终桌面链路**：打包v0.3.14完成5项HTTP→WSL→下载任务：更新 `131ec7b408e640cb9710f1efb606671a`、EIS `0a10832793a840e9b0b498848781d94f`、SIL `1f79192d314f4141b36fbb4fe8d08e20`、MPC `91f06964532246598634cceb1180a618`、CAN `a62bd807fb7a4c4a8613c42eeeffec67`。工作区 `9c47c8fe529f4000845a60a32bb0b729`，界面名“PF温度与老化更新 · v0.3.14最终验证”；逐任务运行版本及24项下载SHA在 `outputs/adaptive_pf_20261029/desktop_final/desktop_acceptance.json`。首次打包的MPC参数表拒绝失败记录保留，修复来源校验后重新打包并完成这5项最终验收；不把失败版称为通过。
+- **交付与差距**：根目录启动脚本优先v0.3.14 final。报告 `docs/adaptive_pf_v0314_20261029.md`，可视报告 `outputs/adaptive_pf_20261029/desktop_final/report.html`。仍需新的电芯/低温与高动态独立数据、可辨识性和热模型改进、PF同体系寿命验证、真实EIS+BMS/HIL、PF电池包热耦合及自有材料配对实验。HUST寿命数据及Chen2020电池包仍属各自参考体系；G0干净电脑重装仍未验收。所有工程结果继续记录 `material_validation=false`、`hardware_connected=false`。
+- **PASS，交付复查**：2026-10-29再次从最终程序下载全部24项产物，SHA与首次最终验收一致；记录 `outputs/adaptive_pf_20261029/desktop_final/release_verification.json`。实际界面核对15项任务目录、公开数据最小配置、7/2/10分角色误差表、更新参数MPC按钮、14条EIS谱的μ/阶数及2条待查标记、5个幅值异常、12项SIL与设备只读枚举，以及MPC模型/估计SOC分开显示。截图与可见项凭证在同目录 `ui_verification.json`、`desktop_ui.png`、`eis_ui.png`、`sil_ui.png`、`hardware_ui.png`、`config_ui.png`、`mpc_ui.png`。

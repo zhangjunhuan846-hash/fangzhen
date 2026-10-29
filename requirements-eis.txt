@@ -1,0 +1,5 @@
+# Optional EIS backend, installed INSIDE the existing WSL pybamm environment.
+# Keep core versions constrained when installing:
+# python -m pip install -r requirements.txt -r requirements-eis.txt
+impedance==1.7.1
+altair==5.5.0

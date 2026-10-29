@@ -135,8 +135,8 @@ def train(dataset, config, out):
         development,calibration_rows,calibration_plan=split_groups(dataset['rows'],config.get('alpha',.1))
         dataset={**dataset,'rows':development}
     chosen = validate_selection(dataset, config); rows = dataset['rows']
-    if not 5 <= len(rows) <= 500:
-        raise ValueError('需要5–500个有目标的样品；未测目标不能训练。')
+    if not 5 <= len(rows) <= 1000:
+        raise ValueError('需要5–1000个有目标的样品；未测目标不能训练。')
     fields = [f for f in dataset['fields'] if f['key'] in chosen]
     group_batch = {}
     for r in rows:

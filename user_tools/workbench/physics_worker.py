@@ -6,6 +6,9 @@ from pathlib import Path
 
 
 def run(config,out):
+    if config['mode']=='eis_fit':
+        from user_tools.workbench.eis_fit import run_eis_fit
+        return run_eis_fit(config,out)
     if config['mode']=='battery_agent':
         from user_tools.workbench.battery_agent_worker import run_agent
         return run_agent(config,out)
@@ -39,6 +42,9 @@ def run(config,out):
     if mode=='eis_forward':
         from user_tools.workbench.eis_worker import public_eis
         result=public_eis(config,out);save(out/'result.json',result)
+    elif mode=='sodium_dfn':
+        from user_tools.workbench.sodium_dfn import run_sodium_dfn
+        result=run_sodium_dfn(config,out);save(out/'result.json',result)
     elif mode=='parquet_preprocess':
         from user_tools.workbench.eis_worker import parquet_recording
         result,curves=parquet_recording(config,out);save(out/'result.json',result)

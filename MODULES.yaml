@@ -189,6 +189,283 @@ core:
 # 换法：见 module_contract 节
 # ==============================================================================
 optional:
+  - path: user_tools/workbench/smoke_engineering.py
+    layer: "可选工程验收"
+    role: "Windows HTTP到三个隔离WSL环境及结果下载验收"
+    test_hook: "python -m user_tools.workbench.smoke_engineering <isolated-data>"
+    pack: included
+
+  - path: user_tools/workbench/engineering_bms.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_common.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_contracts.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_control.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_identification.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_io.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_ml.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_optimize.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_pack.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_service.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_worker.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_frontier.py
+    layer: "可选工程仿真扩展"
+    role: "固定上游源码接入、公开商用电芯与独立验证"
+    test_hook: "tests/test_frontier.py / smoke_frontier.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_batterylife.py
+    layer: "可选工程仿真扩展"
+    role: "固定上游源码接入、公开商用电芯与独立验证"
+    test_hook: "tests/test_frontier.py / smoke_frontier.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_commercial.py
+    layer: "可选工程仿真扩展"
+    role: "固定上游源码接入、公开商用电芯与独立验证"
+    test_hook: "tests/test_frontier.py / smoke_frontier.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_vendor.py
+    layer: "可选工程仿真扩展"
+    role: "固定上游源码接入、公开商用电芯与独立验证"
+    test_hook: "tests/test_frontier.py / smoke_frontier.py"
+    pack: included
+
+  - path: user_tools/prepare_frontier_public.py
+    layer: "可选工程仿真扩展"
+    role: "固定上游源码接入、公开商用电芯与独立验证"
+    test_hook: "tests/test_frontier.py / smoke_frontier.py"
+    pack: included
+
+  - path: user_tools/workbench/smoke_frontier.py
+    layer: "验证（可选集成）"
+    role: "公开数据闭环、桌面验收或独立ODE与指标核验"
+    test_hook: "tests/test_frontier.py / desktop_final_acceptance.json"
+    pack: included
+
+  - path: user_tools/run_frontier_battery_loop.py
+    layer: "验证（可选集成）"
+    role: "公开数据闭环、桌面验收或独立ODE与指标核验"
+    test_hook: "tests/test_frontier.py / desktop_final_acceptance.json"
+    pack: included
+
+  - path: user_tools/validate_frontier_evidence.py
+    layer: "验证（可选集成）"
+    role: "公开数据闭环、桌面验收或独立ODE与指标核验"
+    test_hook: "tests/test_frontier.py / desktop_final_acceptance.json"
+    pack: included
+
+  - path: user_tools/build_frontier_report.py
+    layer: "验证（可选集成）"
+    role: "从真实运行证据构建商用电芯验证报告与图"
+    test_hook: "independent_evidence_audit.json"
+    pack: included
+
+  - path: user_tools/workbench/engineering_adaptive.py
+    layer: "可选工程仿真扩展"
+    role: "同电芯温度/SOH更新、EIS质量诊断或离线保护验证"
+    test_hook: "tests/test_adaptive_pf.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_adaptive_math.py
+    layer: "可选工程仿真扩展"
+    role: "同电芯温度/SOH更新、EIS质量诊断或离线保护验证"
+    test_hook: "tests/test_adaptive_pf.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_eis_audit.py
+    layer: "可选工程仿真扩展"
+    role: "同电芯温度/SOH更新、EIS质量诊断或离线保护验证"
+    test_hook: "tests/test_adaptive_pf.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_eis_grid.py
+    layer: "可选工程仿真扩展"
+    role: "EIS多SOC与温度的RC表辨识及独立频谱筛查"
+    test_hook: "tests/test_engineering_eis_grid.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_eis_hppc_joint.py
+    layer: "可选工程仿真扩展"
+    role: "EIS筛查后的同阶RC与HPPC对照辨识"
+    test_hook: "tests/test_eis_hppc_joint.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_eis_hppc_report.py
+    layer: "可选工程仿真扩展"
+    role: "EIS与HPPC回顾性对照报告"
+    test_hook: "tests/test_eis_hppc_joint.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_stanford_case.py
+    layer: "可选工程仿真扩展"
+    role: "Stanford公开案例"
+    test_hook: "tests/test_stanford_frozen.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_stanford_frozen.py
+    layer: "可选工程仿真扩展"
+    role: "Stanford冻结参数案例"
+    test_hook: "tests/test_stanford_frozen.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_rc_grid.py
+    layer: "可选工程仿真扩展"
+    role: "EIS与BMS共用的有界RC网格插值"
+    test_hook: "tests/test_engineering_eis_grid.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_calb_validation.py
+    layer: "可选工程仿真扩展"
+    role: "CALB同电芯C20、HPPC与驾驶工况标准化及验证"
+    test_hook: "tests/test_calb_validation.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_calb_validation_v2.py
+    layer: "可选工程仿真扩展"
+    role: "开发选择、开环与单步预测比较和额外电芯验证"
+    test_hook: "tests/test_calb_validation.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_calb_validation_v3.py
+    layer: "可选工程仿真扩展"
+    role: "CALB滤波噪声选择及新电芯留出"
+    test_hook: "tests/test_calb_validation.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_crosscell.py
+    layer: "可选工程仿真扩展"
+    role: "CALB源电芯参数池化和未见电芯温度OCV/RC对照"
+    test_hook: "tests/test_calb_validation.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_tesla_validation.py
+    layer: "可选工程仿真扩展"
+    role: "Tesla低温C20和HPPC标定与跨电芯评估"
+    test_hook: "tests/test_calb_validation.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_tesla_refined.py
+    layer: "可选工程仿真扩展"
+    role: "低温OCV补偿、投影统计及新驾驶记录验证"
+    test_hook: "tests/test_calb_validation.py"
+    pack: included
+
+  - path: user_tools/workbench/engineering_safety.py
+    layer: "可选工程仿真扩展"
+    role: "同电芯温度/SOH更新、EIS质量诊断或离线保护验证"
+    test_hook: "tests/test_adaptive_pf.py"
+    pack: included
+
+  - path: user_tools/workbench/hardware_readiness.py
+    layer: "可选工程仿真扩展"
+    role: "同电芯温度/SOH更新、EIS质量诊断或离线保护验证"
+    test_hook: "tests/test_adaptive_pf.py"
+    pack: included
+
+  - path: user_tools/prepare_pf_temperature.py
+    layer: "可选工程仿真扩展"
+    role: "同电芯温度/SOH更新、EIS质量诊断或离线保护验证"
+    test_hook: "tests/test_adaptive_pf.py"
+    pack: included
+
+  - path: user_tools/workbench/smoke_adaptive.py
+    layer: "验证（可选集成）"
+    role: "更新参数闭环桌面验收或观测掩码独立核验"
+    test_hook: "tests/test_adaptive_pf.py"
+    pack: included
+
+  - path: user_tools/validate_adaptive_evidence.py
+    layer: "验证（可选集成）"
+    role: "更新参数闭环桌面验收或观测掩码独立核验"
+    test_hook: "tests/test_adaptive_pf.py"
+    pack: included
+
+  - path: user_tools/build_adaptive_report.py
+    layer: "验证（可选集成）"
+    role: "从最终桌面证据生成温度/老化更新报告和图"
+    test_hook: "independent_audit.json"
+    pack: included
+
+  - path: user_tools/install_engineering.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/prepare_ch_batterygen.py
+    layer: "可选工程仿真扩展"
+    role: "隔离依赖的电池工程任务、来源记录或本地数据接入"
+    test_hook: "tests/test_engineering.py / smoke_engineering.py"
+    pack: included
+
+  - path: user_tools/workbench/smoke_eis.py
+    layer: "验证（可选集成）"
+    role: "独立数据目录的Windows HTTP→WSL→EIS结果下载端到端验收"
+    test_hook: "python -m user_tools.workbench.smoke_eis <isolated-data>"
+    pack: included
+
+  - path: user_tools/workbench/eis_fit.py
+    layer: "⑤ EIS局部诊断（可选）"
+    role: "impedance.py Lin-KK一致性诊断、1RC/2RC拟合与来源留档"
+    test_hook: "test_eis_fit.py"
+    swap_how: "保留原始谱、明确谱编号、单位和虚部符号；拟合参数不自动写入材料内核"
+    pack: included
+
   - path: battery_sim/datasets/
     layer: "② 接入层"
     role: "7 个 adapter + base/template/ocp_lookup/material_metadata"

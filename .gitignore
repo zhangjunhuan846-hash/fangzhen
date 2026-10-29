@@ -63,3 +63,14 @@ data/agent_llm.local.json
 /outputs/battery_agent_*/
 /outputs/workbench_*tests*/
 /outputs/github_backend_probe_*/
+
+# Disposable optional-engineering numerical probes.
+/outputs/engineering_probe_*/
+
+# Regenerable public-cell experiments, vendor copies and local desktop evidence.
+/outputs/frontier_validation_*/
+
+/outputs/adaptive_pf_*/
+
+# Rebuildable desktop executables, Python bundles, and local build trees.
+/outputs/fangzhen_workbench_*/

@@ -1,0 +1,281 @@
+{
+  "selection_rule": "W5 Diag_2, W5 Diag_3, then W9 Diag_2; quality and metadata before dynamic errors",
+  "candidates": [
+    {
+      "cell": "W5",
+      "diagnostic": "Diag_2",
+      "eis_files": []
+    },
+    {
+      "cell": "W5",
+      "diagnostic": "Diag_3",
+      "eis_files": []
+    },
+    {
+      "cell": "W9",
+      "diagnostic": "Diag_2",
+      "eis_files": [
+        "INR21700_M50T_T23_Aging_EIS_SOC20_W9_Channel_5.xlsx",
+        "INR21700_M50T_T23_Aging_EIS_SOC50_W9_Channel_5.xlsx",
+        "INR21700_M50T_T23_Aging_EIS_SOC80_W9_Channel_5.xlsx"
+      ],
+      "hppc_files": [
+        "INR21700_M50T_T23_Aging_HPPC_W9_Channel_5.xlsx"
+      ],
+      "capacity_files": [
+        "INR21700_M50T_T23_Aging_0_05C_W9_Channel_5.xlsx"
+      ],
+      "cycling_files_count": 70
+    }
+  ],
+  "w9_spectra": [
+    {
+      "file": "INR21700_M50T_T23_Aging_EIS_SOC20_W9_Channel_5.xlsx",
+      "soc_percent": 20,
+      "sha256_local": "0a33eab6fc600be78a1d1254947ccbb3378c39f8de3abcf84063815a27c21e3a",
+      "publisher_sha256": null,
+      "start_time": "2020-06-25 19:15:00.003000",
+      "end_time": "2020-06-25 19:27:32.114000",
+      "raw_columns": [
+        "Freq",
+        "Zmod",
+        "Zphz"
+      ],
+      "unit_interpretation": "Hz, ohm, degrees; complex = magnitude exp(j phase)",
+      "bands": {
+        "full": {
+          "points": 19,
+          "add_cap": true,
+          "library_version": "1.7.1",
+          "fit_type": "complex",
+          "c": 0.85,
+          "max_M": 9,
+          "M": 3,
+          "mu": 0.5060688550749484,
+          "reached_max_M": false,
+          "real_relative_rms": 0.0350511921842947,
+          "imag_relative_rms": 0.02657499717557955,
+          "relative_rms": 0.04398654963079535,
+          "relative_max": 0.07008797637426546,
+          "cutoff_reached": true,
+          "independent_SVD_max_difference_ohm": 6.522589465211168e-16,
+          "rank": 6,
+          "columns": 6,
+          "scaled_condition_number": 28.857509395207494,
+          "screening_pass": false,
+          "screening_thresholds": {
+            "relative_rms_max": 0.02,
+            "relative_max_max": 0.05,
+            "mu_cutoff": 0.85
+          },
+          "screening_failures": [
+            "relative_rms_above_threshold",
+            "relative_max_above_threshold"
+          ],
+          "below_0_1Hz_relative_rms": 0.021022536312171405,
+          "0_1_to_100Hz_relative_rms": 0.04113667397455065,
+          "above_100Hz_relative_rms": 0.05554789804626816
+        },
+        "under_500Hz": {
+          "points": 15,
+          "add_cap": true,
+          "library_version": "1.7.1",
+          "fit_type": "complex",
+          "c": 0.85,
+          "max_M": 7,
+          "M": 7,
+          "mu": 1.0,
+          "reached_max_M": true,
+          "real_relative_rms": 0.0011182477019631206,
+          "imag_relative_rms": 0.0010628712832269599,
+          "relative_rms": 0.0015427810238832745,
+          "relative_max": 0.002467911404795505,
+          "cutoff_reached": false,
+          "independent_SVD_max_difference_ohm": 1.4753765837714006e-15,
+          "rank": 10,
+          "columns": 10,
+          "scaled_condition_number": 35.822569864139304,
+          "screening_pass": false,
+          "screening_thresholds": {
+            "relative_rms_max": 0.02,
+            "relative_max_max": 0.05,
+            "mu_cutoff": 0.85
+          },
+          "screening_failures": [
+            "mu_cutoff_not_reached_at_max_M"
+          ],
+          "below_0_1Hz_relative_rms": 0.0015951389765543928,
+          "0_1_to_100Hz_relative_rms": 0.0016354203436413054,
+          "above_100Hz_relative_rms": 0.0008133871302422447
+        }
+      }
+    },
+    {
+      "file": "INR21700_M50T_T23_Aging_EIS_SOC50_W9_Channel_5.xlsx",
+      "soc_percent": 50,
+      "sha256_local": "dc5c0b3efb6b4e535d07aad3770cb2618f5b43262a48680b43a8f592803c15de",
+      "publisher_sha256": null,
+      "start_time": "2020-06-27 23:47:07.861000",
+      "end_time": "2020-06-28 00:00:20.925000",
+      "raw_columns": [
+        "Freq",
+        "Zmod",
+        "Zphz"
+      ],
+      "unit_interpretation": "Hz, ohm, degrees; complex = magnitude exp(j phase)",
+      "bands": {
+        "full": {
+          "points": 19,
+          "add_cap": true,
+          "library_version": "1.7.1",
+          "fit_type": "complex",
+          "c": 0.85,
+          "max_M": 9,
+          "M": 2,
+          "mu": 0.7738252117783311,
+          "reached_max_M": false,
+          "real_relative_rms": 0.058889309961960366,
+          "imag_relative_rms": 0.02644684080647465,
+          "relative_rms": 0.06455529580475067,
+          "relative_max": 0.11560251715450848,
+          "cutoff_reached": true,
+          "independent_SVD_max_difference_ohm": 5.840636449905002e-16,
+          "rank": 5,
+          "columns": 5,
+          "scaled_condition_number": 25.916569346316834,
+          "screening_pass": false,
+          "screening_thresholds": {
+            "relative_rms_max": 0.02,
+            "relative_max_max": 0.05,
+            "mu_cutoff": 0.85
+          },
+          "screening_failures": [
+            "relative_rms_above_threshold",
+            "relative_max_above_threshold"
+          ],
+          "below_0_1Hz_relative_rms": 0.06171683867201643,
+          "0_1_to_100Hz_relative_rms": 0.04680554252206022,
+          "above_100Hz_relative_rms": 0.08741266639479973
+        },
+        "under_500Hz": {
+          "points": 15,
+          "add_cap": true,
+          "library_version": "1.7.1",
+          "fit_type": "complex",
+          "c": 0.85,
+          "max_M": 7,
+          "M": 7,
+          "mu": 1.0,
+          "reached_max_M": true,
+          "real_relative_rms": 0.0011973528238825102,
+          "imag_relative_rms": 0.0009688361853719288,
+          "relative_rms": 0.0015402263921078135,
+          "relative_max": 0.002638402225816487,
+          "cutoff_reached": false,
+          "independent_SVD_max_difference_ohm": 8.068075805804697e-16,
+          "rank": 10,
+          "columns": 10,
+          "scaled_condition_number": 36.960266947873976,
+          "screening_pass": false,
+          "screening_thresholds": {
+            "relative_rms_max": 0.02,
+            "relative_max_max": 0.05,
+            "mu_cutoff": 0.85
+          },
+          "screening_failures": [
+            "mu_cutoff_not_reached_at_max_M"
+          ],
+          "below_0_1Hz_relative_rms": 0.0016054916202601981,
+          "0_1_to_100Hz_relative_rms": 0.0015640189015279035,
+          "above_100Hz_relative_rms": 0.001301940630873608
+        }
+      }
+    },
+    {
+      "file": "INR21700_M50T_T23_Aging_EIS_SOC80_W9_Channel_5.xlsx",
+      "soc_percent": 80,
+      "sha256_local": "c56c1ecbc54fbf4635375cc643b842276f34493ceb548859553f9cc6ef5ae54a",
+      "publisher_sha256": null,
+      "start_time": "2020-06-30 17:20:39.666000",
+      "end_time": "2020-06-30 17:31:45.186000",
+      "raw_columns": [
+        "Freq",
+        "Zmod",
+        "Zphz"
+      ],
+      "unit_interpretation": "Hz, ohm, degrees; complex = magnitude exp(j phase)",
+      "bands": {
+        "full": {
+          "points": 19,
+          "add_cap": true,
+          "library_version": "1.7.1",
+          "fit_type": "complex",
+          "c": 0.85,
+          "max_M": 9,
+          "M": 3,
+          "mu": 0.5733733249458292,
+          "reached_max_M": false,
+          "real_relative_rms": 0.03578710964144761,
+          "imag_relative_rms": 0.027312144309341525,
+          "relative_rms": 0.045018556654598425,
+          "relative_max": 0.06716866159623995,
+          "cutoff_reached": true,
+          "independent_SVD_max_difference_ohm": 4.69094375588105e-16,
+          "rank": 6,
+          "columns": 6,
+          "scaled_condition_number": 29.403209924579585,
+          "screening_pass": false,
+          "screening_thresholds": {
+            "relative_rms_max": 0.02,
+            "relative_max_max": 0.05,
+            "mu_cutoff": 0.85
+          },
+          "screening_failures": [
+            "relative_rms_above_threshold",
+            "relative_max_above_threshold"
+          ],
+          "below_0_1Hz_relative_rms": 0.03954701527226477,
+          "0_1_to_100Hz_relative_rms": 0.041329001106514225,
+          "above_100Hz_relative_rms": 0.052810945592976145
+        },
+        "under_500Hz": {
+          "points": 15,
+          "add_cap": true,
+          "library_version": "1.7.1",
+          "fit_type": "complex",
+          "c": 0.85,
+          "max_M": 7,
+          "M": 7,
+          "mu": 1.0,
+          "reached_max_M": true,
+          "real_relative_rms": 0.0010763791818718938,
+          "imag_relative_rms": 0.0012160613723713864,
+          "relative_rms": 0.0016240065900546671,
+          "relative_max": 0.0027651832933323134,
+          "cutoff_reached": false,
+          "independent_SVD_max_difference_ohm": 7.079713667274081e-16,
+          "rank": 10,
+          "columns": 10,
+          "scaled_condition_number": 36.16727381310414,
+          "screening_pass": false,
+          "screening_thresholds": {
+            "relative_rms_max": 0.02,
+            "relative_max_max": 0.05,
+            "mu_cutoff": 0.85
+          },
+          "screening_failures": [
+            "mu_cutoff_not_reached_at_max_M"
+          ],
+          "below_0_1Hz_relative_rms": 0.0013544775345988279,
+          "0_1_to_100Hz_relative_rms": 0.001818269488917076,
+          "above_100Hz_relative_rms": 0.0007057242909410162
+        }
+      }
+    }
+  ],
+  "failures": [],
+  "w9_screen_pass_all_full": false,
+  "selected": null,
+  "status": "未冻结：缺少 W5 EIS，W9 需要通过质量及诊断-动态时间、SOC/温度/状态审核",
+  "screen_scope": "fixed existing Lin-KK engineering screen, not proof data invalid; under 500 Hz is exploratory; no gate changed"
+}

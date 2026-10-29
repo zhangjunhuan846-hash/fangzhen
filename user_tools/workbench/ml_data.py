@@ -148,8 +148,8 @@ def csv_dataset(raw, config):
             exclusions.append({'record_id': ident, 'reason': '目标缺失，不插补'}); continue
         rows.append({**rawrow, 'record_id': ident, 'group_id': str(rawrow['group_id']).strip(),
                      'batch_id': str(rawrow['batch_id']).strip(), 'target': y})
-        if len(rows) > 500:
-            raise ValueError('第一版最多500行建模样本。')
+        if len(rows) > 1000:
+            raise ValueError('最多1000行建模样本。')
     fields = []
     for name in names:
         if name.startswith('_') or name in {'record_id', 'group_id', 'batch_id', target, 'target'}:

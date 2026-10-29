@@ -1,0 +1,1060 @@
+{
+  "cell": "60129",
+  "temperature_C": 25,
+  "models": {
+    "hppc_only": {
+      "cell_id": "CALB-60129",
+      "capacity_Ah": 54.1668459624615,
+      "initial_soc": 0.8,
+      "estimated_initial_soc": 0.65,
+      "temperature_C": 25,
+      "mass_kg": 0.07,
+      "heat_capacity_J_kgK": 900.0,
+      "heat_transfer_W_K": 0.2,
+      "voltage_min_V": 2.8,
+      "voltage_max_V": 4.2,
+      "temperature_max_C": 45.0,
+      "current_max_A": 5.0,
+      "ocv_soc": [
+        0.0,
+        0.0450713255976104,
+        0.13387503502993225,
+        0.24213979748948655,
+        0.3504050713585559,
+        0.458670003000642,
+        0.5669309935131817,
+        0.6751963413061042,
+        0.7834614962693774,
+        0.891721971647774,
+        0.9999822741369889,
+        1.0
+      ],
+      "ocv_V": [
+        3.3552498560281814,
+        3.3552498560281814,
+        3.4910113693846636,
+        3.5713996905774272,
+        3.6260042433393243,
+        3.661533196728152,
+        3.7179234699419053,
+        3.8336432016360185,
+        3.9514438687969173,
+        4.071530687933505,
+        4.194678310812105,
+        4.194678310812105
+      ],
+      "R0_ohm": 0.012,
+      "R_ohm": [
+        0.025
+      ],
+      "C_F": [
+        1500.0
+      ],
+      "rc_table": [
+        {
+          "soc": 0.0,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010727603054689224,
+          "R1_ohm": 0.0005582435695976675,
+          "C1_F": 44159.037972541526
+        },
+        {
+          "soc": 0.2,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010727603054689224,
+          "R1_ohm": 0.0005582435695976675,
+          "C1_F": 44159.037972541526
+        },
+        {
+          "soc": 0.4,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010574591677246137,
+          "R1_ohm": 0.000517616535383376,
+          "C1_F": 49576.146710928886
+        },
+        {
+          "soc": 0.6,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010443004953417608,
+          "R1_ohm": 0.0005258645931607105,
+          "C1_F": 46515.483471118416
+        },
+        {
+          "soc": 0.8,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010572708221084524,
+          "R1_ohm": 0.0006956919422530541,
+          "C1_F": 34273.06203214843
+        },
+        {
+          "soc": 1.0,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010572708221084524,
+          "R1_ohm": 0.0006956919422530541,
+          "C1_F": 34273.06203214843
+        }
+      ],
+      "rc_interpolation": "linear"
+    },
+    "eis_initial": {
+      "cell_id": "CALB-60129",
+      "capacity_Ah": 54.1668459624615,
+      "initial_soc": 0.8,
+      "estimated_initial_soc": 0.65,
+      "temperature_C": 25,
+      "mass_kg": 0.07,
+      "heat_capacity_J_kgK": 900.0,
+      "heat_transfer_W_K": 0.2,
+      "voltage_min_V": 2.8,
+      "voltage_max_V": 4.2,
+      "temperature_max_C": 45.0,
+      "current_max_A": 5.0,
+      "ocv_soc": [
+        0.0,
+        0.0450713255976104,
+        0.13387503502993225,
+        0.24213979748948655,
+        0.3504050713585559,
+        0.458670003000642,
+        0.5669309935131817,
+        0.6751963413061042,
+        0.7834614962693774,
+        0.891721971647774,
+        0.9999822741369889,
+        1.0
+      ],
+      "ocv_V": [
+        3.3552498560281814,
+        3.3552498560281814,
+        3.4910113693846636,
+        3.5713996905774272,
+        3.6260042433393243,
+        3.661533196728152,
+        3.7179234699419053,
+        3.8336432016360185,
+        3.9514438687969173,
+        4.071530687933505,
+        4.194678310812105,
+        4.194678310812105
+      ],
+      "R0_ohm": 0.012,
+      "R_ohm": [
+        0.025
+      ],
+      "C_F": [
+        1500.0
+      ],
+      "rc_table": [
+        {
+          "soc": 0.0,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010727596938966662,
+          "R1_ohm": 0.0005582395015514951,
+          "C1_F": 44158.87465900044
+        },
+        {
+          "soc": 0.2,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010727596938966662,
+          "R1_ohm": 0.0005582395015514951,
+          "C1_F": 44158.87465900044
+        },
+        {
+          "soc": 0.4,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010574578854516798,
+          "R1_ohm": 0.0005176075272092867,
+          "C1_F": 49575.73947071552
+        },
+        {
+          "soc": 0.6,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010442966627258548,
+          "R1_ohm": 0.0005258398736891476,
+          "C1_F": 46514.31595144613
+        },
+        {
+          "soc": 0.8,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010572706944029363,
+          "R1_ohm": 0.0006956912950514196,
+          "C1_F": 34273.03755002941
+        },
+        {
+          "soc": 1.0,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010572706944029363,
+          "R1_ohm": 0.0006956912950514196,
+          "C1_F": 34273.03755002941
+        }
+      ],
+      "rc_interpolation": "linear"
+    },
+    "joint": {
+      "cell_id": "CALB-60129",
+      "capacity_Ah": 54.1668459624615,
+      "initial_soc": 0.8,
+      "estimated_initial_soc": 0.65,
+      "temperature_C": 25,
+      "mass_kg": 0.07,
+      "heat_capacity_J_kgK": 900.0,
+      "heat_transfer_W_K": 0.2,
+      "voltage_min_V": 2.8,
+      "voltage_max_V": 4.2,
+      "temperature_max_C": 45.0,
+      "current_max_A": 5.0,
+      "ocv_soc": [
+        0.0,
+        0.0450713255976104,
+        0.13387503502993225,
+        0.24213979748948655,
+        0.3504050713585559,
+        0.458670003000642,
+        0.5669309935131817,
+        0.6751963413061042,
+        0.7834614962693774,
+        0.891721971647774,
+        0.9999822741369889,
+        1.0
+      ],
+      "ocv_V": [
+        3.3552498560281814,
+        3.3552498560281814,
+        3.4910113693846636,
+        3.5713996905774272,
+        3.6260042433393243,
+        3.661533196728152,
+        3.7179234699419053,
+        3.8336432016360185,
+        3.9514438687969173,
+        4.071530687933505,
+        4.194678310812105,
+        4.194678310812105
+      ],
+      "R0_ohm": 0.012,
+      "R_ohm": [
+        0.025
+      ],
+      "C_F": [
+        1500.0
+      ],
+      "rc_table": [
+        {
+          "soc": 0.0,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010511031563460557,
+          "R1_ohm": 0.0005316667492811256,
+          "C1_F": 40811.907530371966
+        },
+        {
+          "soc": 0.2,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010511031563460557,
+          "R1_ohm": 0.0005316667492811256,
+          "C1_F": 40811.907530371966
+        },
+        {
+          "soc": 0.4,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010354567210297924,
+          "R1_ohm": 0.0004901300561101451,
+          "C1_F": 45573.093309859854
+        },
+        {
+          "soc": 0.6,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010213039228260058,
+          "R1_ohm": 0.0004992642811431212,
+          "C1_F": 42553.65896184302
+        },
+        {
+          "soc": 0.8,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010290360843921743,
+          "R1_ohm": 0.0006589349686027178,
+          "C1_F": 31420.01795053124
+        },
+        {
+          "soc": 1.0,
+          "temperature_C": 25.0,
+          "R0_ohm": 0.0010290360843921743,
+          "R1_ohm": 0.0006589349686027178,
+          "C1_F": 31420.01795053124
+        }
+      ],
+      "rc_interpolation": "linear"
+    }
+  },
+  "node_fits": [
+    {
+      "soc": 0.8,
+      "hppc_soc_proxy": 0.7834614962693774,
+      "fit": {
+        "hppc_only": {
+          "R0_ohm": 0.0010572708221084524,
+          "R1_ohm": 0.0006956919422530541,
+          "tau_s": 23.843493092104747,
+          "pulse_baseline_V": 3.9513214927842535,
+          "pulse_rmse_mV": 3.5216811254109794,
+          "eis_relative_rms": 0.22574691330307833,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 912.1254530501578,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.49608951797125633,
+              "parameters": [
+                0.0010572711294595096,
+                0.0006956939436581874,
+                23.843597772844145,
+                3.9513215032608713
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.49608951796303763,
+              "parameters": [
+                0.0010572708221084524,
+                0.0006956919422530541,
+                23.843493092104747,
+                3.9513214927842535
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.49608951796617706,
+              "parameters": [
+                0.0010572692462968163,
+                0.0006956823195491895,
+                23.842973767259377,
+                3.9513214420072305
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "eis_initial": {
+          "R0_ohm": 0.0010572706944029363,
+          "R1_ohm": 0.0006956912950514196,
+          "tau_s": 23.843453878525892,
+          "pulse_baseline_V": 3.951321489288739,
+          "pulse_rmse_mV": 3.521681125402758,
+          "eis_relative_rms": 0.22574680942660066,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 912.1244769774405,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.49608951798993217,
+              "parameters": [
+                0.0010572716348579499,
+                0.0006956968987459164,
+                23.84376048582022,
+                3.9513215189280215
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.49608951796072165,
+              "parameters": [
+                0.0010572706944029363,
+                0.0006956912950514196,
+                23.843453878525892,
+                3.951321489288739
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.496089517963,
+              "parameters": [
+                0.0010572693965591252,
+                0.0006956831033557978,
+                23.84301906092195,
+                3.951321446233405
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "joint": {
+          "R0_ohm": 0.0010290360843921743,
+          "R1_ohm": 0.0006589349686027178,
+          "tau_s": 20.703748541730132,
+          "pulse_baseline_V": 3.9510229246751396,
+          "pulse_rmse_mV": 3.536818213797603,
+          "eis_relative_rms": 0.20384354129299206,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 785.3103776033599,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.2709577562124496,
+              "parameters": [
+                0.001029036050056147,
+                0.0006589348191458563,
+                20.703739330549613,
+                3.951022923822542
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.2709577562124443,
+              "parameters": [
+                0.0010290361056602465,
+                0.0006589350666758562,
+                20.703754143210247,
+                3.95102292522993
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.2709577562124433,
+              "parameters": [
+                0.0010290360843921743,
+                0.0006589349686027178,
+                20.703748541730132,
+                3.9510229246751396
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "eis_initialization": {
+          "R0_ohm": 0.00089117863049809,
+          "R1_ohm": 0.00023758596076526832,
+          "tau_s": 0.2500000001556499,
+          "at_bound": true,
+          "note": "time-domain tau bounds applied also to EIS initialization; lower bound is not a measured physical limit"
+        }
+      }
+    },
+    {
+      "soc": 0.6,
+      "hppc_soc_proxy": 0.5669309935131817,
+      "fit": {
+        "hppc_only": {
+          "R0_ohm": 0.0010443004953417608,
+          "R1_ohm": 0.0005258645931607105,
+          "tau_s": 24.460845791213437,
+          "pulse_baseline_V": 3.717771358282994,
+          "pulse_rmse_mV": 3.552688089181377,
+          "eis_relative_rms": 0.21090179231989045,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 1248.338821178681,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.5048637063622251,
+              "parameters": [
+                0.0010442967810834537,
+                0.0005258404875010419,
+                24.459132498929787,
+                3.717771232800734
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5048637068093556,
+              "parameters": [
+                0.0010443040539333595,
+                0.0005258873044254114,
+                24.46247581673093,
+                3.717771476677699
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.504863706360449,
+              "parameters": [
+                0.0010443004953417608,
+                0.0005258645931607105,
+                24.460845791213437,
+                3.717771358282994
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "eis_initial": {
+          "R0_ohm": 0.0010442966627258548,
+          "R1_ohm": 0.0005258398736891476,
+          "tau_s": 24.459082024645536,
+          "pulse_baseline_V": 3.717771229518774,
+          "pulse_rmse_mV": 3.5526880892137016,
+          "eis_relative_rms": 0.2108989391525868,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 1248.2747024496316,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.5048637063696362,
+              "parameters": [
+                0.0010442966627258548,
+                0.0005258398736891476,
+                24.459082024645536,
+                3.717771229518774
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5048637064789346,
+              "parameters": [
+                0.001044301854308717,
+                0.0005258731411876845,
+                24.46146376209021,
+                3.7177714029250257
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5048637064061039,
+              "parameters": [
+                0.0010443011105791054,
+                0.0005258684402162673,
+                24.461124747089038,
+                3.717771378389632
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "joint": {
+          "R0_ohm": 0.0010213039228260058,
+          "R1_ohm": 0.0004992642811431212,
+          "tau_s": 21.245521951594093,
+          "pulse_baseline_V": 3.7175445790644517,
+          "pulse_rmse_mV": 3.5632919510520025,
+          "eis_relative_rms": 0.19463728720066117,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 1067.8148894314813,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.27288282735307834,
+              "parameters": [
+                0.001021303918593427,
+                0.0004992642702608712,
+                21.245521525184653,
+                3.717544578992986
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.2728828273530561,
+              "parameters": [
+                0.0010213039228260058,
+                0.0004992642811431212,
+                21.245521951594093,
+                3.7175445790644517
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.2728828273550116,
+              "parameters": [
+                0.0010213037879435356,
+                0.0004992635771485073,
+                21.245469312675887,
+                3.717544575180223
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "eis_initialization": {
+          "R0_ohm": 0.0008993371636485707,
+          "R1_ohm": 0.00021437914193656819,
+          "tau_s": 0.2500000002099487,
+          "at_bound": true,
+          "note": "time-domain tau bounds applied also to EIS initialization; lower bound is not a measured physical limit"
+        }
+      }
+    },
+    {
+      "soc": 0.4,
+      "hppc_soc_proxy": 0.3504050713585559,
+      "fit": {
+        "hppc_only": {
+          "R0_ohm": 0.0010574591677246137,
+          "R1_ohm": 0.000517616535383376,
+          "tau_s": 25.661433298168962,
+          "pulse_baseline_V": 3.62581277520591,
+          "pulse_rmse_mV": 3.6334006065578133,
+          "eis_relative_rms": 0.21165418698855573,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 1356.1197620290093,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.5280639987093871,
+              "parameters": [
+                0.0010574591677246137,
+                0.000517616535383376,
+                25.661433298168962,
+                3.62581277520591
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5280639991037417,
+              "parameters": [
+                0.0010574611010757298,
+                0.0005176301440513255,
+                25.66242619639786,
+                3.625812844475747
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5280639993144413,
+              "parameters": [
+                0.001057461923857409,
+                0.0005176359442725488,
+                25.66285031028178,
+                3.6258128739838615
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "eis_initial": {
+          "R0_ohm": 0.0010574578854516798,
+          "R1_ohm": 0.0005176075272092867,
+          "tau_s": 25.660775917008888,
+          "pulse_baseline_V": 3.6258127293367903,
+          "pulse_rmse_mV": 3.6334006059218984,
+          "eis_relative_rms": 0.21165325778186786,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 1356.0939540958605,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.5280639985317264,
+              "parameters": [
+                0.001057457948582905,
+                0.0005176079410305044,
+                25.66080621320902,
+                3.6258127314638133
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5280639985245447,
+              "parameters": [
+                0.0010574578854516798,
+                0.0005176075272092867,
+                25.660775917008888,
+                3.6258127293367903
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5280639988015018,
+              "parameters": [
+                0.0010574495841890702,
+                0.0005175491286750347,
+                25.656511315155104,
+                3.6258124319365144
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "joint": {
+          "R0_ohm": 0.0010354567210297924,
+          "R1_ohm": 0.0004901300561101451,
+          "tau_s": 22.33674278107449,
+          "pulse_baseline_V": 3.625588718793359,
+          "pulse_rmse_mV": 3.6431753615056253,
+          "eis_relative_rms": 0.19648042951473715,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 1156.2966302117406,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.2847568138847805,
+              "parameters": [
+                0.0010354567210297924,
+                0.0004901300561101451,
+                22.33674278107449,
+                3.625588718793359
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.28475681388694474,
+              "parameters": [
+                0.0010354567920398878,
+                0.0004901305285334991,
+                22.33677818390765,
+                3.625588721287358
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.28475681388543544,
+              "parameters": [
+                0.0010354567384559725,
+                0.0004901302078018325,
+                22.336753676449042,
+                3.6255887195697936
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "eis_initialization": {
+          "R0_ohm": 0.0009115556556329404,
+          "R1_ohm": 0.00022272398623757823,
+          "tau_s": 0.2500000000434583,
+          "at_bound": true,
+          "note": "time-domain tau bounds applied also to EIS initialization; lower bound is not a measured physical limit"
+        }
+      }
+    },
+    {
+      "soc": 0.2,
+      "hppc_soc_proxy": 0.24213979748948655,
+      "fit": {
+        "hppc_only": {
+          "R0_ohm": 0.0010727603054689224,
+          "R1_ohm": 0.0005582435695976675,
+          "tau_s": 24.651498987790525,
+          "pulse_baseline_V": 3.571241520742202,
+          "pulse_rmse_mV": 3.6886294552193664,
+          "eis_relative_rms": 0.21622605314929708,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 1188.6455922451594,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.5442394903164766,
+              "parameters": [
+                0.0010727603054689224,
+                0.0005582435695976675,
+                24.651498987790525,
+                3.571241520742202
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5442394905379049,
+              "parameters": [
+                0.0010727529784151319,
+                0.0005581957016943566,
+                24.648277412111128,
+                3.571241272256573
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5442394904432877,
+              "parameters": [
+                0.0010727536315218976,
+                0.000558199968733168,
+                24.648564403099762,
+                3.571241294414835
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "eis_initial": {
+          "R0_ohm": 0.0010727596938966662,
+          "R1_ohm": 0.0005582395015514951,
+          "tau_s": 24.65122817871535,
+          "pulse_baseline_V": 3.571241499671653,
+          "pulse_rmse_mV": 3.6886294550416614,
+          "eis_relative_rms": 0.21622563966921707,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 1188.6355457115228,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.5442394902640377,
+              "parameters": [
+                0.0010727596938966662,
+                0.0005582395015514951,
+                24.65122817871535,
+                3.571241499671653
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.5442394904069041,
+              "parameters": [
+                0.0010727611232308923,
+                0.0005582489676091898,
+                24.651860914430472,
+                3.571241548715588
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.544239490578228,
+              "parameters": [
+                0.001072762311484551,
+                0.0005582567181596725,
+                24.65238252682824,
+                3.571241588936123
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "joint": {
+          "R0_ohm": 0.0010511031563460557,
+          "R1_ohm": 0.0005316667492811256,
+          "tau_s": 21.698334208634755,
+          "pulse_baseline_V": 3.571021579187449,
+          "pulse_rmse_mV": 3.697673730225659,
+          "eis_relative_rms": 0.20233897949098287,
+          "fit_success": true,
+          "at_bound": false,
+          "jacobian_condition": 1029.9285783455978,
+          "starts": [
+            {
+              "success": true,
+              "cost": 0.29392635161474495,
+              "parameters": [
+                0.0010511031563460557,
+                0.0005316667492811256,
+                21.698334208634755,
+                3.571021579187449
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.2939263516150954,
+              "parameters": [
+                0.0010511031392662126,
+                0.0005316665692685827,
+                21.698325075446512,
+                3.571021578270555
+              ],
+              "at_bound": false
+            },
+            {
+              "success": true,
+              "cost": 0.2939263516148052,
+              "parameters": [
+                0.0010511031470012474,
+                0.0005316667701871413,
+                21.698332756050338,
+                3.571021579247194
+              ],
+              "at_bound": false
+            }
+          ]
+        },
+        "eis_initialization": {
+          "R0_ohm": 0.000926302208314458,
+          "R1_ohm": 0.0002656926115107568,
+          "tau_s": 0.2500000000000046,
+          "at_bound": true,
+          "note": "time-domain tau bounds applied also to EIS initialization; lower bound is not a measured physical limit"
+        }
+      }
+    }
+  ],
+  "eis_audit": [
+    {
+      "nominal_eis_soc": 0.8,
+      "hppc_soc_proxy": 0.7834614962693774,
+      "eis_c20_voltage_inferred_soc": 0.7994186671880085,
+      "points": 24,
+      "lin_kk": {
+        "add_cap": true,
+        "library_version": "1.7.1",
+        "fit_type": "complex",
+        "c": 0.85,
+        "max_M": 12,
+        "M": 10,
+        "mu": 0.6632727376783738,
+        "reached_max_M": false,
+        "real_relative_rms": 0.0064231956202675045,
+        "imag_relative_rms": 0.008081933568299107,
+        "relative_rms": 0.01032352130712305,
+        "relative_max": 0.03075148592183462,
+        "cutoff_reached": true,
+        "independent_SVD_max_difference_ohm": 1.2734358015896512e-15,
+        "rank": 13,
+        "columns": 13,
+        "scaled_condition_number": 255.54907039928935,
+        "screening_pass": true,
+        "screening_thresholds": {
+          "relative_rms_max": 0.02,
+          "relative_max_max": 0.05,
+          "mu_cutoff": 0.85
+        },
+        "screening_failures": [],
+        "below_0_1Hz_relative_rms": null,
+        "0_1_to_100Hz_relative_rms": 0.007040169827558487,
+        "above_100Hz_relative_rms": 0.014852518107517696
+      },
+      "timestamp_order": "EIS later than HPPC and drive"
+    },
+    {
+      "nominal_eis_soc": 0.6,
+      "hppc_soc_proxy": 0.5669309935131817,
+      "eis_c20_voltage_inferred_soc": 0.589339204047854,
+      "points": 24,
+      "lin_kk": {
+        "add_cap": true,
+        "library_version": "1.7.1",
+        "fit_type": "complex",
+        "c": 0.85,
+        "max_M": 12,
+        "M": 11,
+        "mu": 0.828862958449787,
+        "reached_max_M": false,
+        "real_relative_rms": 0.006146071501950079,
+        "imag_relative_rms": 0.005171883926954131,
+        "relative_rms": 0.00803259474024237,
+        "relative_max": 0.027488209304951487,
+        "cutoff_reached": true,
+        "independent_SVD_max_difference_ohm": 4.1755315269414805e-15,
+        "rank": 14,
+        "columns": 14,
+        "scaled_condition_number": 455.9377836416422,
+        "screening_pass": true,
+        "screening_thresholds": {
+          "relative_rms_max": 0.02,
+          "relative_max_max": 0.05,
+          "mu_cutoff": 0.85
+        },
+        "screening_failures": [],
+        "below_0_1Hz_relative_rms": null,
+        "0_1_to_100Hz_relative_rms": 0.0043495946795690426,
+        "above_100Hz_relative_rms": 0.012479174132523255
+      },
+      "timestamp_order": "EIS later than HPPC and drive"
+    },
+    {
+      "nominal_eis_soc": 0.4,
+      "hppc_soc_proxy": 0.3504050713585559,
+      "eis_c20_voltage_inferred_soc": 0.40024510862887597,
+      "points": 24,
+      "lin_kk": {
+        "add_cap": true,
+        "library_version": "1.7.1",
+        "fit_type": "complex",
+        "c": 0.85,
+        "max_M": 12,
+        "M": 10,
+        "mu": 0.8102177117400583,
+        "reached_max_M": false,
+        "real_relative_rms": 0.004208154156797068,
+        "imag_relative_rms": 0.004487806659785071,
+        "relative_rms": 0.006152151657995736,
+        "relative_max": 0.013566752854592246,
+        "cutoff_reached": true,
+        "independent_SVD_max_difference_ohm": 2.2453487709460157e-15,
+        "rank": 13,
+        "columns": 13,
+        "scaled_condition_number": 254.118587912224,
+        "screening_pass": true,
+        "screening_thresholds": {
+          "relative_rms_max": 0.02,
+          "relative_max_max": 0.05,
+          "mu_cutoff": 0.85
+        },
+        "screening_failures": [],
+        "below_0_1Hz_relative_rms": null,
+        "0_1_to_100Hz_relative_rms": 0.005752313668601124,
+        "above_100Hz_relative_rms": 0.006882491190331331
+      },
+      "timestamp_order": "EIS later than HPPC and drive"
+    },
+    {
+      "nominal_eis_soc": 0.2,
+      "hppc_soc_proxy": 0.24213979748948655,
+      "eis_c20_voltage_inferred_soc": 0.16482700540917325,
+      "points": 24,
+      "lin_kk": {
+        "add_cap": true,
+        "library_version": "1.7.1",
+        "fit_type": "complex",
+        "c": 0.85,
+        "max_M": 12,
+        "M": 11,
+        "mu": 0.7603987164571693,
+        "reached_max_M": false,
+        "real_relative_rms": 0.00346296383869799,
+        "imag_relative_rms": 0.0039389792800015285,
+        "relative_rms": 0.005244776097834042,
+        "relative_max": 0.014101291231955722,
+        "cutoff_reached": true,
+        "independent_SVD_max_difference_ohm": 1.9935734194949625e-15,
+        "rank": 14,
+        "columns": 14,
+        "scaled_condition_number": 448.2670718463519,
+        "screening_pass": true,
+        "screening_thresholds": {
+          "relative_rms_max": 0.02,
+          "relative_max_max": 0.05,
+          "mu_cutoff": 0.85
+        },
+        "screening_failures": [],
+        "below_0_1Hz_relative_rms": null,
+        "0_1_to_100Hz_relative_rms": 0.005659256296634225,
+        "above_100Hz_relative_rms": 0.0042975185034209665
+      },
+      "timestamp_order": "EIS later than HPPC and drive"
+    }
+  ],
+  "manifest_sha256": "bc173a7680a978f8a274c7fe2104fea794084cfb0e3075705750c168c5081114",
+  "procedure": {
+    "spectrum_band_Hz": [
+      0.5,
+      1000.0
+    ],
+    "time_scale_V": 0.005,
+    "frequency_scale": "pointwise |Z|",
+    "joint_weights": "1/2 per normalized group",
+    "starts_per_method": 3,
+    "tau_bounds_s": [
+      0.25,
+      600
+    ],
+    "common_initial_soc": "C/20 based window proxy minus 4 percentage points",
+    "ocv_and_capacity": "same HPPC/C20 per method",
+    "evaluation": "3 C/3 pulse and six 600s driving windows; outputs have previously been examined",
+    "eis_temporal_order": "later than all scored signals: retrospective, not prospective",
+    "quality": "Lin-KK screen per spectrum; not proof of physical identity or state match"
+  }
+}

@@ -31,7 +31,7 @@ from user_tools.workbench.research_data import parse_campaign
 from user_tools.workbench.experiment_ledger import ExperimentLedger
 from user_tools.workbench.agent_api_settings import public_settings, save_settings, probe_settings
 
-APP_VERSION='0.3.10'
+APP_VERSION='0.3.23'
 
 
 def resource_dir():
@@ -98,12 +98,67 @@ class Application:
         return dest
 
     def start_job(self,payload):
-        modes={'battery_agent','forward','chen_baseline','graphite_baseline','identify','predict','public_replay','sample_forward','candidate_multi','eis_forward','parquet_preprocess','ml_train','ml_predict','ml_recommend','research_multi','research_chain','public_ml_validation'}
+        modes={'sodium_dfn','engineering','battery_agent','forward','chen_baseline','graphite_baseline','identify','predict','public_replay','sample_forward','candidate_multi','eis_forward','eis_fit','parquet_preprocess','ml_train','ml_predict','ml_recommend','research_multi','research_chain','public_ml_validation'}
         mode=payload.get('mode');model=payload.get('model','SPM')
         if mode not in modes or model not in ['SPM','SPMe','DFN']:raise ValueError('未支持的仿真类型或模型。')
         if not self.project or not (self.project/'user_tools/workbench/physics_worker.py').exists():raise ValueError('未找到原项目，物理仿真需本机项目与WSL环境。')
         workspace=self.store.get(payload['workspace'])
         config={'mode':mode,'model':model}
+        engineering_raw=None
+        if mode=='engineering':
+            from user_tools.workbench.engineering_contracts import normalize as normalize_engineering
+            from user_tools.workbench.engineering_service import runtime_for, bridge_eis, bridge_eis_grid, bridge_can
+            engineering_raw=base64.b64decode(payload['content'],validate=True) if payload.get('content') else None
+            request=payload.get('engineering_config',{})
+            if request.get('filter_rc_mode') in ('estimated_grid','estimated_grid_jacobian') and not payload.get('eis_grid_parent'):
+                raise ValueError('estimated_grid滤波器需要选择本方案已通过筛查的EIS网格任务。')
+            if request.get('eis_grid_source') and not payload.get('eis_grid_parent'):raise ValueError('参数表来源必须由已完成的EIS任务建立。')
+            if request.get('adaptive_parameter_source') and not payload.get('adaptive_parent'):raise ValueError('请从本方案已完成的更新任务创建参数来源，不接受手填验证标记。')
+            if payload.get('adaptive_parent'):
+                if engineering_raw is not None or payload.get('eis_parent'):raise ValueError('更新参数MPC不能同时选择CSV或EIS单谱桥接。')
+                from user_tools.workbench.engineering_service import bridge_adaptive_control
+                parent=self.store.job(payload['adaptive_parent'])
+                if parent['workspace']!=workspace['id'] or parent['status']!='completed' or parent['mode']!='engineering' or parent.get('result',{}).get('action')!='commercial_adaptive':
+                    raise ValueError('更新参数来源必须是本方案已完成的工程任务。')
+                folder=self.data/'jobs'/parent['id']/'physics'
+                artifact=(folder/'adaptive_frozen_model.json').read_bytes()
+                control_bytes=(folder/'adaptive_control_config.json').read_bytes()
+                if hashlib.sha256(control_bytes).hexdigest()!=parent['result'].get('control_config_sha256'):raise ValueError('更新参数MPC配置文件校验不符。')
+                exported=json.loads(control_bytes.decode('utf-8'))
+                request=bridge_adaptive_control(request,parent['result'],parent['id'],artifact,exported)
+            if payload.get('eis_parent'):
+                if payload.get('eis_grid_parent'):raise ValueError('单谱和多工况参数表只能选择一项。')
+                parent=self.store.job(payload['eis_parent'])
+                if parent['workspace']!=workspace['id'] or parent['status']!='completed' or parent['mode']!='eis_fit':
+                    raise ValueError('EIS参数来源必须是本方案已完成的RC拟合。')
+                artifact=(self.data/'jobs'/parent['id']/'physics/result.json').read_bytes()
+                request=bridge_eis(request,parent['result'],parent['id'],artifact)
+            if payload.get('eis_grid_parent'):
+                if payload.get('adaptive_parent'):raise ValueError('EIS表不能与更新参数来源同时使用。')
+                parent=self.store.job(payload['eis_grid_parent'])
+                if parent['workspace']!=workspace['id'] or parent['status']!='completed' or parent['mode']!='engineering' or parent.get('result',{}).get('action')!='eis_grid':
+                    raise ValueError('参数表来源必须为本方案已完成的多工况EIS任务。')
+                artifact=(self.data/'jobs'/parent['id']/'physics/rc_grid.json').read_bytes()
+                request=bridge_eis_grid(request,parent['result'],parent['id'],artifact)
+            if payload.get('telemetry_parent'):
+                if engineering_raw is not None:raise ValueError('CSV日志和遥测父任务只能选择一项。')
+                parent=self.store.job(payload['telemetry_parent'])
+                if parent['workspace']!=workspace['id'] or parent['status']!='completed' or parent['mode']!='engineering':
+                    raise ValueError('CAN遥测来源必须是本方案已完成的工程任务。')
+                artifact=(self.data/'jobs'/parent['id']/'physics/result.json').read_bytes()
+                with (self.data/'jobs'/parent['id']/'physics/engineering.csv').open(encoding='utf-8-sig',newline='') as stream:
+                    samples=list(csv.DictReader(stream))
+                request=bridge_can(request,parent['result'],parent['id'],artifact,samples)
+            request=normalize_engineering(request,engineering_raw)
+            runtime_for(self.project,request['action'])
+            config['engineering_config']=request
+        if mode=='eis_fit':
+            from user_tools.workbench.eis_fit import prepare_eis_fit
+            raw=base64.b64decode(payload['content'],validate=True)
+            if len(raw)>4_000_000:raise ValueError('EIS CSV最多4MB。')
+            eis_config=payload.get('eis_config',{})
+            packet=prepare_eis_fit(raw,eis_config)
+            config.update(eis_config=eis_config,source_sha256=packet['source_sha256'])
         if mode=='battery_agent':
             from user_tools.workbench.battery_agent import normalize as normalize_agent
             config['agent_config']=normalize_agent(payload.get('agent_config',{}))
@@ -186,6 +241,15 @@ class Application:
                 v=float(payload.get(key,default))
                 if not math.isfinite(v) or not lo<=v<=hi:raise ValueError(key+'超出允许范围。')
                 config[key]=v
+        if mode=='sodium_dfn':
+            for key,default,lo,hi in [('c_rate',1,.05,3),('duration_s',60,1,3600),('temperature_C',25,10,40)]:
+                v=float(payload.get(key,default))
+                if not math.isfinite(v) or not lo<=v<=hi:raise ValueError(key+'超出钠电参考模型范围。')
+                config[key]=v
+            policy=payload.get('extrapolation_policy','stop_before_bound')
+            if policy not in ('stop_before_bound','error'):raise ValueError('未知参数外推处理策略。')
+            config['extrapolation_policy']=policy
+            config['model']='DFN';model='DFN'
         if mode=='predict':
             parent=self.store.job(payload.get('parent',''))
             if parent['mode']!='identify' or parent['status']!='completed' or parent['workspace']!=workspace['id']:raise ValueError('需选择同一方案已完成的参数辨识任务。')
@@ -194,6 +258,11 @@ class Application:
         ident=uuid.uuid4().hex;folder=self.data/'jobs'/ident;folder.mkdir(parents=True)
         if mode=='research_multi':config.setdefault('campaign_id',ident)
         if mode=='candidate_multi':(folder/'source_candidates.csv').write_bytes(raw)
+        if mode=='eis_fit':
+            (folder/'source.csv').write_bytes(raw);config['source_path']=wsl_path(folder/'source.csv')
+        if mode=='engineering' and engineering_raw is not None:
+            (folder/'source.csv').write_bytes(engineering_raw)
+            config.update(source_path=wsl_path(folder/'source.csv'),source_sha256=hashlib.sha256(engineering_raw).hexdigest())
         if mode.startswith('ml_') and payload.get('content'):(folder/'source_ml.csv').write_bytes(raw)
         if mode in ['research_multi','research_chain']:(folder/'source_campaign.csv').write_bytes(raw)
         if mode=='parquet_preprocess':
@@ -202,7 +271,10 @@ class Application:
         (folder/'config.json').write_text(json.dumps(config),encoding='utf-8')
         (folder/'workspace_snapshot.json').write_text(json.dumps(workspace,ensure_ascii=False),encoding='utf-8')
         job={'id':ident,'workspace':workspace['id'],'workspace_name':workspace['name'],'workspace_revision':workspace['revision'],
-             'mode':mode,'model':'科研闭环 / 代理模型' if mode in ['research_multi','research_chain','public_ml_validation'] else '描述符 / 分组机器学习' if mode.startswith('ml_') else 'GP / MC-HVI' if mode=='candidate_multi' else '数据转换' if mode=='parquet_preprocess' else model,'status':'queued','scope':'模型探索/方法处理；没有自动校准你的回收石墨材料'}
+             'mode':mode,'model':'impedance.py / RC' if mode=='eis_fit' else '科研闭环 / 代理模型' if mode in ['research_multi','research_chain','public_ml_validation'] else '描述符 / 分组机器学习' if mode.startswith('ml_') else 'GP / MC-HVI' if mode=='candidate_multi' else '数据转换' if mode=='parquet_preprocess' else model,'status':'queued','scope':'模型探索/方法处理；没有自动校准你的回收石墨材料'}
+        if mode=='engineering':
+            from user_tools.workbench.engineering_contracts import ACTIONS
+            job['model']=ACTIONS[request['action']]
         self.store.put_job(job)
         threading.Thread(target=self.run_job,args=(job,folder),daemon=True).start()
         return job
@@ -211,8 +283,13 @@ class Application:
         with self.physics_lock:
             job['status']='running';self.store.put_job(job)
             try:
-                args=['wsl.exe','-d','Ubuntu','--cd',wsl_path(self.project),'--','/home/zjh/miniforge3/envs/pybamm/bin/python',
-                      '-m','user_tools.workbench.physics_worker','--config',wsl_path(folder/'config.json'),'--out',wsl_path(folder/'physics')]
+                runtime='/home/zjh/miniforge3/envs/pybamm/bin/python';worker='user_tools.workbench.physics_worker'
+                if job['mode']=='engineering':
+                    from user_tools.workbench.engineering_service import runtime_for
+                    saved=json.loads((folder/'config.json').read_text(encoding='utf-8'))
+                    runtime=runtime_for(self.project,saved['engineering_config']['action']);worker='user_tools.workbench.engineering_worker'
+                args=['wsl.exe','-d','Ubuntu','--cd',wsl_path(self.project),'--',runtime,
+                      '-m',worker,'--config',wsl_path(folder/'config.json'),'--out',wsl_path(folder/'physics')]
                 with (folder/'log.txt').open('wb') as log:
                     p=subprocess.run(args,stdout=log,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0),timeout=1800)
                 target=folder/'physics/ui_result.json'
@@ -267,6 +344,57 @@ class Application:
              'mode':'preprocess','status':'completed','result':result,'config':payload.get('config',{}),
              'curves':[{'name':'标准化电压','points':[[r['time_s'],r['voltage_V'],None] for r in records[::max(1,len(records)//500)]]}]}
         self.store.put_job(job);return job
+
+    def multichem(self,payload):
+        from user_tools.workbench.multichem_analysis import run
+        workspace=self.store.get(payload['workspace'])
+        raw=base64.b64decode(payload.get('content',''),validate=True)
+        config=payload.get('config',{})
+        ident=uuid.uuid4().hex;folder=self.data/'jobs'/ident;folder.mkdir(parents=True)
+        if payload.get('kind') in ('cv_sim','ixdat','osbad','hardcarbon_train','hardcarbon_predict','hardcarbon_shap','hardcarbon_joint_train','hardcarbon_joint_recommend','hardcarbon_ax_mobo','sodium_identify','soh_train','soh_predict','uncertainty_audit','ax_recommend','helao_plan'):
+            if not self.project:raise ValueError('上游工具需要项目目录和独立WSL环境。')
+            if payload.get('kind')!='cv_sim' and (not raw or len(raw)>20_000_000):raise ValueError('CSV文件需非空且不超过20MB。')
+            if payload.get('kind') in ('soh_predict','hardcarbon_predict','hardcarbon_shap','hardcarbon_joint_recommend'):
+                parent=self.store.job(payload.get('parent',''))
+                expected='soh_train' if payload['kind']=='soh_predict' else 'hardcarbon_joint_train' if payload['kind']=='hardcarbon_joint_recommend' else 'hardcarbon_train'
+                if parent['workspace']!=workspace['id'] or parent['mode']!='multichem' or parent['result'].get('kind')!=expected or parent['status']!='completed':
+                    raise ValueError('请选择同一方案已完成的对应模型训练任务。')
+                config={**config,'_model_path':wsl_path(self.data/'jobs'/parent['id']/'trained_model.joblib'),
+                        '_model_sha256':parent['result']['model_sha256'],'parent_job':parent['id']}
+                if payload['kind']=='hardcarbon_shap':
+                    config.update(_training_source_path=wsl_path(self.data/'jobs'/parent['id']/'source.csv'),
+                                  _training_source_sha256=parent['result']['source_sha256'])
+            if payload.get('kind')=='sodium_identify' and payload.get('parent'):
+                parent=self.store.job(payload['parent'])
+                if parent['workspace']!=workspace['id'] or parent['mode']!='multichem' or parent['result'].get('kind')!='hardcarbon_joint_recommend' or parent['status']!='completed':
+                    raise ValueError('关联候选必须来自同方案已完成的硬碳候选任务。')
+                previous=json.loads((self.data/'jobs'/parent['id']/'multichem.json').read_text(encoding='utf-8'))['result']
+                candidate_id=str(config.get('candidate_id','')).strip()
+                matches=[r for r in previous['predictions'] if r['record_id']==candidate_id]
+                if len(matches)!=1:raise ValueError('candidate_id必须存在于关联的候选任务中。')
+                config={**config,'_candidate_link':{'job_id':parent['id'],'candidate':matches[0]}}
+            (folder/'upstream_config.json').write_text(json.dumps(config,ensure_ascii=False),encoding='utf-8')
+            (folder/'source.csv').write_bytes(raw)
+            args=['wsl.exe','-d','Ubuntu','--cd',wsl_path(self.project),'--',
+                  '/home/zjh/.local/share/fangzhen/multichem-20261029/bin/python','-m',
+                  'user_tools.workbench.multichem_upstream',payload['kind'],wsl_path(folder/'upstream_config.json'),wsl_path(folder/'source.csv'),wsl_path(folder/'upstream_result.json')]
+            try:
+                process=subprocess.run(args,capture_output=True,timeout=900 if payload['kind'] in ('hardcarbon_train','hardcarbon_joint_train','hardcarbon_ax_mobo','sodium_identify','soh_train','hardcarbon_shap','ax_recommend') else 90,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+            except subprocess.TimeoutExpired:raise ValueError('上游工具运行超时。') from None
+            if process.returncode or not (folder/'upstream_result.json').exists():
+                raise ValueError('上游工具运行失败；请检查独立WSL环境及参数：'+process.stderr.decode('utf-8',errors='replace')[-1000:])
+            result=json.loads((folder/'upstream_result.json').read_text(encoding='utf-8'))
+        else:
+            result=run(payload.get('kind'),raw,config)
+        (folder/'source.csv').write_bytes(raw)
+        result.update(source_sha256=hashlib.sha256(raw).hexdigest(),filename=str(payload.get('filename',''))[:200])
+        (folder/'multichem.json').write_text(json.dumps({'kind':payload['kind'],'config':config,'result':result},ensure_ascii=False,indent=2,allow_nan=False),encoding='utf-8')
+        job={'id':ident,'workspace':workspace['id'],'workspace_name':workspace['name'],
+             'workspace_revision':workspace['revision'],'mode':'multichem','status':'completed',
+             'result':{'kind':payload['kind'],'source_sha256':result['source_sha256'],'scope':result['scope']}}
+        if result.get('model_sha256'):job['result']['model_sha256']=result['model_sha256']
+        self.store.put_job(job)
+        return {'job':job,'result':result}
 
     def import_ocp(self,payload):
         workspace=self.store.get(payload['workspace']);raw=base64.b64decode(payload['content'],validate=True)
@@ -417,7 +545,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed=urlsplit(self.path);path=parsed.path
         if not path.startswith('/api/'):
-            assets={'/agent.js':'agent.js','/':'index.html','/app.js':'app.js','/analysis.js':'analysis.js','/pipeline.js':'pipeline.js','/papers.js':'papers.js','/ml.js':'ml.js','/research.js':'research.js','/sustainability.js':'sustainability.js','/style.css':'style.css'}
+            assets={'/multichem.js':'multichem.js','/engineering.js':'engineering.js','/agent.js':'agent.js','/':'index.html','/app.js':'app.js','/analysis.js':'analysis.js','/pipeline.js':'pipeline.js','/papers.js':'papers.js','/ml.js':'ml.js','/research.js':'research.js','/sustainability.js':'sustainability.js','/style.css':'style.css'}
             if path not in assets:self.send_error(404);return
             file=resource_dir()/'web'/assets[path]
             mime='text/html; charset=utf-8' if path=='/' else 'text/javascript; charset=utf-8' if path.endswith('.js') else 'text/css; charset=utf-8'
@@ -426,6 +554,12 @@ class Handler(BaseHTTPRequestHandler):
         try:
             args=parse_qs(parsed.query);ident=args.get('id',[''])[0]
             if path=='/api/bootstrap':self.json({'schema':SCHEMA,'workspaces':self.app.store.list(),'jobs':self.app.store.jobs(),'physics_available':bool(self.app.project)})
+            elif path=='/api/hardware_readiness':
+                from user_tools.workbench.hardware_readiness import inventory
+                self.json(inventory(self.app.project))
+            elif path=='/api/engineering_catalog':
+                from user_tools.workbench.engineering_service import public_catalog
+                self.json(public_catalog(self.app.project))
             elif path=='/api/workspace':self.json(self.app.store.get(ident))
             elif path=='/api/versions':self.json(self.app.store.revisions(ident))
             elif path=='/api/jobs':self.json(self.app.store.jobs())
@@ -440,13 +574,66 @@ class Handler(BaseHTTPRequestHandler):
                 self.binary((self.app.project/'outputs/paper_study_20261012/论文与源码学习报告.html').read_bytes(),'text/html; charset=utf-8')
             elif path=='/api/download':
                 job=self.app.store.job(ident);kind=args.get('kind',['normalized'])[0]
-                files={'normalized':('normalized.csv','text/csv; charset=utf-8'),'qc':('qc.json','application/json'),'ocp':('ocp.csv','text/csv; charset=utf-8'),
+                files={'multichem':('multichem.json','application/json'),'multichem_source':('source.csv','text/csv; charset=utf-8'),'multichem_holdout':('holdout.csv','text/csv; charset=utf-8'),'hardcarbon_prepared':('prepared.csv','text/csv; charset=utf-8'),'normalized':('normalized.csv','text/csv; charset=utf-8'),'qc':('qc.json','application/json'),'ocp':('ocp.csv','text/csv; charset=utf-8'),
                        'assessment':('assessment/result.json','application/json'),'inventory':('assessment/contributions.csv','text/csv; charset=utf-8'),
                        'assessment_config':('config.json','application/json'),
                        'ml_oof':('physics/oof.csv','text/csv; charset=utf-8'),'ml_importance':('physics/importance.csv','text/csv; charset=utf-8'),
                        'ml_predictions':('physics/predictions.csv','text/csv; charset=utf-8'),'ml_result':('physics/result.json','application/json'),
                        'campaign':('physics/campaign.csv','text/csv; charset=utf-8'),'chain_oof':('physics/chain_oof.csv','text/csv; charset=utf-8'),
-                       'public_replay':('physics/replay.csv','text/csv; charset=utf-8'),'public_summary':('physics/replay_summary.csv','text/csv; charset=utf-8')}
+                       'public_replay':('physics/replay.csv','text/csv; charset=utf-8'),'public_summary':('physics/replay_summary.csv','text/csv; charset=utf-8'),
+                       'eis_fit':('physics/spectrum_fit.csv','text/csv; charset=utf-8'),
+                       'sodium_curve':('physics/forward_curve.csv','text/csv; charset=utf-8'),
+                       'eis_parameters':('physics/parameters.csv','text/csv; charset=utf-8'),
+                       'eis_result':('physics/result.json','application/json'),
+                       'engineering_csv':('physics/engineering.csv','text/csv; charset=utf-8'),
+                       'stanford_model':('physics/stanford_model.json','application/json'),
+                       'stanford_selection':('physics/stanford_selection.json','application/json'),
+                       'eis_hppc_models':('physics/frozen_models.json','application/json'),
+                       'eis_hppc_summary':('physics/summary.json','application/json'),
+                       'eis_hppc_traces':('physics/window_traces.csv','text/csv; charset=utf-8'),
+                       'eis_hppc_report':('physics/ablation_report.html','text/html; charset=utf-8'),
+                       'engineering_result':('physics/result.json','application/json'),
+                       'engineering_config':('config.json','application/json'),
+                       'engineering_parameters':('physics/parameters.csv','text/csv; charset=utf-8'),
+                       'engineering_eis_grid':('physics/rc_grid.json','application/json'),
+                       'engineering_pack':('physics/pack_raw.json','application/json'),
+                       'engineering_netlist':('physics/pack_netlist.csv','text/csv; charset=utf-8'),
+                       'engineering_cycler':('physics/pyprobe_normalized.csv','text/csv; charset=utf-8'),
+                       'engineering_dbc':('physics/can_database.json','application/json'),
+                       'engineering_dbc_audit':('physics/dbc_compatibility.json','application/json'),
+                       'engineering_split':('physics/split_manifest.json','application/json'),
+                       'engineering_faults':('physics/fault_confusion.json','application/json'),
+                       'engineering_bo':('physics/bo_training_manifest.json','application/json'),
+                       'engineering_frontier':('physics/frontier_manifest.json','application/json'),
+                       'engineering_life_split':('physics/batterylife_split.json','application/json'),
+                       'engineering_life_checkpoint':('physics/batterylife_checkpoint.pt','application/octet-stream'),
+                       'engineering_commercial':('physics/commercial_validation.json','application/json'),
+                       'engineering_commercial_metrics':('physics/commercial_metrics.csv','text/csv; charset=utf-8'),
+                       'engineering_frozen':('physics/frozen_model.json','application/json'),
+                       'engineering_control_config':('physics/commercial_control_config.json','application/json'),
+                       'adaptive_model':('physics/adaptive_frozen_model.json','application/json'),
+                       'adaptive_validation':('physics/adaptive_validation.json','application/json'),
+                       'adaptive_control_config':('physics/adaptive_control_config.json','application/json'),
+                       'adaptive_metrics':('physics/adaptive_metrics.csv','text/csv; charset=utf-8'),
+                       'calb_validation':('physics/calb_validation.json','application/json'),
+                       'calb_metrics':('physics/calb_metrics.csv','text/csv; charset=utf-8'),
+                       'calb_pulse_metrics':('physics/calb_pulse_metrics.csv','text/csv; charset=utf-8'),
+                       'calb_eis_inventory':('physics/calb_eis_inventory.csv','text/csv; charset=utf-8'),
+                       'calb_traces':('physics/calb_traces.csv','text/csv; charset=utf-8'),
+                       'calb_calibration':('physics/calb_calibration.json','application/json'),
+                       'crosscell_metrics':('physics/crosscell_metrics.csv','text/csv; charset=utf-8'),
+                       'crosscell_traces':('physics/crosscell_traces.csv','text/csv; charset=utf-8'),
+                       'crosscell_validation':('physics/crosscell_validation.json','application/json'),
+                       'crosscell_model':('physics/pooled_model.json','application/json'),
+                       'tesla_metrics':('physics/tesla_metrics.csv','text/csv; charset=utf-8'),
+                       'tesla_traces':('physics/tesla_traces.csv','text/csv; charset=utf-8'),
+                       'tesla_validation':('physics/tesla_validation.json','application/json'),
+                       'tesla_calibration':('physics/tesla_calibration.json','application/json'),
+                       'eis_audit':('physics/eis_audit.json','application/json'),
+                       'eis_audit_metrics':('physics/eis_audit_metrics.csv','text/csv; charset=utf-8'),
+                       'safety_cases':('physics/safety_cases.json','application/json'),
+                       'safety_trace':('physics/safety_trace.json','application/json'),
+                       'hardware_template':('physics/hardware_template.json','application/json')}
                 if kind not in files:raise ValueError('未知下载类型。')
                 name,mime=files[kind];self.binary((self.app.data/'jobs'/job['id']/name).read_bytes(),mime)
             elif path=='/api/export':self.binary(self.app.export(ident).read_bytes(),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -517,6 +704,7 @@ class Handler(BaseHTTPRequestHandler):
             elif path=='/api/curve':result=self.app.import_curve(data)
             elif path=='/api/analyze':result=self.app.analyze(data)
             elif path=='/api/preprocess':result=self.app.preprocess(data)
+            elif path=='/api/multichem':result=self.app.multichem(data)
             elif path=='/api/ocp':result=self.app.import_ocp(data)
             elif path=='/api/papermethod':result=self.app.paper_analysis(data)
             elif path=='/api/inventorypreview':result=self.app.inventory_preview(data)
@@ -560,10 +748,16 @@ def main():
         try:
             old=json.loads(session_file.read_text(encoding='utf-8'));parts=urlsplit(old['url'])
             old_token=parse_qs(parts.fragment)['token'][0]
-            if parts.hostname!='127.0.0.1' or old.get('entry_version')!=APP_VERSION:raise ValueError('old local version')
+            if parts.hostname!='127.0.0.1':raise ValueError('invalid local host')
             request=Request(f'http://127.0.0.1:{old["port"]}/api/bootstrap',headers={'X-Workbench-Token':old_token})
             with urlopen(request,timeout=2) as response:
-                if response.status==200:webbrowser.open(old['url']);return
+                if response.status==200:
+                    if old.get('entry_version')!=APP_VERSION:
+                        if os.name=='nt':
+                            import ctypes
+                            ctypes.windll.user32.MessageBoxW(0,'请先在旧工作站中保存并点击“关闭程序”，再启动新版。','科研工作站',0)
+                        return
+                    webbrowser.open(old['url']);return
         except Exception:pass
     app=Application(data,project);server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler);server.app=app
     url=f'http://127.0.0.1:{server.server_port}/#token={app.token}'

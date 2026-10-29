@@ -1,0 +1,80 @@
+{
+  "sources": [
+    {
+      "directory": "sox",
+      "repository": "ahemmatifar/sox",
+      "commit": "2ffd89c5b731fcb1e62e5b43b86250fd4e8770c7",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "directory": "BatteryML",
+      "repository": "microsoft/BatteryML",
+      "commit": "2861ae3b8c79938c7fc8e6fe9986b799ca71c7dd",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "directory": "foxbms-2",
+      "repository": "foxBMS/foxbms-2",
+      "commit": "73dbde670f7e9ec59afc33855bcf27576bd874de",
+      "license_files": [
+        "LICENSE.md"
+      ]
+    },
+    {
+      "directory": "CH-BatteryGen",
+      "repository": "CH-BatteryGen/dataset-warehouse",
+      "commit": "f9d635de87961c4c33f4415264a18698dadb7bac",
+      "license_files": []
+    },
+    {
+      "directory": "mobo-osd",
+      "repository": "LamNgo1/mobo-osd",
+      "commit": "114195634070ba3e111f9b25c5edd041c8c78398",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "directory": "rMFBO",
+      "repository": "SchroDeCat/rMFBO",
+      "commit": "ad29ea54c0aeb87ec24320891ef14a0e1c877160",
+      "license_files": [
+        "license"
+      ]
+    },
+    {
+      "directory": "CAMO",
+      "repository": "IceLab-X/CAMO",
+      "commit": "d84fc3f7630614b82a2bd366607c391c080742a3",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "directory": "BatteryLife",
+      "repository": "Ruifeng-Tan/BatteryLife",
+      "commit": "3b17bb53202e10711deae0448c91f84144bb3dd9",
+      "license_files": [
+        "LICENSE"
+      ]
+    }
+  ],
+  "algorithm_references": [
+    {
+      "repository": "quchongqi/DynMeanBO",
+      "path": "botorch/benchmarking/mapping/gp_priors.py",
+      "method": "exp(-gamma*t)*(A*pi(x)+B)",
+      "status": "formula adapted, full repository not installed"
+    },
+    {
+      "repository": "RaulAstudillo06/PSBAX",
+      "paper": "https://proceedings.neurips.cc/paper_files/paper/2024/file/f3c8bfcc9c2bc13a0f141cb58afc6e5a-Paper-Conference.pdf",
+      "method": "Algorithm 1, sample target set then maximum posterior entropy",
+      "status": "finite Pareto adaptation"
+    }
+  ]
+}

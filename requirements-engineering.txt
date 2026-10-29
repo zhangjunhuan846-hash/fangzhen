@@ -1,0 +1,33 @@
+# WSL Python 3.11; installed in an optional venv over the pinned core runtime.
+numpy==2.3.5
+scipy==1.17.1
+pybamm==26.8.0.0
+pybop==26.3
+thevenin==0.2.1
+scikit-sundae==1.2.0
+do-mpc==5.1.2
+python-can==4.6.1
+cantools==45.1.1
+PyProBE-Data==2.6.1
+polars==1.44.2
+botorch==0.18.1
+gpytorch==1.15.2
+linear_operator==0.6.1
+loguru==0.7.3
+distinctipy==1.3.4
+tzlocal==5.4.5
+fastexcel==0.21.0
+ray==2.59.0
+ipython==9.17.1
+ipywidgets==8.1.9
+networkx==3.6.1
+redis==8.1.0
+scikit-spatial==10.0.0
+textwrapper==1.0.2
+property-cached==1.6.4
+ruamel.yaml==0.19.1
+
+
+# PF adaptive integration and full-band EIS diagnostics.
+numba==0.68.1
+impedance==1.7.1

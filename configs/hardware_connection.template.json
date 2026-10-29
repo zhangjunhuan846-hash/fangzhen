@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "profile": "unconfigured",
+  "device_model": null,
+  "physical_cell_id": null,
+  "transport": null,
+  "serial": {"port": null, "baudrate": null, "protocol": null},
+  "visa": {"resource": null, "manufacturer_command_manual": null},
+  "can": {"interface": null, "channel": null, "bitrate": null, "dbc_path": null},
+  "reference_cell": "Panasonic NCR18650PF nominal2.9Ah; a software reference, not identification of connected hardware",
+  "current_convention": "sensor positive_discharge; requested_charge_A positive_charge",
+  "limits": {"voltage_min_V": 2.5, "voltage_max_V": 4.2, "temperature_max_C": 45.0, "current_max_A": 2.9, "stale_timeout_s": 0.5},
+  "limits_origin": "simulation-only screening values; actual hardware limits require the matched cell/device documentation",
+  "actuator_enabled": false,
+  "hardware_protection_verified": false,
+  "clock_sync_verified": false,
+  "physical_commands_implemented": false
+}

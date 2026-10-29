@@ -1,0 +1,18 @@
+{
+  "source": "https://doi.org/10.17632/ycx459r5c3.2",
+  "development_cells": ["59294", "59485", "59627", "59690", "60129", "60403"],
+  "new_test_cells": ["60644", "60710"],
+  "prior_calibration": "Each cell's own preceding C/20 discharge and HPPC 1C; 25C pulse rest curve for OCV approximation; temperature lookup uses chamber setpoint",
+  "fixed_rc_selection": "Fixed initial RC selected by prior 6-cell evaluation; no within-window RC change",
+  "voltage_noise_V": 0.005,
+  "soc_process_variance_candidates_per_step": [1e-10, 1e-8, 1e-7, 1e-6],
+  "selection": "Select lowest development EKF SOC proxy RMSE with one-step voltage RMSE no more than 1.1 times the 1e-8 baseline; before decoding new test drive voltages; raw bytes are read for checksum verification",
+  "drive_windows": "600 seconds beginning at 20% and 60% of each active WLTP, UDDS, US06 recording; per-second charge-preserving resampling",
+  "pulse_holdout": "Separate HPPC C/3 discharge pulses nearest SOC proxies 0.3, 0.5 and 0.7, with 5 seconds preceding rest and 115 seconds including/after pulse",
+  "reference": "Slow-discharge voltage anchor at each driving start and integrated current/capacity; pulse reference assumes full charge at HPPC start; neither is an independent direct SOC measurement",
+  "initialization": "Each window intentionally initializes estimator at its SOC proxy minus 0.04; zero RC voltage; controlled recovery test, not a blind-start SOC benchmark",
+  "one_step_voltage": "The prior voltage is computed before the voltage observation at that same time, but earlier observations are used",
+  "open_loop_voltage": "No measured voltage is used after the proxy-based window initialization; current and chamber setpoint are supplied",
+  "eis": "Processed EIS measured after the driving sequence is checked and catalogued only; it is not treated as a prior model calibration",
+  "exposure_note": "One 60644/25C C/3 pulse was inspected for data and code integrity after q was frozen; no parameter selection used that pulse. The full driving test was run once then reproduced unchanged."
+}

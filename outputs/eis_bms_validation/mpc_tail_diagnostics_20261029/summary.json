@@ -1,0 +1,167 @@
+{
+  "config": {
+    "action": "mpc",
+    "data_origin": "synthetic",
+    "seed": 42,
+    "cell": {
+      "cell_id": "synthetic-5Ah-1RC",
+      "capacity_Ah": 5.0,
+      "initial_soc": 0.55,
+      "estimated_initial_soc": 0.55,
+      "temperature_C": 25.0,
+      "mass_kg": 0.07,
+      "heat_capacity_J_kgK": 900.0,
+      "heat_transfer_W_K": 0.2,
+      "voltage_min_V": 2.8,
+      "voltage_max_V": 4.2,
+      "temperature_max_C": 45.0,
+      "current_max_A": 2.5,
+      "ocv_soc": [
+        0.0,
+        0.2,
+        0.5,
+        0.8,
+        1.0
+      ],
+      "ocv_V": [
+        3.0,
+        3.35,
+        3.65,
+        3.95,
+        4.18
+      ],
+      "R0_ohm": 0.012,
+      "R_ohm": [
+        0.025
+      ],
+      "C_F": [
+        1500.0
+      ]
+    },
+    "steps": 180,
+    "dt_s": 20.0,
+    "voltage_noise_V": 0.001,
+    "current_noise_A": 0.001,
+    "current_bias_A": 0.0,
+    "algorithm": "qlognehvi",
+    "target_soc": 0.6,
+    "horizon": 6,
+    "Ns": 2,
+    "Np": 2,
+    "pack_current_A": 2.0,
+    "duration_s": 60.0,
+    "period_s": 10.0,
+    "voltage_guard_V": 0.01,
+    "temperature_guard_C": 1.0
+  },
+  "plant": {
+    "cell_id": "synthetic-5Ah-1RC",
+    "capacity_Ah": 4.75,
+    "initial_soc": 0.55,
+    "estimated_initial_soc": 0.55,
+    "temperature_C": 25.0,
+    "mass_kg": 0.07,
+    "heat_capacity_J_kgK": 900.0,
+    "heat_transfer_W_K": 0.16000000000000003,
+    "voltage_min_V": 2.8,
+    "voltage_max_V": 4.2,
+    "temperature_max_C": 45.0,
+    "current_max_A": 2.5,
+    "ocv_soc": [
+      0.0,
+      0.2,
+      0.5,
+      0.8,
+      1.0
+    ],
+    "ocv_V": [
+      3.0,
+      3.35,
+      3.65,
+      3.95,
+      4.18
+    ],
+    "R0_ohm": 0.015600000000000001,
+    "R_ohm": [
+      0.0325
+    ],
+    "C_F": [
+      1500.0
+    ]
+  },
+  "outcomes": {
+    "ekf": {
+      "elapsed_s": 2460.0,
+      "steps": 123,
+      "terminal_soc_plant": 0.6000265780098878,
+      "terminal_soc_ekf": 0.5999622889200178,
+      "first_current_below_90pct_max": {
+        "time_s": 160.0,
+        "charge_A": 2.0996999281397217,
+        "voltage_V": 3.828843053916544,
+        "temperature_C": 25.49035919356885,
+        "soc_model": 0.5728324538108713,
+        "soc_ekf": 0.5960442806232623,
+        "fallback": false,
+        "solver_time_ms": 3.7274620000005134,
+        "plant_soc_before": 0.5703766644212341,
+        "controller_soc_before": 0.5934259107449221,
+        "command_A": 2.0996999281397217,
+        "applied_A": 2.0996999281397217,
+        "predicted_voltage_start_V": 3.828587946657478,
+        "predicted_voltage_end_V": 3.827831896497025,
+        "predicted_temperature_end_C": 25.471281539464325,
+        "solver_status": "Solve_Succeeded",
+        "voltage_margin_V": 0.371156946083456,
+        "temperature_margin_C": 19.50964080643115
+      },
+      "min_voltage_margin_V": 0.3660404266378698,
+      "min_temperature_margin_C": 19.477604730625277,
+      "minimum_command_A": 3.0342510765188863e-06,
+      "solver_fallbacks": 0,
+      "events": [
+        {
+          "time_s": 2460.0,
+          "kind": "model_target_reached"
+        }
+      ]
+    },
+    "ideal_soc": {
+      "elapsed_s": 380.0,
+      "steps": 19,
+      "terminal_soc_plant": 0.6003237733090325,
+      "terminal_soc_ekf": 0.6240068994060056,
+      "first_current_below_90pct_max": {
+        "time_s": 320.0,
+        "charge_A": 2.017169645031468,
+        "voltage_V": 3.8521865892731695,
+        "temperature_C": 25.932592348621085,
+        "soc_model": 0.5960308340908842,
+        "soc_ekf": 0.6213958587479339,
+        "fallback": false,
+        "solver_time_ms": 3.926897000013696,
+        "plant_soc_before": 0.5936715713481577,
+        "controller_soc_before": 0.5936715713481577,
+        "command_A": 2.017169645031468,
+        "applied_A": 2.017169645031468,
+        "predicted_voltage_start_V": 3.829375696318664,
+        "predicted_voltage_end_V": 3.827041645714656,
+        "predicted_temperature_end_C": 25.907147951370305,
+        "solver_status": "Solve_Succeeded",
+        "voltage_margin_V": 0.3478134107268298,
+        "temperature_margin_C": 19.067407651378915
+      },
+      "min_voltage_margin_V": 0.3390746098690322,
+      "min_temperature_margin_C": 19.065439082683383,
+      "minimum_command_A": 0.836395472013053,
+      "solver_fallbacks": 0,
+      "events": [
+        {
+          "time_s": 380.0,
+          "kind": "model_target_reached"
+        }
+      ]
+    }
+  },
+  "scope": "synthetic diagnostic; ideal SOC is supplied only in diagnostic run, EKF polarization retained; first-step predictions are not full-horizon constraint extrema; simulated true SOC is evaluator stop only"
+}
