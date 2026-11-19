@@ -1,0 +1,363 @@
+{
+  "title": "BatteryLife · Na-ion 逐循环放电容量",
+  "url": "https://huggingface.co/datasets/Battery-Life/BatteryLife_Raw/tree/e52318a5a5036a46f5fb2f69b3dbd584d0d815e5/NAion",
+  "method": "每份原始记录作为一条轨迹。CSV 按原始循环对负电流放电步骤取最大累计放电容量。XLSX 使用 Cycle 表的 CapD/Ah。略去没有正放电容量的循环和末次可能尚未完成的循环。",
+  "license": "MIT (dataset card)",
+  "axis_label": "循环次数",
+  "source_files": [
+    {
+      "path": "270040-1-1-64.csv",
+      "sha256": "3d957dcd40db29cfdc1a2853c37b3860e28a4dfe7b84530cd4e04d7ed9cbebde",
+      "rows": 91
+    },
+    {
+      "path": "270040-1-2-63.csv",
+      "sha256": "006b354060c18f5d8bd448aa2f18fdfd4e885a0699c6e29cd48b824dcf7cf5c6",
+      "rows": 235
+    },
+    {
+      "path": "270040-1-3-62.csv",
+      "sha256": "ca7b59e67f8da19367f52756e8195985782f9287e1b41d9dd9d08b33376588bb",
+      "rows": 175
+    },
+    {
+      "path": "270040-1-4-61.csv",
+      "sha256": "cc30ab63cbb92326d936d4476602eda8c4d09a173db0a440f46f1ad2b125f470",
+      "rows": 232
+    },
+    {
+      "path": "270040-1-5-60.csv",
+      "sha256": "38fc2e036618893fab5062749f47991d4d7865ad1a30b48775e0ca96a7d410fb",
+      "rows": 236
+    },
+    {
+      "path": "270040-1-6-59.csv",
+      "sha256": "67c2e2b1ab3d1ec573d2a2e50a0dd66dbb474ba5e8258e649d2e421e7bff8847",
+      "rows": 240
+    },
+    {
+      "path": "270040-1-7-58.csv",
+      "sha256": "93e684d7828182a9302f3a259383c817b325fc01f6d986e74d2c327fcde2fce4",
+      "rows": 223
+    },
+    {
+      "path": "270040-1-8-57.csv",
+      "sha256": "bf3a1f39b5682dd0ca5ee350c309f97fbf1ae584d1efe017908b7b75d84db3ef",
+      "rows": 240
+    },
+    {
+      "path": "270040-2-1-12.csv",
+      "sha256": "87ee26ea41e41cfe60c9d971294193e98d9eb38d707b7803b961b77f7e118352",
+      "rows": 121
+    },
+    {
+      "path": "270040-2-2-12.csv",
+      "sha256": "a99720f48139a6cb92d9ce69b71f48866d6f0fbde76030fa3f81a447cb1bf3f9",
+      "rows": 128
+    },
+    {
+      "path": "270040-2-3-12.csv",
+      "sha256": "e4f67f459a5c362179e4cf05a597985124b963f55ab37f2a80b15d9feb3172b1",
+      "rows": 121
+    },
+    {
+      "path": "270040-2-4-12.csv",
+      "sha256": "3ff2fcce744220cff5fa75eef8ffdd06ed265aa74300c351d522eb8cd29d9908",
+      "rows": 134
+    },
+    {
+      "path": "270040-2-5-12.csv",
+      "sha256": "085bbc90141fb32075b0e86738ff2950cbb23d2a99edd15779d88a53a398db65",
+      "rows": 129
+    },
+    {
+      "path": "270040-2-6-12.csv",
+      "sha256": "ec8e90bb374804f22c2997eb4e167e407bc8b6a41148578066294ce947f081e1",
+      "rows": 134
+    },
+    {
+      "path": "270040-2-7-12.csv",
+      "sha256": "383b92a581a896e9d9e1122a7ffeeba258cd39ae7767a748ec52a34e4a45270b",
+      "rows": 132
+    },
+    {
+      "path": "270040-2-8-12.csv",
+      "sha256": "72fef43eefc0068ab8408ceb9f3c8d542f3dbb9d0ecdd29f7ba9157ed966b95e",
+      "rows": 120
+    },
+    {
+      "path": "270040-3-1-56.csv",
+      "sha256": "bc4d417a2a405748f3ad51b95504b0d458a6f8042eafab7e6b2e29f005bf1a77",
+      "rows": 205
+    },
+    {
+      "path": "270040-3-2-55.csv",
+      "sha256": "6aec75657ad8548ab21d55a5387299b928ecaf42458767e58435d58d9d4dfd15",
+      "rows": 215
+    },
+    {
+      "path": "270040-3-3-54.csv",
+      "sha256": "5d347bc635667c17973f735b79d1beb17f7f7e0c3889a3e5f7ed05f409370ab4",
+      "rows": 233
+    },
+    {
+      "path": "270040-3-4-53.csv",
+      "sha256": "fa3c7685585007ab8f6d5c320e19aaaa82e67e9cab0288803eda777837ffa9e8",
+      "rows": 225
+    },
+    {
+      "path": "270040-3-5-52.csv",
+      "sha256": "716700381d2fdff6d25f3f0907e085cb41e97907333e2492bf1bba0f630d6233",
+      "rows": 251
+    },
+    {
+      "path": "270040-3-6-51.csv",
+      "sha256": "55a49be7d35d9a5fb468dac5d6bdc6091071f0c1313b99b2c2673de213ea050b",
+      "rows": 246
+    },
+    {
+      "path": "270040-3-7-50.csv",
+      "sha256": "6c8064a8ed0b9cb4ce175680903f02f90616b6ce2edd5070a94b1fb1e741a544",
+      "rows": 184
+    },
+    {
+      "path": "270040-3-8-49.csv",
+      "sha256": "310cfe7bffb1d2d79c4049b430e3b6eeec31180a6dfa5b63dfc200685565b156",
+      "rows": 251
+    },
+    {
+      "path": "270040-4-1-48.csv",
+      "sha256": "5ed0a37816e2723dd94ef7b4e3f0e32a5ac41a6ab418e9b13c2f4987229de2ef",
+      "rows": 249
+    },
+    {
+      "path": "270040-4-2-47.csv",
+      "sha256": "390235a6ae64e3648551f51696e3592c13fb6f1277cfcd9591b19b647cc4e224",
+      "rows": 202
+    },
+    {
+      "path": "270040-4-3-46.csv",
+      "sha256": "4a9e130d65e09cac66b84c2fe32a16a27955d480cf1be21dcaa32fc287ba4d12",
+      "rows": 243
+    },
+    {
+      "path": "270040-4-4-45.csv",
+      "sha256": "871068e57ec4073b2f107ce7c136acaff2ab6b2f8ae286cea5c0552120d28e46",
+      "rows": 234
+    },
+    {
+      "path": "270040-4-5-44.csv",
+      "sha256": "07a46c3364ada60a619bb9d485c2d5ae08c614e5f92f38a6bcfa02aeb6b59c56",
+      "rows": 244
+    },
+    {
+      "path": "270040-4-6-43.csv",
+      "sha256": "8278bd5c65db8d05e33263dc4815d3e4f281de97838b76bf2ca3d2d4690e549d",
+      "rows": 194
+    },
+    {
+      "path": "270040-4-7-42.csv",
+      "sha256": "be70a458d282e3cd0221403e162dfa2768a016bf02e904e9c9c25f1edc95fede",
+      "rows": 237
+    },
+    {
+      "path": "270040-4-8-40.csv",
+      "sha256": "0bcd149b38606d6969f4854bedf8f88eb1b0c15270b6aaab8bbb93bd64bd8d3c",
+      "rows": 0,
+      "excluded": "不足三个可用放电循环"
+    },
+    {
+      "path": "270040-4-8-41.csv",
+      "sha256": "b1a9f1e38203fdc4020b442d27085d5011591b3d09e2b391dd700746bd55525a",
+      "rows": 100
+    },
+    {
+      "path": "270040-5-1-39.csv",
+      "sha256": "be30f0f0a9284f903a43f2db37e47d2faa4955a3844830ce21bac0c7919da178",
+      "rows": 225
+    },
+    {
+      "path": "270040-5-2-38.csv",
+      "sha256": "6134d37413d6d7e018b6a2bd70803f54206ffc7569c4d3ac694273e3303428e1",
+      "rows": 226
+    },
+    {
+      "path": "270040-5-3-37.csv",
+      "sha256": "bd702d81464b7158476a66acbd75ae5d496d0dd6c372cd9052eea0323a9f4a0e",
+      "rows": 211
+    },
+    {
+      "path": "270040-5-4-36.csv",
+      "sha256": "8d0b7d4cbdd941336200edb69fac232dbc337c4912d82a845c10c527176bc76d",
+      "rows": 108
+    },
+    {
+      "path": "270040-5-5-35.csv",
+      "sha256": "e87ab329318fd0e5f7989f214ad0be5c6d0c91e38a48af0a053eede9f27900fe",
+      "rows": 244
+    },
+    {
+      "path": "270040-5-6-34.csv",
+      "sha256": "072967d125ad6858ff794ce90e5aaaa92ecc59e936f451f98930a18e04a647ac",
+      "rows": 223
+    },
+    {
+      "path": "270040-5-7-33.csv",
+      "sha256": "e03f4337a720941c23af561053c370c52072af5642e4e15f007ac2637bb0e0ea",
+      "rows": 212
+    },
+    {
+      "path": "270040-5-8-32.csv",
+      "sha256": "194baab269089f4fac1bc1625c13a2588e54b76d8fe56aefbcbc8238916e3187",
+      "rows": 200
+    },
+    {
+      "path": "270040-6-1-31.csv",
+      "sha256": "eb4ceaa77c06642ddbb3ed6a5da01515e10d5a4a496e9464caa196c05c41fb86",
+      "rows": 244
+    },
+    {
+      "path": "270040-6-2-30.csv",
+      "sha256": "47f6dec55991abf44bb648c4893394d05094e56416225f19364b550ed6ab4d92",
+      "rows": 171
+    },
+    {
+      "path": "270040-6-3-29.csv",
+      "sha256": "804bdff6179b281f0ee123ed64737e65fe991e19f9bfbf5bc16666227b06c724",
+      "rows": 239
+    },
+    {
+      "path": "270040-6-4-28.csv",
+      "sha256": "e3d6d31cc99c7a2c90bd578607a5863bc53aac1f65f7dbf3f1bfe2043528924f",
+      "rows": 238
+    },
+    {
+      "path": "270040-6-5-27.csv",
+      "sha256": "729da6cd834dc4565fd0f0a612b42ffd83fe61399d2515919ffc1020c982069e",
+      "rows": 101
+    },
+    {
+      "path": "270040-6-6-26.csv",
+      "sha256": "2be66ba9e2b97517d2523bb828e1817033a552f5bb5c7de0991f31f97f46c8ee",
+      "rows": 241
+    },
+    {
+      "path": "270040-6-7-25.csv",
+      "sha256": "09b0cffb422d65ec6812e20c4ac84b546c6aeb3a82e616d3e7e56acdf1477439",
+      "rows": 239
+    },
+    {
+      "path": "270040-6-8-24.csv",
+      "sha256": "8fb810e93da41f5f0ab5d054ff144ea7541ec6c8c05c719b3da2ea985260f569",
+      "rows": 235
+    },
+    {
+      "path": "270040-7-1-23.csv",
+      "sha256": "6b346ed2f88b78f31278ce88305930f2feebe49ecb7a6b6950dda79f9e50ed6d",
+      "rows": 248
+    },
+    {
+      "path": "270040-7-2-22.csv",
+      "sha256": "6b423deeef3cb6174816d45e3f943c4ca12d9a59b593d73f574a0c2c6acd734a",
+      "rows": 179
+    },
+    {
+      "path": "270040-7-3-21.csv",
+      "sha256": "7665e4e3ef1567a115020701d98f12711cb033d2629b0ae6d0c8c63d173b46e0",
+      "rows": 242
+    },
+    {
+      "path": "270040-8-1-20.csv",
+      "sha256": "7c6b26e7a85d762bde29d464a9331dfe92a6c6451011ee8775f9a472275996ec",
+      "rows": 239
+    },
+    {
+      "path": "270040-8-2-19.csv",
+      "sha256": "aeac68437cfc4cacdd4b28bbe94e215c255263d303d7bbef580e2b16fadf3af9",
+      "rows": 239
+    },
+    {
+      "path": "270040-8-3-18.csv",
+      "sha256": "ed0f7c201ada4914c80af95779650d163184c0cba769475d4898152b0545c772",
+      "rows": 97
+    },
+    {
+      "path": "270040-8-4-17.csv",
+      "sha256": "d6d961dcbde1da229e7e0cb89792da54805fa6c9ef0dc88afae0f5eb2227c18f",
+      "rows": 237
+    },
+    {
+      "path": "270040-8-5-16.csv",
+      "sha256": "75a0a76ac1bab5c34ad270d475440e65fc588ecbc4544b92ba9882007baffa32",
+      "rows": 128
+    },
+    {
+      "path": "270040-8-6-15.csv",
+      "sha256": "e33b4119a698d88dabe256e9719cacf929500d0d47e8154f16d23bf2260e7e3d",
+      "rows": 236
+    },
+    {
+      "path": "270040-8-7-14.csv",
+      "sha256": "b6b4f7d9f0f8fb380da7569af670e82e577b8055b35af50472356a6250f4ddc0",
+      "rows": 234
+    },
+    {
+      "path": "270040-8-8-13.csv",
+      "sha256": "56f1117cf3c4bf2c0773552eb100d1fc6933b239a7bea7e4735d20609d985c46",
+      "rows": 239
+    },
+    {
+      "path": "2750-30_20250115171823_DefaultGroup_45_2.xlsx",
+      "sha256": "2ba5644d6bf8255cb28a96969f310aed4fa6f4b1ec30f3a3fa125136ff33b259",
+      "rows": 63
+    },
+    {
+      "path": "2850-30_20250117105706_DefaultGroup_45_2.xlsx",
+      "sha256": "7ca26578c9a0b596b3d6eb2f917a31c6c8f736edae19e1130f21c6f31ebde7f0",
+      "rows": 169
+    },
+    {
+      "path": "4000-30_20250115110135_DefaultGroup_45_7.xlsx",
+      "sha256": "9c982bb259950a4e6e9348b7107f7f90542afa09c51617aa685eda73fe7557e9",
+      "rows": 118
+    },
+    {
+      "path": "4000-30_20250115110206_DefaultGroup_45_1.xlsx",
+      "sha256": "75fe256b5ec8e28751c58a98faafcd0e903e06abafc052ebaeafbcc84d862341",
+      "rows": 118
+    },
+    {
+      "path": "4500-30_20250114232539_DefaultGroup_45_8.xlsx",
+      "sha256": "e9d63ec147119844658aee012fef4b9d41ba136c49f7d69a36f1c6f3bb03b63d",
+      "rows": 163
+    },
+    {
+      "path": "5000-25_20250115110326_DefaultGroup_38_1.xlsx",
+      "sha256": "69927b19d9bfee91b6aeb94635f0c59b40c00dd8472eae96d2b662e167fbc2b0",
+      "rows": 134
+    },
+    {
+      "path": "5000-25_20250115110326_DefaultGroup_38_2.xlsx",
+      "sha256": "69ab674804ceaab34aa0260216a1f173695027e24832de41fdd60ba31e5989b1",
+      "rows": 136
+    },
+    {
+      "path": "5000-25_20250115110326_DefaultGroup_38_5.xlsx",
+      "sha256": "4dc9095e6c9dfa37433c4dbea4e2247dcd7a3f61154bd01bf43c4de5868b7c9f",
+      "rows": 137
+    },
+    {
+      "path": "5000-25_20250115110326_DefaultGroup_38_7.xlsx",
+      "sha256": "576144ed46608447a5a478a1c7941dfe739117950c16f008f3ed0fa63a78a2b4",
+      "rows": 140
+    },
+    {
+      "path": "5000-25_20250115110326_DefaultGroup_38_8.xlsx",
+      "sha256": "720c3eac916b79b83a22c65566a796806a4fbaeb22c505e4d2d5a3ae7e0a9f78",
+      "rows": 135
+    }
+  ],
+  "records": 13192,
+  "series": 69,
+  "sha256": "e05c7292eddd2df3b98e65a41cde898a7399c26fa321f31f87548094e534cfc6"
+}

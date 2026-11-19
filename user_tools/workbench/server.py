@@ -31,7 +31,7 @@ from user_tools.workbench.research_data import parse_campaign
 from user_tools.workbench.experiment_ledger import ExperimentLedger
 from user_tools.workbench.agent_api_settings import public_settings, save_settings, probe_settings
 
-APP_VERSION='0.3.23'
+APP_VERSION='0.3.25'
 
 
 def resource_dir():
@@ -345,6 +345,25 @@ class Application:
              'curves':[{'name':'标准化电压','points':[[r['time_s'],r['voltage_V'],None] for r in records[::max(1,len(records)//500)]]}]}
         self.store.put_job(job);return job
 
+    def capacity_forecast(self, payload):
+        from user_tools.workbench.capacity_forecast import csv_bytes, run
+        workspace = self.store.get(payload['workspace'])
+        raw, result = run(self.project, payload)
+        ident = uuid.uuid4().hex
+        folder = self.data / 'jobs' / ident
+        folder.mkdir(parents=True)
+        (folder / 'capacity_input.csv').write_bytes(raw)
+        (folder / 'capacity.csv').write_bytes(csv_bytes(result['columns'], result['points']))
+        (folder / 'capacity.json').write_text(json.dumps(result, ensure_ascii=False, allow_nan=False), encoding='utf-8')
+        summary = {k: result[k] for k in ('cell_id', 'algorithm_name', 'cutoff', 'metrics', 'input_sha256')}
+        summary['dataset'] = result['source']['title']
+        if 'interval' in result:
+            summary['interval_level'] = result['interval']['level']
+        job = dict(id=ident, workspace=workspace['id'], workspace_name=workspace['name'],
+                   workspace_revision=workspace['revision'], mode='capacity_forecast', status='completed', result=summary)
+        self.store.put_job(job)
+        return {'job': job, 'result': result}
+
     def multichem(self,payload):
         from user_tools.workbench.multichem_analysis import run
         workspace=self.store.get(payload['workspace'])
@@ -546,6 +565,7 @@ class Handler(BaseHTTPRequestHandler):
         parsed=urlsplit(self.path);path=parsed.path
         if not path.startswith('/api/'):
             assets={'/multichem.js':'multichem.js','/engineering.js':'engineering.js','/agent.js':'agent.js','/':'index.html','/app.js':'app.js','/analysis.js':'analysis.js','/pipeline.js':'pipeline.js','/papers.js':'papers.js','/ml.js':'ml.js','/research.js':'research.js','/sustainability.js':'sustainability.js','/style.css':'style.css'}
+            assets['/capacity.js'] = 'capacity.js'
             if path not in assets:self.send_error(404);return
             file=resource_dir()/'web'/assets[path]
             mime='text/html; charset=utf-8' if path=='/' else 'text/javascript; charset=utf-8' if path.endswith('.js') else 'text/css; charset=utf-8'
@@ -554,6 +574,9 @@ class Handler(BaseHTTPRequestHandler):
         try:
             args=parse_qs(parsed.query);ident=args.get('id',[''])[0]
             if path=='/api/bootstrap':self.json({'schema':SCHEMA,'workspaces':self.app.store.list(),'jobs':self.app.store.jobs(),'physics_available':bool(self.app.project)})
+            elif path=='/api/capacity_catalog':
+                from user_tools.workbench.capacity_forecast import catalog
+                self.json(catalog(self.app.project))
             elif path=='/api/hardware_readiness':
                 from user_tools.workbench.hardware_readiness import inventory
                 self.json(inventory(self.app.project))
@@ -634,6 +657,9 @@ class Handler(BaseHTTPRequestHandler):
                        'safety_cases':('physics/safety_cases.json','application/json'),
                        'safety_trace':('physics/safety_trace.json','application/json'),
                        'hardware_template':('physics/hardware_template.json','application/json')}
+                files.update(capacity_csv=('capacity.csv','text/csv; charset=utf-8'),
+                             capacity_json=('capacity.json','application/json'),
+                             capacity_input=('capacity_input.csv','text/csv; charset=utf-8'))
                 if kind not in files:raise ValueError('未知下载类型。')
                 name,mime=files[kind];self.binary((self.app.data/'jobs'/job['id']/name).read_bytes(),mime)
             elif path=='/api/export':self.binary(self.app.export(ident).read_bytes(),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -704,6 +730,19 @@ class Handler(BaseHTTPRequestHandler):
             elif path=='/api/curve':result=self.app.import_curve(data)
             elif path=='/api/analyze':result=self.app.analyze(data)
             elif path=='/api/preprocess':result=self.app.preprocess(data)
+            elif path=='/api/capacity_cells':
+                from user_tools.workbench.capacity_forecast import cells_info, input_data, parse_cycles
+                raw, _ = input_data(self.app.project, data)
+                result = cells_info(parse_cycles(raw))
+            elif path=='/api/capacity_forecast':result=self.app.capacity_forecast(data)
+            elif path=='/api/capacity_source_folder':
+                from user_tools.workbench.capacity_forecast import source_folder
+                folder = source_folder(self.app.project, data.get('source'))
+                if os.name == 'nt':
+                    os.startfile(str(folder))
+                elif sys.platform == 'darwin' or os.environ.get('DISPLAY') or os.environ.get('WAYLAND_DISPLAY'):
+                    subprocess.Popen(['open' if sys.platform == 'darwin' else 'xdg-open', str(folder)])
+                result = {'folder': str(folder)}
             elif path=='/api/multichem':result=self.app.multichem(data)
             elif path=='/api/ocp':result=self.app.import_ocp(data)
             elif path=='/api/papermethod':result=self.app.paper_analysis(data)

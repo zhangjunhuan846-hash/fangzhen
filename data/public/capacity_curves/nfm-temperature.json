@@ -1,0 +1,22 @@
+{
+  "title": "NFM 4.5 Ah · 25 °C / −15 °C",
+  "url": "https://data.mendeley.com/datasets/4mztcdc4gt/1",
+  "method": "使用两个 NFM 文件的 Discharge 表，取 2.00–4.00 V 两端容量之差（Ah）。原表按行排列曲线，循环轴为从 1 开始的观测序号。每个温度一条轨迹，SOH 列未参与计算。",
+  "license": "CC BY 4.0",
+  "axis_label": "循环观测序号",
+  "source_files": [
+    {
+      "path": "Dataset 1-1.xlsx",
+      "sha256": "dd45991249a0b0e457d646fc49a6af34b0a2383a6e24b1c25ddf3168a547c668",
+      "rows": 1528
+    },
+    {
+      "path": "Dataset 1-2.xlsx",
+      "sha256": "d7cecb8f493a8c2be592609e7a6c344b4f181d083af6df7527cb80bca590e39a",
+      "rows": 1211
+    }
+  ],
+  "records": 2739,
+  "series": 2,
+  "sha256": "8e31a325eed4a188c39af28a2b54b24c77870108bf2cccc09ee3b1a9e72d4caa"
+}

@@ -1,0 +1,17 @@
+{
+  "title": "NIMS · NVP / 硬碳叠片电芯",
+  "url": "https://huggingface.co/datasets/TOzawa-8887/nims-sib-additives-72/tree/489059aea27d13770ad5630393bed3fe5745e38c/",
+  "method": "采用发布者的 csv/cycle_summary.csv，使用 sample_key 和原始循环号。选取 phase=cycling 的正放电容量，由 mAh 换算成 Ah，化成阶段单独保留在原始数据中。",
+  "license": "CC BY 4.0",
+  "axis_label": "循环次数",
+  "source_files": [
+    {
+      "path": "csv/cycle_summary.csv",
+      "sha256": "3f87ede3953d854e2ee17400945fb291a1fe2d0a2b43d8156265b46677b902cb",
+      "rows": 68416
+    }
+  ],
+  "records": 68416,
+  "series": 72,
+  "sha256": "85dc841fccd4ce908967f3db72c0f452a728dfe5b03e974f8c4cf493d33e0ea9"
+}

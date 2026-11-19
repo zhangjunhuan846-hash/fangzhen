@@ -1,5 +1,19 @@
 # ---- heavy raw data (13 GB) - never commit ----
 data/
+# The source distribution includes only these three attributed capacity tables
+# and their provenance. Raw archives and workbench databases stay local.
+!/data/
+/data/*
+!/data/public/
+/data/public/*
+!/data/public/capacity_curves/
+/data/public/capacity_curves/*
+!/data/public/capacity_curves/batterylife-naion.csv
+!/data/public/capacity_curves/batterylife-naion.json
+!/data/public/capacity_curves/nims-additives.csv
+!/data/public/capacity_curves/nims-additives.json
+!/data/public/capacity_curves/nfm-temperature.csv
+!/data/public/capacity_curves/nfm-temperature.json
 
 # ---- external repos: vendored (Jackowska BSD 3-Clause, pinned commit 9f3b526, see README §11) ----
 # tracked except the nested .git of the upstream clone

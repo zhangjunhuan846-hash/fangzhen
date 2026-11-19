@@ -1,6 +1,16 @@
 @echo off
 setlocal
 set "ROOT=%~dp0"
+pushd "%ROOT%"
+python -c "from user_tools.workbench.server import main" >nul 2>nul
+if errorlevel 1 goto packaged
+python -m user_tools.research_workbench %*
+set "RESULT=%ERRORLEVEL%"
+popd
+if not "%RESULT%"=="0" pause
+exit /b %RESULT%
+:packaged
+popd
 set "EIS_HPPC=%ROOT%outputs\fangzhen_workbench_eis_hppc_20261029\FangzhenResearch\FangzhenResearch.exe"
 set "STANFORD=%ROOT%outputs\fangzhen_workbench_stanford_20261029_v2\FangzhenResearch\FangzhenResearch.exe"
 set "COLD=%ROOT%outputs\fangzhen_workbench_cold_20261029\FangzhenResearch\FangzhenResearch.exe"

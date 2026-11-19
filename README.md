@@ -71,11 +71,11 @@ python run_pipeline.py --list-datasets
 python run_pipeline.py --config configs/example.yaml
 ```
 
-`data/` 不随仓库发布，因此在全新 clone 上直接运行完整测试集会遇到依赖本地原始数据的用例；请按 [STATUS.md](STATUS.md) 区分软件回归与带数据的研究验收。
+仓库附带三套逐循环钠电容量表。完整测试集中的部分用例还需要另行准备的原始数据，所需实验环境见[状态说明](STATUS.md)。
 
 ### 2 · 打开本地研究工作站
 
-在已配置项目依赖的 Windows 电脑上，双击 `启动科研工作站.bat`；它优先打开本机已有的工作站打包版，GitHub clone 中没有打包版时会改用源码启动。也可以直接执行：
+在已配置项目依赖的 Windows 电脑上，双击 `启动科研工作站.bat`；它优先启动当前工作区的源码，Python 环境不可用时会尝试本机已有的打包版。也可以直接执行：
 
 ```powershell
 python -m user_tools.research_workbench
@@ -84,6 +84,8 @@ python -m user_tools.research_workbench
 工作站自动打开本机浏览器。Windows 打包命令是 `./user_tools/build_workbench.ps1`；生成的 EXE 留在本机 `outputs/`，不纳入 GitHub 源码仓库。工作站的物理/ML 任务仍需可访问项目的 WSL 环境，Excel 导出及环境经济分析还需各自的本机依赖，详见[工作站说明](docs/workbench_v03.md)和[环境与经济说明](docs/workbench_v036.md)。
 
 工程仿真和 EIS 功能还需按需配置 `requirements-engineering.txt`、`requirements-eis.txt` 所列依赖；Windows 可从 `安装工程仿真扩展.bat` 进入安装流程。不同引擎使用隔离环境，具体要求和固定版本见[工程集成说明](docs/engineering_integrations_v0312_20261029.md)。公开数据与本地运行时清单不随仓库发布，需要依来源说明自行准备。Stanford OSF 若要求 view-only 参数，通过本机环境变量 `STANFORD_OSF_VIEW_ONLY` 提供，勿提交访问凭据。
+
+在“容量衰退预测”中可直接选择随仓库提供的 BatteryLife、NIMS 或 NFM 容量数据，切换算法，查看 80%、90% 或 95% 的逐圈预测区间，并导出上下限 CSV。三个基础算法使用 Python 标准库。要复现示例图中的二次多项式预测，在启动工作站的环境中运行 `python -m pip install numpy`。平台也支持导入自己的 CSV 和注册预测算法。[钠电数据、示例与接入说明](docs/sodium_capacity.md)
 
 在“仿真诊断与参数探索”中可直接用规则策略。若使用可选模型服务，展开“模型API地址与端口”，填写基础地址（例如 `http://localhost:11434/v1`）、模型名和可选密钥，保存后检查接口。配置写入本机忽略文件 `data/agent_llm.local.json`；界面检查 `/models`，实际建议任务从 WSL 调用 `/chat/completions`，两者需分别保证可达。详见 [Agent 接入说明](docs/battery_agent_adaptation.md)。
 
