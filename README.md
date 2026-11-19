@@ -1,23 +1,44 @@
 # 🔋 Fangzhen · 电池数据—模型研究工作站
 
-<p align="center">
-  <strong>让实验记录、物理仿真、诊断分析与下一轮实验建议接在同一条可追溯的研究链上。</strong><br>
-  Battery data → model → simulation → evidence → experiment
-</p>
+Fangzhen 是在本机浏览器中运行的锂电与钠电研究工作站。当前版本 `v0.3.25` 可以读取公开钠电池的循环数据，用早期放电容量预测后续容量曲线，并给出逐圈预测区间。平台也支持 PyBaMM 电化学仿真、阻抗谱（EIS）分析、BMS 状态估计与充电控制仿真。
 
-<p align="center">
-  <a href="#项目能做什么">项目能力</a> ·
-  <a href="#研究流程">研究流程</a> ·
-  <a href="#快速开始">快速开始</a> ·
-  <a href="#项目路线图">路线图</a> ·
-  <a href="STATUS.md">验收状态</a>
-</p>
+[快速开始](#快速开始) · [钠电池容量衰减预测](#钠电池容量衰减预测) · [接入数据与算法](#接入数据与算法) · [项目能力](#项目能做什么) · [研究流程](#研究流程) · [路线图](#项目路线图) · [验收状态](STATUS.md)
 
-> **当前状态：持续开发的电池仿真与研究工作站。** 平台把电化学仿真、EIS 分析、BMS 状态估计与充电控制的软件实验放在同一工作流中；`v0.1.0-platform` 为早期冻结标签。公开数据回放、合成测试和实物验证是不同证据等级，具体条件以各案例报告为准。
+## 快速开始
 
-平台面向锂离子与钠离子电池研究，可从实验数据出发进行模型构建、参数辨识和独立工况比较；同时提供材料性能预测、实验方案优化及可导出的分析报告。部分能力依赖可选软件环境与外部数据，实际可运行范围应以安装环境和案例输入为准。
+克隆仓库后，在仓库根目录用 Python 3.11 或更高版本运行以下命令。第一行安装下方案例使用的 NumPy。选择内置的「线性趋势」「平方根趋势」或「末次容量基线」时，可以直接运行第二行。
 
-### 近期工作：EIS 与 BMS
+```powershell
+python -m pip install numpy
+python -m user_tools.research_workbench
+```
+
+工作站会自动打开本机浏览器。Windows 用户也可以双击 `启动科研工作站.bat` 启动。钠电容量预测直接在本机 Python 中运行。PyBaMM 半电池案例的环境和命令见下文。[物理仿真与扩展环境](#物理仿真与扩展环境)
+
+## 钠电池容量衰减预测
+
+仓库附带 BatteryLife、NIMS 和 NFM 三套可直接使用的容量表，共 **143 条轨迹、84,347 个放电容量观测**。BatteryLife 和 NIMS 保留原始循环编号，NFM 按原工作表的观测顺序排列。[容量表与来源记录](data/public/capacity_curves) · [各表的提取方法与许可](docs/sodium_capacity.md#已接入的逐循环容量)
+
+1. 打开左侧「容量衰退预测」，在「逐循环数据」中选择 BatteryLife，再选择轨迹 `270040-1-1-64`。
+2. 选择「NumPy 二次多项式」，把「训练截止循环」设为 `63`，「末次实测后外推圈数」设为 `10`，保留默认的 `90%` 预测区间，点击「预测容量」。
+
+![BatteryLife 容量预测示例。虚线标出训练截止的第 63 圈，绿线为后续实测容量，橙色虚线和阴影为预测值及 90% 预测区间。](outputs/sodium_capacity_forecast/区间90_270040-1-1-64.png)
+
+模型用第 1–63 圈拟合。第 64–91 圈的 28 个留出实测值全部落在区间内。第 92–101 圈是末次实测之后的外推，第 92 圈的容量预测为 **0.7694 Ah**，区间为 **0.7406–0.7982 Ah**。页面可下载输入数据、逐圈结果和含算法版本的运行记录。[逐圈预测 CSV](outputs/sodium_capacity_forecast/区间90_270040-1-1-64.csv) · [本次运行 JSON](outputs/sodium_capacity_forecast/区间90_270040-1-1-64.json)
+
+对 BatteryLife 的 69 条文件轨迹分别用最早约 70% 的观测训练，在同一轨迹的后续实测点上回测。相同算法在 90% 目标水平下覆盖了 3,990 个留出点中的 3,494 个，按点计算的实测覆盖率为 **87.6%**。[逐轨迹回测 CSV](outputs/sodium_capacity_forecast/区间90_逐轨迹回测.csv)
+
+### 接入数据与算法
+
+| 模块 | 输入 | 输出 |
+| --- | --- | --- |
+| 数据接入 | 选择现有容量表，或导入 UTF-8 CSV，表头为 `cell_id,cycle,capacity_Ah` | 每条轨迹按循环号或观测序号排列的放电容量，单位 Ah |
+| 容量预测 | 单条轨迹的训练循环号、训练容量和待预测循环号 | 按目标循环顺序返回容量预测值，单位 Ah |
+| 区间与回测 | 用训练段的历史预测误差估计 80%、90% 或 95% 区间，用留出实测容量评分 | 逐圈上下限、留出 MAE、RMSE 和实测覆盖率。某个预测跨度的校准数据不足时，该跨度仅输出点预测 |
+
+要添加预测算法，在算法包中通过 Python 入口点 `fangzhen.capacity_forecasters` 注册预测函数，把包安装到工作站使用的 Python 环境，刷新页面即可选择。要添加数据，可从「导入容量 CSV…」试用新表，也可把标准表加入数据目录供后续调用。[数据与算法接入示例](docs/sodium_capacity.md#接入新数据与算法) · [34 条钠电公开数据来源](configs/sodium_public_sources.json)
+
+## EIS 与 BMS
 
 - **电芯模型与状态估计：** 支持等效电路的电压回放和库仑计数、EKF 等状态估计；公开数据案例分别记录开环电压和使用电压反馈后的估计结果。
 - **EIS 与 HPPC：** 对阻抗谱进行筛查与电路拟合，比较 HPPC 单独辨识、EIS 初始化及联合辨识；结果包括参数、窗口指标、逐点轨迹和报告。EIS 进入时域模型前仍需检查采集条件与参数适用范围。
@@ -41,7 +62,7 @@
 | **描述符与实验闭环** | 分组验证、有限候选模型建议、多目标探索、待实验记录与实验反馈 | 公开/合成回放是方法验收，建议必须经新的独立实验检验 |
 | **环境与经济** | 用户工艺清单、Brightway 前景 GWP 计算、成本核算和来源留档；独立的 EverBatt 社区迁移参考案例 | 按声明边界和功能单位筛选；尚非完整背景数据库 LCA 或资本现金流 TEA |
 
-工作站默认监听本机 `127.0.0.1`，研究记录保存在 `data/`（该目录不进 Git）。物理任务需要配置好的 WSL/PyBaMM 环境；Windows 打包程序也不是跨电脑零依赖安装包。具体版本说明见 [工作站文档](docs/workbench_v038.md)、[Agent 接入说明](docs/battery_agent_adaptation.md)和[环境与经济评价](docs/workbench_v036.md)。
+工作站默认监听本机 `127.0.0.1`，个人方案与作业记录保存在本机 `data/`。物理仿真任务使用配置好的 WSL/PyBaMM 环境。[工作站文档](docs/workbench_v038.md) · [Agent 接入说明](docs/battery_agent_adaptation.md) · [环境与经济评价](docs/workbench_v036.md)
 
 ## 研究流程
 
@@ -53,39 +74,31 @@
 
 图中的“下一轮实验”带时钟，表示待开展的计划。**公开数据回放**检验软件通路，**参数诊断**发现模型和数据哪里不一致，**独立实验**才检验结论能否迁移到新样品。碳足迹与成本使用另一套明确的工艺清单，不能与不同功能单位的参考结果混算。
 
-## 快速开始
+## 物理仿真与扩展环境
 
-### 1 · 从仓库自包含案例开始
+### PyBaMM 半电池示例
 
-`examples/half_cell_demo/` 可以在没有本地 `data/` 原始库的 clone 中运行。先按 [HANDOFF.md](HANDOFF.md) 配好 WSL Ubuntu 的 `pybamm` 环境，再执行：
+仓库中的 `examples/half_cell_demo/` 包含运行此示例所需的实验数据。先配好 WSL Ubuntu 的 `pybamm` 环境，再从仓库根目录运行下面的命令。[安装指南](HANDOFF.md)
 
 ```bash
 python -m user_tools.import_dataset --package examples/half_cell_demo
 python -m user_tools.run_baseline --package examples/half_cell_demo --models DFN
 ```
 
-这会走完实验 CSV 导入校验与 zero-fit DFN 基线。完整数据集列表及 YAML 流水线需要另行准备本地数据：
+第一条命令校验并导入实验 CSV，第二条运行使用原始参数的 DFN 基线。准备好相应的本地数据后，也可以列出数据集或按 YAML 配置运行流水线。
 
 ```bash
 python run_pipeline.py --list-datasets
 python run_pipeline.py --config configs/example.yaml
 ```
 
-仓库附带三套逐循环钠电容量表。完整测试集中的部分用例还需要另行准备的原始数据，所需实验环境见[状态说明](STATUS.md)。
+完整测试套件中的部分用例还需要另行准备原始数据。[测试环境与验收状态](STATUS.md)
 
-### 2 · 打开本地研究工作站
+### 工作站扩展
 
-在已配置项目依赖的 Windows 电脑上，双击 `启动科研工作站.bat`；它优先启动当前工作区的源码，Python 环境不可用时会尝试本机已有的打包版。也可以直接执行：
+Windows 打包命令是 `./user_tools/build_workbench.ps1`，生成的 EXE 保存在本机 `outputs/`。启动脚本优先运行工作区源码，Python 环境不可用时会尝试本机已有的打包版。工作站的物理仿真和部分机器学习任务使用 WSL，Excel 导出及环境经济分析还需各自的本机依赖。[工作站说明](docs/workbench_v03.md) · [环境与经济说明](docs/workbench_v036.md)
 
-```powershell
-python -m user_tools.research_workbench
-```
-
-工作站自动打开本机浏览器。Windows 打包命令是 `./user_tools/build_workbench.ps1`；生成的 EXE 留在本机 `outputs/`，不纳入 GitHub 源码仓库。工作站的物理/ML 任务仍需可访问项目的 WSL 环境，Excel 导出及环境经济分析还需各自的本机依赖，详见[工作站说明](docs/workbench_v03.md)和[环境与经济说明](docs/workbench_v036.md)。
-
-工程仿真和 EIS 功能还需按需配置 `requirements-engineering.txt`、`requirements-eis.txt` 所列依赖；Windows 可从 `安装工程仿真扩展.bat` 进入安装流程。不同引擎使用隔离环境，具体要求和固定版本见[工程集成说明](docs/engineering_integrations_v0312_20261029.md)。公开数据与本地运行时清单不随仓库发布，需要依来源说明自行准备。Stanford OSF 若要求 view-only 参数，通过本机环境变量 `STANFORD_OSF_VIEW_ONLY` 提供，勿提交访问凭据。
-
-在“容量衰退预测”中可直接选择随仓库提供的 BatteryLife、NIMS 或 NFM 容量数据，切换算法，查看 80%、90% 或 95% 的逐圈预测区间，并导出上下限 CSV。三个基础算法使用 Python 标准库。要复现示例图中的二次多项式预测，在启动工作站的环境中运行 `python -m pip install numpy`。平台也支持导入自己的 CSV 和注册预测算法。[钠电数据、示例与接入说明](docs/sodium_capacity.md)
+工程仿真和 EIS 功能按需安装 `requirements-engineering.txt`、`requirements-eis.txt` 所列依赖。Windows 可从 `安装工程仿真扩展.bat` 进入安装流程。工程案例的大体积原始数据按各来源说明准备。Stanford OSF 若要求 view-only 参数，在本机环境变量 `STANFORD_OSF_VIEW_ONLY` 中填写。[工程引擎与固定版本](docs/engineering_integrations_v0312_20261029.md)
 
 在“仿真诊断与参数探索”中可直接用规则策略。若使用可选模型服务，展开“模型API地址与端口”，填写基础地址（例如 `http://localhost:11434/v1`）、模型名和可选密钥，保存后检查接口。配置写入本机忽略文件 `data/agent_llm.local.json`；界面检查 `/models`，实际建议任务从 WSL 调用 `/chat/completions`，两者需分别保证可达。详见 [Agent 接入说明](docs/battery_agent_adaptation.md)。
 
@@ -104,6 +117,7 @@ v0.3.11 新增了 EIS 谱诊断与 RC 参数拟合。可用 [合成演示谱](ex
 | **v0.1 冻结平台** | 数据适配、参数来源矩阵、尺度对齐门、PyBaMM 回放与报告 | 冻结标签 `v0.1.0-platform`；详见[预注册判据](docs/preregistration_2026-09-18.md) |
 | **v0.2 模拟闭环** | Excel 研究任务、受控约束、公开/合成回放、模拟工艺比较 | 软件闭环通过；[验收报告](docs/v02_simulation_loop.md)保留科学失败门 |
 | **v0.3.11 本地工作站** | 数据版本、仿真诊断、描述符/多目标研究、清单评价与本机 API 配置 | 已完成工程接入；[Agent 说明](docs/battery_agent_adaptation.md)与[状态页](STATUS.md)列明限制 |
+| **v0.3.25 钠电容量预测** | 三套容量表、可切换的预测算法、逐圈预测区间及 CSV/JSON 导出 | BatteryLife 同轨迹留出回测已完成。[复现说明](docs/sodium_capacity.md) |
 | **下一阶段** | 真实材料数据、独立协议/批次、前瞻实验和来源完整的环境清单 | 待采集与验证；不能由软件演示结果代替 |
 
 ## 复现与判断边界
