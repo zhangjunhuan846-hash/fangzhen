@@ -144,9 +144,15 @@ def input_data(project, payload):
 
 
 def cells_info(cells):
-    return [dict(id=key, first=min(values), last=max(values), observations=len(values),
-                 default_cutoff=sorted(values)[min(len(values), max(2, int(.7 * len(values)))) - 1])
-            for key, values in sorted(cells.items())]
+    result=[]
+    for key,values in sorted(cells.items()):
+        cycles=sorted(values)
+        result.append(dict(id=key,first=cycles[0],last=cycles[-1],observations=len(cycles),cycles=cycles,
+                           first_capacity_Ah=values[cycles[0]],last_capacity_Ah=values[cycles[-1]],
+                           nonconsecutive_intervals=sum(b-a>1 for a,b in zip(cycles,cycles[1:])),
+                           zero_capacity_count=sum(value==0 for value in values.values()),
+                           default_cutoff=cycles[min(len(cycles),max(2,int(.7*len(cycles))))-1]))
+    return result
 
 
 def _integer(value, label):
@@ -290,8 +296,8 @@ def csv_bytes(columns, rows):
     return stream.getvalue().encode('utf-8-sig')
 
 
-def run(project, payload):
-    raw, source = input_data(project, payload)
+def run(project, payload, *, source_input=None):
+    raw, source = source_input if source_input is not None else input_data(project, payload)
     cells = parse_cycles(raw)
     result = forecast(cells, payload.get('cell'), payload.get('algorithm'), payload.get('cutoff'),
                       payload.get('horizon', 0), payload.get('interval_level'))

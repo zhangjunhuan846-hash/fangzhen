@@ -88,3 +88,13 @@ data/agent_llm.local.json
 
 # Rebuildable desktop executables, Python bundles, and local build trees.
 /outputs/fangzhen_workbench_*/
+
+# Local release preparation, prediction QA, and deployment credentials.
+/tmp/
+/outputs/platform_unification_*/
+/outputs/prediction_refinement_*/
+/.env
+/.env.*
+!/.env.example
+/deploy/**/.env
+/deploy/**/administrator.json

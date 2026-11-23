@@ -2,6 +2,7 @@ from __future__ import annotations
 import argparse
 import base64
 import csv
+from datetime import datetime, timezone
 import hashlib
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 import io
@@ -20,7 +21,7 @@ import zipfile
 import html
 from user_tools.rg_lite import SCHEMA,is_lite
 from user_tools.rg_workstation import read_xlsx,column,solve_constraints
-from user_tools.workbench.store import Store,blank_tables
+from user_tools.workbench.store import Store,blank_tables,normalize_tables
 from user_tools.scalar_migration import schema_for_cells,to_scalar_tables
 from user_tools.workbench.analysis import run_analysis
 from user_tools.workbench.preprocess import normalize_csv,save_normalized
@@ -30,8 +31,9 @@ from user_tools.workbench.ml_data import workspace_dataset,csv_dataset,validate_
 from user_tools.workbench.research_data import parse_campaign
 from user_tools.workbench.experiment_ledger import ExperimentLedger
 from user_tools.workbench.agent_api_settings import public_settings, save_settings, probe_settings
+from user_tools.workbench.desktop_entry import running_session, startup_lock
 
-APP_VERSION='0.3.25'
+APP_VERSION='0.4.1'
 
 
 def resource_dir():
@@ -46,9 +48,17 @@ def project_dir():
 
 
 def wsl_path(p):
+    if os.name != 'nt':
+        return str(Path(p).resolve())
     s=str(Path(p).resolve()).replace('\\','/')
     if len(s)<3 or s[1:3]!=':/':raise ValueError('本机仿真需Windows盘符路径。')
     return '/mnt/'+s[0].lower()+'/'+s[3:]
+
+
+def runtime_command(project, python, *arguments):
+    if os.name == 'nt':
+        return ['wsl.exe', '-d', 'Ubuntu', '--cd', wsl_path(project), '--exec', python, *arguments]
+    return [python, *arguments]
 
 
 def read_import(path):
@@ -75,12 +85,74 @@ def read_import(path):
 
 
 class Application:
-    def __init__(self,data,project=None):
+    def __init__(self,data,project=None,*,database_path=None):
         self.data=Path(data).resolve();self.data.mkdir(parents=True,exist_ok=True)
-        self.store=Store(self.data/'workbench.sqlite');self.project=Path(project).resolve() if project else project_dir()
+        self.store=Store(database_path or self.data/'workbench.sqlite');self.project=Path(project).resolve() if project else project_dir()
         self.token=secrets.token_urlsafe(32);self.physics_lock=threading.Lock();self.sustainability_lock=threading.Lock()
         self.experiments=ExperimentLedger(self.store.path)
         if not self.store.list():self.store.create('我的回收石墨研究')
+
+    def import_into_workspace(self, payload):
+        workspace=self.store.get(payload['workspace'])
+        revision=int(payload['revision'])
+        if revision!=workspace['revision']:raise ValueError('项目已在另一个窗口更新，请重新读取后导入。')
+        raw=base64.b64decode(payload['content'],validate=True)
+        if not raw or len(raw)>20_000_000:raise ValueError('Excel文件需非空且不超过20MB。')
+        folder=self.data/'imports'/uuid.uuid4().hex
+        folder.mkdir(parents=True)
+        file=folder/'source.xlsx';file.write_bytes(raw)
+        incoming,_=normalize_tables(read_import(file))
+        tables=workspace['tables'];added=skipped=0
+        for spec in SCHEMA['tables']:
+            rows=tables[spec['sheet']]
+            id_keys=[key for key,_,typ in spec['fields'] if typ=='id']
+            for row in incoming[spec['sheet']]:
+                if row in rows:skipped+=1;continue
+                for key in id_keys:
+                    value=row.get(key)
+                    if value and any(old.get(key)==value for old in rows):
+                        raise ValueError(f'{spec["sheet"]}的编号 {value} 已存在且内容不同。请修改编号，或导入为新项目。已有数据未修改。')
+                rows.append(row);added+=1
+        prior=workspace.get('source')
+        source=dict(prior) if isinstance(prior,dict) else ({'previous':prior} if prior else {})
+        imports=list(source.get('imports',[]))
+        fingerprint=hashlib.sha256(raw).hexdigest()
+        if not any(item.get('sha256')==fingerprint for item in imports):
+            imports.append({'name':str(payload.get('filename','source.xlsx'))[:200],
+                            'sha256':fingerprint,'file':str(file.relative_to(self.data)).replace('\\','/')})
+        source['imports']=imports
+        result=self.store.save(workspace['id'],revision,tables,source=source)
+        result['import_summary']={'added':added,'skipped':skipped}
+        return result
+
+    def job_context(self, ident):
+        job=self.store.job(ident)
+        folder=self.data/'jobs'/job['id']
+        config_path=folder/'config.json'
+        config={}
+        if config_path.is_file() and config_path.stat().st_size<=10_000_000:
+            config=json.loads(config_path.read_text(encoding='utf-8'))
+        scoped={j['id']:j for j in self.store.jobs() if j['workspace']==job['workspace']}
+        parents=[]
+        references=[config.get(key) for key in ('parent','parent_job','feedback_parent','fit_path','model_path','ocp_path','source_job')]
+        result=job.get('result') or {}
+        for source in (result,config.get('engineering_config') or {}):
+            for key in ('eis_parameter_source','eis_grid_source','adaptive_parameter_source','telemetry_source'):
+                value=source.get(key)
+                if isinstance(value,dict):references.append(value.get('job_id'))
+        for reference in references:
+            if not isinstance(reference,str):continue
+            for part in reference.replace('\\','/').split('/'):
+                if part in scoped and part!=ident and part not in {p['id'] for p in parents}:
+                    parent=scoped[part]
+                    parents.append({'id':part,'title':parent.get('mode','来源任务')})
+        sources=[]
+        for key,label in (('source_sha256','原始数据'),('input_sha256','输入文件'),('inventory_sha256','清单数据')):
+            value=result.get(key) or config.get(key)
+            if isinstance(value,str) and len(value)==64:sources.append({'label':label,'sha256':value})
+        if result.get('filename'):sources.append({'label':str(result['filename'])[:200]})
+        return {'job':ident,'workspace':job['workspace'],'workspace_revision':job.get('workspace_revision'),
+                'snapshot_available':(folder/'workspace_snapshot.json').is_file(),'parents':parents,'sources':sources}
 
     def node_runtime(self):
         runtime=Path.home()/'.cache/codex-runtimes/codex-primary-runtime/dependencies/node'
@@ -91,11 +163,28 @@ class Application:
     def export(self,ident):
         body=self.store.get(ident);folder=self.data/'exports'/uuid.uuid4().hex;folder.mkdir(parents=True)
         (folder/'data.json').write_text(json.dumps({'schema':SCHEMA,'workspace':body},ensure_ascii=False),encoding='utf-8')
-        node,module=self.node_runtime();dest=folder/'关键数据.xlsx'
+        dest=folder/'关键数据.xlsx'
+        if os.name != 'nt':
+            from user_tools.workbench.excel_export import export_workbook
+            export_workbook(SCHEMA, body, dest)
+            return dest
+        node,module=self.node_runtime()
         p=subprocess.run([str(node),str(resource_dir()/'export.mjs'),str(module),str(folder/'data.json'),str(dest)],
                          capture_output=True,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0),timeout=90)
         if p.returncode or not dest.exists():raise RuntimeError('Excel导出失败：'+p.stderr.decode('utf-8',errors='replace')[-500:])
         return dest
+
+    def save_download(self, payload):
+        name = str(payload.get('filename', '')).replace('\\', '/').rsplit('/', 1)[-1]
+        name = ''.join('_' if c in '<>:"|?*' or ord(c) < 32 else c for c in name).rstrip(' .')
+        if not name or Path(name).is_reserved():
+            raise ValueError('请使用有效的导出文件名。')
+        content = base64.b64decode(payload['content'], validate=True)
+        folder = self.data / 'exports' / uuid.uuid4().hex
+        folder.mkdir(parents=True)
+        dest = folder / name
+        dest.write_bytes(content)
+        return {'name': name, 'path': str(dest.resolve())}
 
     def start_job(self,payload):
         modes={'sodium_dfn','engineering','battery_agent','forward','chen_baseline','graphite_baseline','identify','predict','public_replay','sample_forward','candidate_multi','eis_forward','eis_fit','parquet_preprocess','ml_train','ml_predict','ml_recommend','research_multi','research_chain','public_ml_validation'}
@@ -288,10 +377,10 @@ class Application:
                     from user_tools.workbench.engineering_service import runtime_for
                     saved=json.loads((folder/'config.json').read_text(encoding='utf-8'))
                     runtime=runtime_for(self.project,saved['engineering_config']['action']);worker='user_tools.workbench.engineering_worker'
-                args=['wsl.exe','-d','Ubuntu','--cd',wsl_path(self.project),'--',runtime,
-                      '-m',worker,'--config',wsl_path(folder/'config.json'),'--out',wsl_path(folder/'physics')]
+                args=runtime_command(self.project, runtime, '-m',worker,
+                                     '--config',wsl_path(folder/'config.json'),'--out',wsl_path(folder/'physics'))
                 with (folder/'log.txt').open('wb') as log:
-                    p=subprocess.run(args,stdout=log,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0),timeout=1800)
+                    p=subprocess.run(args,cwd=self.project,stdout=log,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0),timeout=1800)
                 target=folder/'physics/ui_result.json'
                 if p.returncode or not target.exists():raise RuntimeError('任务失败，见运行日志；可能是环境缺失或模型不能覆盖数据。')
                 data=json.loads(target.read_text(encoding='utf-8'))
@@ -345,22 +434,47 @@ class Application:
              'curves':[{'name':'标准化电压','points':[[r['time_s'],r['voltage_V'],None] for r in records[::max(1,len(records)//500)]]}]}
         self.store.put_job(job);return job
 
+    def capacity_source(self, payload):
+        from user_tools.workbench.capacity_forecast import input_data
+        if not payload.get('source_job'):
+            return input_data(self.project,payload)
+        if payload.get('dataset') or payload.get('content'):
+            raise ValueError('项目已存数据与其他容量来源只能选择一项。')
+        workspace=self.store.get(payload['workspace'])
+        parent=self.store.job(payload['source_job'])
+        if parent['workspace']!=workspace['id'] or parent['mode']!='capacity_forecast' or parent['status']!='completed':
+            raise ValueError('容量数据必须来自当前项目已完成的预测任务。')
+        folder=self.data/'jobs'/parent['id']
+        raw=(folder/'capacity_input.csv').read_bytes()
+        if len(raw)>20_000_000:raise ValueError('逐循环 CSV 超过 20 MB。')
+        expected=parent['result'].get('input_sha256')
+        if not expected or hashlib.sha256(raw).hexdigest()!=expected:
+            raise ValueError('已保存的容量输入与原任务校验值不一致，请核对原始数据。')
+        saved=json.loads((folder/'capacity.json').read_text(encoding='utf-8'))
+        source={**saved.get('source',{}),'parent_job':parent['id']}
+        return raw,source
+
     def capacity_forecast(self, payload):
         from user_tools.workbench.capacity_forecast import csv_bytes, run
         workspace = self.store.get(payload['workspace'])
-        raw, result = run(self.project, payload)
+        raw, result = run(self.project, payload, source_input=self.capacity_source(payload))
         ident = uuid.uuid4().hex
         folder = self.data / 'jobs' / ident
         folder.mkdir(parents=True)
         (folder / 'capacity_input.csv').write_bytes(raw)
         (folder / 'capacity.csv').write_bytes(csv_bytes(result['columns'], result['points']))
         (folder / 'capacity.json').write_text(json.dumps(result, ensure_ascii=False, allow_nan=False), encoding='utf-8')
-        summary = {k: result[k] for k in ('cell_id', 'algorithm_name', 'cutoff', 'metrics', 'input_sha256')}
+        config={key:payload.get(key) for key in ('cell','algorithm','cutoff','horizon','interval_level','source_job','dataset') if payload.get(key) is not None}
+        (folder/'config.json').write_text(json.dumps(config,ensure_ascii=False),encoding='utf-8')
+        (folder/'workspace_snapshot.json').write_text(json.dumps(workspace,ensure_ascii=False),encoding='utf-8')
+        summary = {k: result[k] for k in ('cell_id', 'algorithm', 'algorithm_name', 'cutoff', 'metrics', 'input_sha256','train_points','holdout_points','future_cycles')}
         summary['dataset'] = result['source']['title']
+        if payload.get('source_job'):summary['source_job']=payload['source_job']
         if 'interval' in result:
             summary['interval_level'] = result['interval']['level']
         job = dict(id=ident, workspace=workspace['id'], workspace_name=workspace['name'],
-                   workspace_revision=workspace['revision'], mode='capacity_forecast', status='completed', result=summary)
+                   workspace_revision=workspace['revision'], mode='capacity_forecast', status='completed', result=summary,
+                   created_at=datetime.now(timezone.utc).isoformat())
         self.store.put_job(job)
         return {'job': job, 'result': result}
 
@@ -394,11 +508,11 @@ class Application:
                 config={**config,'_candidate_link':{'job_id':parent['id'],'candidate':matches[0]}}
             (folder/'upstream_config.json').write_text(json.dumps(config,ensure_ascii=False),encoding='utf-8')
             (folder/'source.csv').write_bytes(raw)
-            args=['wsl.exe','-d','Ubuntu','--cd',wsl_path(self.project),'--',
-                  '/home/zjh/.local/share/fangzhen/multichem-20261029/bin/python','-m',
-                  'user_tools.workbench.multichem_upstream',payload['kind'],wsl_path(folder/'upstream_config.json'),wsl_path(folder/'source.csv'),wsl_path(folder/'upstream_result.json')]
+            args=runtime_command(self.project, '/home/zjh/.local/share/fangzhen/multichem-20261029/bin/python',
+                  '-m', 'user_tools.workbench.multichem_upstream',payload['kind'],
+                  wsl_path(folder/'upstream_config.json'),wsl_path(folder/'source.csv'),wsl_path(folder/'upstream_result.json'))
             try:
-                process=subprocess.run(args,capture_output=True,timeout=900 if payload['kind'] in ('hardcarbon_train','hardcarbon_joint_train','hardcarbon_ax_mobo','sodium_identify','soh_train','hardcarbon_shap','ax_recommend') else 90,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+                process=subprocess.run(args,cwd=self.project,capture_output=True,timeout=900 if payload['kind'] in ('hardcarbon_train','hardcarbon_joint_train','hardcarbon_ax_mobo','sodium_identify','soh_train','hardcarbon_shap','ax_recommend') else 90,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
             except subprocess.TimeoutExpired:raise ValueError('上游工具运行超时。') from None
             if process.returncode or not (folder/'upstream_result.json').exists():
                 raise ValueError('上游工具运行失败；请检查独立WSL环境及参数：'+process.stderr.decode('utf-8',errors='replace')[-1000:])
@@ -446,7 +560,11 @@ class Application:
 
     def sustainability_runtime(self):
         if not self.project:raise ValueError('环境评价需要原项目目录。')
-        python=self.project/'data/runtime/sustainability/Scripts/python.exe'
+        if os.name == 'nt':
+            python=self.project/'data/runtime/sustainability/Scripts/python.exe'
+        else:
+            python=Path(os.environ.get('FANGZHEN_SUSTAINABILITY_PYTHON',
+                '/home/zjh/.local/share/fangzhen/sustainability/bin/python'))
         if not python.is_file():raise ValueError('环境评价后端尚未安装，请运行项目根目录“安装环境与经济评价.bat”。')
         return python
 
@@ -512,11 +630,17 @@ class Application:
             result['sustainability_available']=probe.returncode==0
             result['sustainability_versions']=json.loads(probe.stdout.decode('utf-8').strip()) if probe.returncode==0 else None
         except (ValueError,OSError,subprocess.TimeoutExpired):result['sustainability_available']=False
-        try:self.node_runtime();result['excel_export']=True
-        except ValueError:result['excel_export']=False
         try:
-            p=subprocess.run(['wsl.exe','-d','Ubuntu','--','/home/zjh/miniforge3/envs/pybamm/bin/python','-c',
-                 'import json,pybamm,numpy; print(json.dumps({"pybamm":pybamm.__version__,"numpy":numpy.__version__}))'],
+            if os.name == 'nt':
+                self.node_runtime()
+            else:
+                import openpyxl
+            result['excel_export']=True
+        except (ValueError,ImportError):result['excel_export']=False
+        try:
+            command=runtime_command(self.project or Path.cwd(), '/home/zjh/miniforge3/envs/pybamm/bin/python', '-c',
+                 'import json,pybamm,numpy; print(json.dumps({"pybamm":pybamm.__version__,"numpy":numpy.__version__}))')
+            p=subprocess.run(command,
                  capture_output=True,timeout=20,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
             result['physics_runtime']=json.loads(p.stdout.decode('utf-8').strip()) if p.returncode==0 else None
         except (OSError,ValueError,subprocess.TimeoutExpired):result['physics_runtime']=None
@@ -566,6 +690,7 @@ class Handler(BaseHTTPRequestHandler):
         if not path.startswith('/api/'):
             assets={'/multichem.js':'multichem.js','/engineering.js':'engineering.js','/agent.js':'agent.js','/':'index.html','/app.js':'app.js','/analysis.js':'analysis.js','/pipeline.js':'pipeline.js','/papers.js':'papers.js','/ml.js':'ml.js','/research.js':'research.js','/sustainability.js':'sustainability.js','/style.css':'style.css'}
             assets['/capacity.js'] = 'capacity.js'
+            assets['/platform.js'] = 'platform.js'
             if path not in assets:self.send_error(404);return
             file=resource_dir()/'web'/assets[path]
             mime='text/html; charset=utf-8' if path=='/' else 'text/javascript; charset=utf-8' if path.endswith('.js') else 'text/css; charset=utf-8'
@@ -573,7 +698,7 @@ class Handler(BaseHTTPRequestHandler):
         if not self.authorized():self.json({'error':'本地会话无效，请从程序重新打开。'},403);return
         try:
             args=parse_qs(parsed.query);ident=args.get('id',[''])[0]
-            if path=='/api/bootstrap':self.json({'schema':SCHEMA,'workspaces':self.app.store.list(),'jobs':self.app.store.jobs(),'physics_available':bool(self.app.project)})
+            if path=='/api/bootstrap':self.json({'schema':SCHEMA,'workspaces':self.app.store.list(),'jobs':self.app.store.jobs(),'physics_available':bool(self.app.project),'deployment_mode':getattr(self.app,'deployment_mode','local')})
             elif path=='/api/capacity_catalog':
                 from user_tools.workbench.capacity_forecast import catalog
                 self.json(catalog(self.app.project))
@@ -586,6 +711,7 @@ class Handler(BaseHTTPRequestHandler):
             elif path=='/api/workspace':self.json(self.app.store.get(ident))
             elif path=='/api/versions':self.json(self.app.store.revisions(ident))
             elif path=='/api/jobs':self.json(self.app.store.jobs())
+            elif path=='/api/jobcontext':self.json(self.app.job_context(ident))
             elif path=='/api/environment':self.json(self.app.environment())
             elif path=='/api/agent_llm':self.json(public_settings(self.app.project))
             elif path=='/api/mlcatalog':self.json({'fields':ml_catalog(),'targets':ml_targets()})
@@ -687,7 +813,9 @@ class Handler(BaseHTTPRequestHandler):
                 if not isinstance(body,dict) or not isinstance(body.get('tables'),dict):raise ValueError('JSON备份缺少数据表。')
                 tables=to_scalar_tables(body['tables'])
                 result=self.app.store.create(str(body.get('name','恢复方案'))+' · 备份恢复',tables,{'name':'JSON backup'})
+            elif path=='/api/import_into':result=self.app.import_into_workspace(data)
             elif path=='/api/job':result=self.app.start_job(data)
+            elif path=='/api/save_download':result=self.app.save_download(data)
             elif path=='/api/agent_llm':result=save_settings(self.app.project,data)
             elif path=='/api/agent_llm_probe':result=probe_settings(self.app.project)
             elif path=='/api/mlpreview':
@@ -731,9 +859,9 @@ class Handler(BaseHTTPRequestHandler):
             elif path=='/api/analyze':result=self.app.analyze(data)
             elif path=='/api/preprocess':result=self.app.preprocess(data)
             elif path=='/api/capacity_cells':
-                from user_tools.workbench.capacity_forecast import cells_info, input_data, parse_cycles
-                raw, _ = input_data(self.app.project, data)
-                result = cells_info(parse_cycles(raw))
+                from user_tools.workbench.capacity_forecast import cells_info, parse_cycles
+                raw, source = self.app.capacity_source(data)
+                result = [{**cell,'axis_label':source.get('axis_label','循环次数')} for cell in cells_info(parse_cycles(raw))]
             elif path=='/api/capacity_forecast':result=self.app.capacity_forecast(data)
             elif path=='/api/capacity_source_folder':
                 from user_tools.workbench.capacity_forecast import source_folder
@@ -756,12 +884,8 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError,KeyError,TypeError,RuntimeError,OSError,zipfile.BadZipFile) as exc:self.json({'error':str(exc)},400)
 
 
-def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--data',type=Path);parser.add_argument('--project',type=Path)
-    parser.add_argument('--port',type=int,default=0);parser.add_argument('--no-browser',action='store_true');args=parser.parse_args()
-    project=args.project or project_dir()
-    data=args.data or ((project/'data/workbench_scalar10') if project else Path(sys.executable).parent/'我的研究数据')
-    if not args.data and project and not (Path(data)/'workbench.sqlite').exists():
+def migrate_previous_data(project, data):
+    if not (data/'workbench.sqlite').exists():
         import sqlite3
         old=project/'data/workbench_scalar9/workbench.sqlite'
         if not old.exists():old=project/'data/workbench_scalar8/workbench.sqlite'
@@ -780,28 +904,34 @@ def main():
             for name in ['jobs','imports','exports']:
                 src=old.parent/name;dest=Path(data)/name
                 if src.is_dir() and not dest.exists():shutil.copytree(src,dest)
-    # A second double-click opens the existing instance; never resets running jobs.
-    session_file=Path(data)/'session.json'
-    if not args.no_browser and session_file.exists():
-        from urllib.request import Request,urlopen
-        try:
-            old=json.loads(session_file.read_text(encoding='utf-8'));parts=urlsplit(old['url'])
-            old_token=parse_qs(parts.fragment)['token'][0]
-            if parts.hostname!='127.0.0.1':raise ValueError('invalid local host')
-            request=Request(f'http://127.0.0.1:{old["port"]}/api/bootstrap',headers={'X-Workbench-Token':old_token})
-            with urlopen(request,timeout=2) as response:
-                if response.status==200:
-                    if old.get('entry_version')!=APP_VERSION:
-                        if os.name=='nt':
-                            import ctypes
-                            ctypes.windll.user32.MessageBoxW(0,'请先在旧工作站中保存并点击“关闭程序”，再启动新版。','科研工作站',0)
-                        return
-                    webbrowser.open(old['url']);return
-        except Exception:pass
-    app=Application(data,project);server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler);server.app=app
-    url=f'http://127.0.0.1:{server.server_port}/#token={app.token}'
-    (app.data/'session.json').write_text(json.dumps({'url':url,'port':server.server_port,'pid':os.getpid(),
-        'entry_version':APP_VERSION},ensure_ascii=False),encoding='utf-8')
+
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--data',type=Path);parser.add_argument('--project',type=Path)
+    parser.add_argument('--port',type=int,default=0);parser.add_argument('--no-browser',action='store_true');args=parser.parse_args()
+    project=args.project or project_dir()
+    data=args.data or ((project/'data/workbench_scalar10') if project else Path(sys.executable).parent/'我的研究数据')
+    with startup_lock(data):
+        old = running_session(data)
+        if old:
+            if old.get('entry_version') != APP_VERSION:
+                message = '请先在旧工作站中保存并点击“关闭程序”，再启动新版。'
+                if os.name == 'nt' and not args.no_browser:
+                    import ctypes
+                    ctypes.windll.user32.MessageBoxW(0, message, '科研工作站', 0)
+                else:
+                    raise RuntimeError(message)
+            elif not args.no_browser:
+                webbrowser.open(old['url'])
+            return
+        if not args.data and project:
+            migrate_previous_data(project, data)
+        app=Application(data,project);server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler);server.app=app
+        url=f'http://127.0.0.1:{server.server_port}/#token={app.token}'
+        record = {'url': url, 'port': server.server_port, 'pid': os.getpid(), 'entry_version': APP_VERSION}
+        temporary = app.data / 'session.json.tmp'
+        temporary.write_text(json.dumps(record, ensure_ascii=False), encoding='utf-8')
+        temporary.replace(app.data / 'session.json')
     if not args.no_browser:webbrowser.open(url)
     try:server.serve_forever()
     finally:server.server_close()

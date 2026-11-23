@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY,workspace TEXT,body TEXT NOT
             c.execute('INSERT INTO versions VALUES(?,?,?)',(body['id'],1,text))
         return body
 
-    def save(self,ident,revision,tables,name=None):
+    def save(self,ident,revision,tables,name=None,*,source=...):
         normalized,issues=normalize_tables(tables)
         with self.connect() as c:
             c.execute('BEGIN IMMEDIATE')
@@ -102,6 +102,7 @@ CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY,workspace TEXT,body TEXT NOT
             body=json.loads(row[0])
             if body['revision']!=revision:raise ValueError('另一个窗口已修改此方案，请先重新加载。当前输入仍在浏览器中。')
             body.update(tables=normalized,issues=issues,revision=revision+1)
+            if source is not ...:body['source']=copy.deepcopy(source)
             if name:body['name']=str(name).strip()[:80]
             text=json.dumps(body,ensure_ascii=False,allow_nan=False)
             c.execute('UPDATE workspaces SET name=?,revision=?,body=? WHERE id=?',(body['name'],body['revision'],text,ident))
@@ -114,7 +115,7 @@ CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY,workspace TEXT,body TEXT NOT
     def restore(self,ident,revision,current):
         with self.connect() as c:r=c.execute('SELECT body FROM versions WHERE workspace=? AND revision=?',(ident,revision)).fetchone()
         if not r:raise KeyError('版本不存在。')
-        old=json.loads(r[0]);return self.save(ident,current,old['tables'],old['name'])
+        old=json.loads(r[0]);return self.save(ident,current,old['tables'],old['name'],source=old.get('source'))
 
     def put_job(self,job):
         with self.connect() as c:c.execute('INSERT OR REPLACE INTO jobs VALUES(?,?,?)',(job['id'],job.get('workspace'),json.dumps(job,ensure_ascii=False,allow_nan=False)))

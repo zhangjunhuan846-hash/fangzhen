@@ -132,3 +132,53 @@ def test_uploaded_run_is_reproducible_from_downloadable_inputs(tmp_path, interva
         assert rows[-1]['lower_Ah'] == rows[-1]['upper_Ah'] == '' and rows[-1]['calibration_count'] == '0'
     else:
         assert 'interval' not in saved and 'lower_Ah' not in rows[-1]
+
+
+def test_input_summary_preserves_sparse_observations_and_zero_values():
+    from user_tools.workbench.capacity_forecast import cells_info
+    summary=cells_info({'C':{8:0.,1:3.,3:2.8}})[0]
+    assert summary['cycles']==[1,3,8]
+    assert summary['nonconsecutive_intervals']==2
+    assert summary['first_capacity_Ah']==3 and summary['last_capacity_Ah']==0
+    assert summary['zero_capacity_count']==1 and summary['default_cutoff']==3
+
+
+def test_saved_capacity_input_reuse_keeps_original_result_and_records_parent(tmp_path):
+    app=Application(tmp_path/'data',tmp_path)
+    workspace=app.store.list()[0]['id']
+    raw=b'cell_id,cycle,capacity_Ah\nC,1,3\nC,2,2.9\nC,3,2.8\nC,4,2.7\nC,5,2.6\n'
+    first=app.capacity_forecast({'workspace':workspace,'content':base64.b64encode(raw).decode(),
+                                 'filename':'measured.csv','cell':'C','algorithm':'linear','cutoff':3,'horizon':2})
+    parent=first['job']['id']
+    original=(app.data/'jobs'/parent/'capacity.json').read_bytes()
+    second=app.capacity_forecast({'workspace':workspace,'source_job':parent,'cell':'C',
+                                  'algorithm':'sqrt','cutoff':4,'horizon':3})
+    assert second['job']['id']!=parent
+    assert second['result']['input_sha256']==first['result']['input_sha256']
+    assert second['result']['source']['title']=='measured.csv'
+    assert second['result']['source']['parent_job']==parent
+    assert (app.data/'jobs'/parent/'capacity.json').read_bytes()==original
+    assert app.store.job(parent)==first['job']
+    context=app.job_context(second['job']['id'])
+    assert context['parents']==[{'id':parent,'title':'capacity_forecast'}]
+    assert context['snapshot_available']
+    assert len(app.store.jobs())==2
+
+
+def test_saved_capacity_input_rejects_other_projects_conflicting_sources_and_tampering(tmp_path):
+    app=Application(tmp_path/'data',tmp_path)
+    workspace=app.store.list()[0]['id']
+    raw=b'cell_id,cycle,capacity_Ah\nC,1,3\nC,2,2.9\nC,3,2.8\n'
+    first=app.capacity_forecast({'workspace':workspace,'content':base64.b64encode(raw).decode(),
+                                 'cell':'C','algorithm':'linear','cutoff':2,'horizon':1})
+    payload={'workspace':workspace,'source_job':first['job']['id'],'cell':'C',
+             'algorithm':'linear','cutoff':2,'horizon':1}
+    other=app.store.create('Other project')['id']
+    with pytest.raises(ValueError,match='当前项目'):
+        app.capacity_forecast({**payload,'workspace':other})
+    with pytest.raises(ValueError,match='只能选择一项'):
+        app.capacity_forecast({**payload,'dataset':'another-source'})
+    (app.data/'jobs'/first['job']['id']/'capacity_input.csv').write_bytes(raw+b'C,4,2.7\n')
+    with pytest.raises(ValueError,match='校验值不一致'):
+        app.capacity_forecast(payload)
+    assert len(app.store.jobs())==1
